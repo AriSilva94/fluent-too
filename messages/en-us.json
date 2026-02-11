@@ -1,0 +1,114 @@
+{
+  "nav": {
+    "home": "Home",
+    "resources": "Resources",
+    "blog": "Blog",
+    "student": "I'm a student",
+    "schedule": "Schedule",
+    "contact": "Contact",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
+    "mainMenu": "Main menu"
+  },
+  "home": {
+    "hero": {
+      "titleLine1": "Unlock a",
+      "titleLine2": "new language with",
+      "accent": "fluency",
+      "cta": "Get started"
+    },
+    "newsletter": {
+      "title": "Subscribe to our newsletter",
+      "subtitle": "Get free updates from our blog and YouTube channel straight to your inbox.",
+      "nameLabel": "What should we call you?",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Your best e-mail address",
+      "emailPlaceholder": "Your e-mail",
+      "submit": "SUBSCRIBE"
+    },
+    "blog": {
+      "title": "Blog",
+      "viewAll": "View all posts →"
+    },
+    "quiz": {
+      "title": "Resources",
+      "tabsLabel": "Proficiency levels",
+      "panelLabel": "Quiz level {level}",
+      "subtitle": "Test your knowledge with our interactive quizzes."
+    }
+  },
+  "footer": {
+    "copyright": "© {year} Fluent Too. All rights reserved."
+  },
+  "about": {
+    "title": "About"
+  },
+  "blog": {
+    "title": "Blog",
+    "backToBlog": "← Back to blog",
+    "postTitle": "Post: {slug}"
+  },
+  "quizzes": {
+    "title": "Quizzes",
+    "backToQuizzes": "← Back to quizzes",
+    "quizTitle": "Quiz #{id}",
+    "submit": "Submit",
+    "next": "Next",
+    "score": "Score",
+    "tryAgain": "Try again",
+    "all": "All",
+    "start": "Start Quiz",
+    "perfectScore": "Perfect score!",
+    "greatJob": "Great job!",
+    "goodEffort": "Good effort!",
+    "resultSummary": "You got {correct} out of {total} correct.",
+    "correctAnswers": "Correct",
+    "wrongAnswers": "Wrong",
+    "cardProgress": "Card {current} of {total}",
+    "term": "Term",
+    "clickToFlip": "Click to flip",
+    "meaning": "Meaning",
+    "didntKnow": "Didn't know",
+    "knewIt": "Knew it",
+    "noQuizzesFound": "No quizzes found for this level."
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Access your account to continue",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "submit": "Sign in",
+    "orContinueWith": "or continue with"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back! Here is your overview.",
+    "recentActivity": "Recent Activity"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "subtitle": "Manage content, users, and settings."
+  },
+  "notFound": {
+    "badge": "Routing error",
+    "title": "This page slipped out of your language journey.",
+    "description": "The link you opened no longer exists or moved somewhere else. Head back home or keep practicing with our language quizzes.",
+    "primaryAction": "Back to home",
+    "secondaryAction": "Browse quizzes",
+    "hint": "404 • Even strong learners take a wrong turn sometimes."
+  },
+  "metadata": {
+    "home": {
+      "title": "Fluent Too",
+      "description": "Your platform for learning languages, quizzes, and sharing knowledge."
+    },
+    "blog": {
+      "title": "Blog — Fluent Too",
+      "description": "Articles and tips for learning languages efficiently."
+    },
+    "quizzes": {
+      "title": "Quizzes — Fluent Too",
+      "description": "Test your knowledge with our language quizzes."
+    }
+  }
+}

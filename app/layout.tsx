@@ -1,23 +1,11 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Header from "@/components/home/Header";
-import Footer from "@/components/home/Footer";
+import { Dosis } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dosis = Dosis({
+  variable: "--font-dosis",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Fluent Too",
-  description: "Your platform for learning, quizzes, and knowledge sharing.",
-};
 
 export default function RootLayout({
   children,
@@ -25,13 +13,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
-      >
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+    <html>
+      <body className={`${dosis.variable} font-sans antialiased`}>
+        {children}
       </body>
     </html>
   );

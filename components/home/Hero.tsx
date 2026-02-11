@@ -1,21 +1,29 @@
-import SkeletonBox from "@/components/ui/SkeletonBox";
+import Container from "@/components/ui/Container";
+import type { Dictionary } from "@/lib/getDictionary";
 
-export default function Hero() {
+export default function Hero({ dict }: { dict: Dictionary }) {
   return (
-    <section className="py-20">
-      <div className="mx-auto max-w-6xl px-4 text-center">
-        <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">
-          Welcome to Fluent Too
+    <section
+      id="inicio"
+      className="relative bg-cover bg-[center_top] bg-no-repeat pb-28 pt-20 md:bg-center md:pb-36 md:pt-24"
+      style={{ backgroundImage: "url('/assets/img/FOTO-BANNER-TOPO.png')" }}
+    >
+      {/* Mobile Gradient Overlay for better text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent md:hidden" />
+
+      <Container className="relative text-left">
+        <h1 className="max-w-xl md:max-w-2xl">
+          <span className="block font-medium leading-tight text-brand-blue [font-size:var(--text-hero-main)]">
+            {dict.home.hero.titleLine1}
+          </span>
+          <span className="block font-medium leading-tight text-brand-blue [font-size:var(--text-hero-main)]">
+            {dict.home.hero.titleLine2}
+          </span>
+          <span className="block font-bold leading-none text-brand-orange [font-size:var(--text-hero-accent)]">
+            {dict.home.hero.accent}
+          </span>
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-500">
-          Your platform for learning, quizzes, and knowledge sharing.
-          This is a skeleton — ready to be filled with real content.
-        </p>
-        <div className="mt-8 flex justify-center gap-4">
-          <SkeletonBox className="h-12 w-40" />
-          <SkeletonBox className="h-12 w-40 bg-gray-100" />
-        </div>
-      </div>
+      </Container>
     </section>
   );
 }
