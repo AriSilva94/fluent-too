@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fluent Too
+
+Your platform for learning, quizzes, and knowledge sharing — built with **Next.js 16**, **React 19**, and **Tailwind CSS 4**.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+fluent-too/
+├── app/
+│   ├── layout.tsx              # Root layout (shared Header + Footer)
+│   ├── page.tsx                # / — Home
+│   ├── about/page.tsx          # /about
+│   ├── blog/
+│   │   ├── page.tsx            # /blog — post list
+│   │   └── [slug]/page.tsx     # /blog/:slug — post detail
+│   ├── quizzes/
+│   │   ├── page.tsx            # /quizzes — quiz list
+│   │   └── [id]/page.tsx       # /quizzes/:id — quiz attempt
+│   ├── login/page.tsx          # /login
+│   ├── dashboard/page.tsx      # /dashboard — logged-in area
+│   └── admin/page.tsx          # /admin — teacher/admin area
+├── components/
+│   ├── ui/
+│   │   └── SkeletonBox.tsx     # Reusable placeholder block
+│   └── home/
+│       ├── Header.tsx          # Top nav with active-route styling
+│       ├── Hero.tsx            # Hero / presentation section
+│       ├── Newsletter.tsx      # Newsletter signup form
+│       ├── BlogSection.tsx     # 3 latest post cards
+│       ├── QuizSection.tsx     # 3 popular quiz cards
+│       └── Footer.tsx          # Site footer
+```
 
-## Learn More
+## Routes
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Description |
+|---|---|
+| `/` | Home — Hero, Newsletter, Blog preview, Quiz preview |
+| `/about` | About page |
+| `/blog` | Blog post list |
+| `/blog/[slug]` | Individual blog post |
+| `/quizzes` | Quiz list |
+| `/quizzes/[id]` | Quiz attempt |
+| `/login` | Sign-in form |
+| `/dashboard` | User dashboard (authenticated) |
+| `/admin` | Admin/teacher panel |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router + Turbopack)
+- **UI**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) via `@tailwindcss/postcss`
+- **Language**: TypeScript
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `npm run lint` | Run ESLint |
