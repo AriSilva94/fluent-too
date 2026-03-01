@@ -1,37 +1,39 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import Header from "@/components/home/Header";
-import Footer from "@/components/home/Footer";
+import { Dosis } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
+import { defaultLocale, isValidLocale, localeToHtmlLang } from "@/lib/i18n";
+import { getMetadataBase, getSiteName } from "@/lib/seo";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dosis = Dosis({
+  variable: "--font-dosis",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Fluent Too",
-  description: "Your platform for learning, quizzes, and knowledge sharing.",
+  metadataBase: getMetadataBase(),
+  applicationName: getSiteName(),
+  title: getSiteName(),
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const localeHeader = headersList.get("x-locale") ?? defaultLocale;
+  const locale = isValidLocale(localeHeader) ? localeHeader : defaultLocale;
+
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}
-      >
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+    <html lang={localeToHtmlLang[locale]}>
+      <body className={`${dosis.variable} font-sans antialiased`}>
+        {children}
       </body>
     </html>
   );
