@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
-import { BLOG_LABELS } from "@/lib/constants";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { blogData } from "@/lib/blogData";
 
@@ -31,7 +30,6 @@ export default async function BlogListPage({
 
   const dict = await getDictionary(locale as Locale);
   const posts = blogData[locale as Locale] || [];
-  const labels = BLOG_LABELS[locale as Locale];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16">
@@ -59,7 +57,7 @@ export default async function BlogListPage({
                     <span>•</span>
                     <span>{post.author}</span>
                     <span>•</span>
-                    <span>{post.readingTime} {labels.readingTime}</span>
+                    <span>{post.readingTime} {dict.blog.readingTime}</span>
                 </div>
               <h2 className="text-xl font-bold text-gray-900 group-hover:text-brand-orange transition-colors mb-2 line-clamp-2">
                   {post.title}
@@ -68,14 +66,14 @@ export default async function BlogListPage({
                   {post.excerpt}
               </p>
               <div className="mt-4 text-brand-orange font-medium text-sm group-hover:underline">
-                  {labels.readMore} &rarr;
+                  {dict.blog.readMore} &rarr;
               </div>
             </div>
           </Link>
         ))}
         {posts.length === 0 && (
             <div className="col-span-full text-center py-12 text-gray-500">
-                <p>{labels.noPosts}</p>
+                <p>{dict.blog.noPosts}</p>
             </div>
         )}
       </div>

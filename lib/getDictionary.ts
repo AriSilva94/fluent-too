@@ -55,7 +55,12 @@ export type Dictionary = {
     title: string;
     backToBlog: string;
     postTitle: string;
+    featured: string;
+    readMore: string;
+    noPosts: string;
+    readingTime: string;
   };
+  levels: Record<string, string>;
   quizzes: {
     title: string;
     backToQuizzes: string;

@@ -46,7 +46,18 @@
   "blog": {
     "title": "Blog",
     "backToBlog": "← Voltar ao blog",
-    "postTitle": "Post: {slug}"
+    "postTitle": "Post: {slug}",
+    "featured": "DESTAQUE",
+    "readMore": "LEIA MAIS",
+    "noPosts": "Nenhum post encontrado.",
+    "readingTime": "min de leitura"
+  },
+  "levels": {
+    "A1": "bem básico",
+    "A2": "básico",
+    "B1": "intermediário",
+    "B2": "intermediário superior",
+    "C1/C2": "avançado"
   },
   "quizzes": {
     "title": "Quizzes",

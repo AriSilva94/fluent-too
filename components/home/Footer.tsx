@@ -18,7 +18,7 @@ export default function Footer({ locale, dict }: { locale: Locale; dict: Diction
 
         {/* Left: Copyright */}
         <p className="text-sm font-medium order-2 md:order-1">
-          {dict.footer.copyright.replace("{year}", "")}
+          {dict.footer.copyright.replace("{year}", new Date().getFullYear().toString())}
         </p>
 
         {/* Center: Logo */}

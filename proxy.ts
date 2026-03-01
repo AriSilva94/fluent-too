@@ -52,19 +52,20 @@ export function proxy(request: NextRequest) {
   const firstSegment = segments[1]; // e.g. "pt-br"
 
   if (isValidLocale(firstSegment)) {
-    // Locale already in URL — set cookie to persist choice
+    // Locale already in URL — persistir cookie e injetar header para o root layout setar <html lang>
     const response = NextResponse.next();
     response.cookies.set(LOCALE_COOKIE, firstSegment, {
       maxAge: 60 * 60 * 24 * 365, // 1 year
       path: "/",
     });
+    response.headers.set("x-locale", firstSegment);
     return response;
   }
 
   // No locale in URL — redirect to the preferred locale
   const locale = getPreferredLocale(request);
   const newUrl = request.nextUrl.clone();
-  newUrl.pathname = `/${locale}${pathname}`;
+  newUrl.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
 
   const response = NextResponse.redirect(newUrl);
   response.cookies.set(LOCALE_COOKIE, locale, {

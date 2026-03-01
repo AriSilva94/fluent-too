@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
-import { Locale } from '@/lib/i18n';
+import { isValidLocale, Locale } from '@/lib/i18n';
 import Container from '@/components/ui/Container';
 import { getQuizById } from '@/lib/quizzes/data';
 import QuizRenderer from '@/components/quiz/QuizRenderer';
@@ -13,6 +13,8 @@ interface Props {
 
 export default async function QuizDetailPage({ params }: Props) {
   const { locale, id } = await params;
+  if (!isValidLocale(locale)) notFound();
+
   const dict = await getDictionary(locale as Locale);
   const quiz = getQuizById(id, locale as Locale);
 

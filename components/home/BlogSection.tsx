@@ -5,11 +5,9 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
 import { blogData } from "@/lib/blogData";
-import { BLOG_LABELS } from "@/lib/constants";
 
 export default function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const posts = blogData[locale].slice(0, 6);
-  const labels = BLOG_LABELS[locale];
 
   return (
     <section id="blog" className="bg-white pb-8 pt-0 md:pb-14 md:pt-1">
@@ -42,9 +40,9 @@ export default function BlogSection({ locale, dict }: { locale: Locale; dict: Di
 
               <div className="flex flex-1 flex-col p-5">
                 <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-brand-orange">
-                  <span>{labels.featured}</span>
+                  <span>{dict.blog.featured}</span>
                   <span className="text-gray-300">/</span>
-                  <span className="text-gray-500">{post.readingTime} {labels.readingTime}</span>
+                  <span className="text-gray-500">{post.readingTime} {dict.blog.readingTime}</span>
                 </div>
                 <h3 className="mb-3 text-xl font-bold text-brand-blue line-clamp-3">
                   {post.title}
@@ -53,7 +51,7 @@ export default function BlogSection({ locale, dict }: { locale: Locale; dict: Di
                   {post.excerpt}
                 </p>
                 <span className="text-xs font-bold text-brand-blue uppercase hover:underline">
-                  {labels.readMore} »
+                  {dict.blog.readMore} »
                 </span>
               </div>
             </Link>

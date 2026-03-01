@@ -8,7 +8,7 @@ import HomeQuizCard from "@/components/home/HomeQuizCard";
 import type { Dictionary } from "@/lib/getDictionary";
 import { Locale } from "@/lib/i18n";
 import { getQuizzesByLevel } from "@/lib/quizzes/data";
-import { LEVELS, LEVEL_DESCRIPTIONS } from "@/lib/constants";
+import { LEVELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export default function QuizSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
@@ -54,7 +54,7 @@ export default function QuizSection({ locale, dict }: { locale: Locale; dict: Di
   const targetLevels = currentLabel === "C1/C2" ? ["C1", "C2"] : [currentLabel];
 
   const quizzes = targetLevels.flatMap((lvl) => getQuizzesByLevel(lvl, locale));
-  const description = LEVEL_DESCRIPTIONS[locale]?.[currentLabel];
+  const description = dict.levels[currentLabel];
 
   return (
     <section id="recursos" className="bg-white py-8 md:py-14">

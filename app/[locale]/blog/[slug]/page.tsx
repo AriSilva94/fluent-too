@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
-import { BLOG_LABELS } from "@/lib/constants";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { blogData } from "@/lib/blogData";
 import type { Metadata } from "next";
@@ -50,7 +49,6 @@ export default async function BlogPostPage({
 
   const dict = await getDictionary(locale as Locale);
   const post = findPostBySlug(locale as Locale, slug);
-  const labels = BLOG_LABELS[locale as Locale];
 
   if (!post) {
     notFound();
@@ -71,7 +69,7 @@ export default async function BlogPostPage({
         </span>
         <span className="text-brand-orange font-medium">{dict.home.blog.title}</span>
         <span className="text-gray-400">•</span>
-        <span className="text-gray-500">{post.readingTime} {labels.readingTime}</span>
+        <span className="text-gray-500">{post.readingTime} {dict.blog.readingTime}</span>
       </div>
 
       <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
