@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { blogData } from "@/lib/blogData";
+import { buildPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -15,8 +16,12 @@ export async function generateMetadata({
 
   const dict = await getDictionary(locale);
   return {
-    title: dict.metadata.blog.title,
-    description: dict.metadata.blog.description,
+    ...buildPageMetadata({
+      locale,
+      pathname: "/blog",
+      title: dict.metadata.blog.title,
+      description: dict.metadata.blog.description,
+    }),
   };
 }
 

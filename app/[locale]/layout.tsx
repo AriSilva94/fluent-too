@@ -4,6 +4,7 @@ import Header from "@/components/home/Header";
 import Footer from "@/components/home/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, locales, type Locale } from "@/lib/i18n";
+import { getDefaultMetadata } from "@/lib/seo";
 
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -17,11 +18,7 @@ export async function generateMetadata({
   const { locale } = await params;
   if (!isValidLocale(locale)) return {};
 
-  const dict = await getDictionary(locale);
-  return {
-    title: dict.metadata.home.title,
-    description: dict.metadata.home.description,
-  };
+  return getDefaultMetadata(locale);
 }
 
 export default async function LocaleLayout({

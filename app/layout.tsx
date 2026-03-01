@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import { Dosis } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
-import { defaultLocale, isValidLocale, type Locale } from "@/lib/i18n";
+import { defaultLocale, isValidLocale, localeToHtmlLang } from "@/lib/i18n";
+import { getMetadataBase, getSiteName } from "@/lib/seo";
 
 const dosis = Dosis({
   variable: "--font-dosis",
@@ -9,10 +11,14 @@ const dosis = Dosis({
   weight: ["400", "500", "700"],
 });
 
-const langMap: Record<Locale, string> = {
-  "pt-br": "pt-BR",
-  "en-us": "en-US",
-  "fr-fr": "fr-FR",
+export const metadata: Metadata = {
+  metadataBase: getMetadataBase(),
+  applicationName: getSiteName(),
+  title: getSiteName(),
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default async function RootLayout({
@@ -22,10 +28,10 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const localeHeader = headersList.get("x-locale") ?? defaultLocale;
-  const locale: Locale = isValidLocale(localeHeader) ? localeHeader : defaultLocale;
+  const locale = isValidLocale(localeHeader) ? localeHeader : defaultLocale;
 
   return (
-    <html lang={langMap[locale]}>
+    <html lang={localeToHtmlLang[locale]}>
       <body className={`${dosis.variable} font-sans antialiased`}>
         {children}
       </body>

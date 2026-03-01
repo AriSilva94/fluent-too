@@ -4,6 +4,7 @@ import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { blogData } from "@/lib/blogData";
 import type { Metadata } from "next";
+import { buildPageMetadata, getLocalizedUrl, getSiteName } from "@/lib/seo";
 
 function normalizeSlug(value: string) {
   return value
@@ -17,6 +18,15 @@ function findPostBySlug(locale: Locale, slug: string) {
   return blogData[locale].find((post) => normalizeSlug(post.slug) === normalizedSlug);
 }
 
+export async function generateStaticParams() {
+  return Object.entries(blogData).flatMap(([locale, posts]) =>
+    posts.map((post) => ({
+      locale,
+      slug: post.slug,
+    })),
+  );
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -28,15 +38,14 @@ export async function generateMetadata({
   const post = findPostBySlug(locale, slug);
   if (!post) return {};
 
-  return {
+  return buildPageMetadata({
+    locale,
+    pathname: `/blog/${post.slug}`,
     title: post.title,
     description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: post.coverImage ? [post.coverImage] : [],
-    }
-  };
+    image: post.coverImage ?? "/icon.png",
+    type: "article",
+  });
 }
 
 export default async function BlogPostPage({
@@ -54,8 +63,30 @@ export default async function BlogPostPage({
     notFound();
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    author: {
+      "@type": "Person",
+      name: post.author,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: getSiteName(),
+    },
+    mainEntityOfPage: getLocalizedUrl(locale as Locale, `/blog/${post.slug}`),
+    image: post.coverImage ? [post.coverImage] : undefined,
+    inLanguage: locale,
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link
         href={`/${locale}/blog`}
         className="text-sm text-gray-500 transition-colors hover:text-gray-900 flex items-center gap-1 mb-8"
@@ -94,9 +125,6 @@ export default async function BlogPostPage({
       )}
 
       <div className="mt-8 prose prose-lg prose-orange max-w-none text-gray-600">
-        {/* If content is a string, we might want to render it as paragraphs. 
-            Since we typed it as ReactNode, we can render it directly if it's JSX, 
-            or wrap it if it's text. For now assuming it is text or simple string. */}
         {typeof post.content === 'string' ? (
           post.content.split('\n\n').map((paragraph, idx) => (
             <p key={idx}>{paragraph}</p>

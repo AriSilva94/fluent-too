@@ -17,6 +17,12 @@ export const localeToLangTag: Record<Locale, string> = {
   "fr-fr": "fr",
 };
 
+export const localeToHtmlLang: Record<Locale, string> = {
+  "pt-br": "pt-BR",
+  "en-us": "en-US",
+  "fr-fr": "fr-FR",
+};
+
 export function isValidLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
 }

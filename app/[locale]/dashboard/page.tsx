@@ -1,7 +1,33 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SkeletonBox from "@/components/ui/SkeletonBox";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
+import { buildPageMetadata } from "@/lib/seo";
+
+const dashboardDescriptions: Record<Locale, string> = {
+  "pt-br": "Painel do aluno na Fluent Too com progresso, atividades e dados privados.",
+  "en-us": "Student dashboard on Fluent Too with progress, activity, and private account data.",
+  "fr-fr": "Tableau de bord élève sur Fluent Too avec progression, activité et données privées.",
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isValidLocale(locale)) return {};
+
+  const dict = await getDictionary(locale);
+  return buildPageMetadata({
+    locale,
+    pathname: "/dashboard",
+    title: `${dict.dashboard.title} | Fluent Too`,
+    description: dashboardDescriptions[locale],
+    index: false,
+  });
+}
 
 export default async function DashboardPage({
   params,
