@@ -39,6 +39,14 @@ export function getLocalizedUrl(locale: Locale, pathname = "") {
   return `${getSiteUrl()}${getLocalizedPath(locale, pathname)}`;
 }
 
+export function getSocialImagePath(locale: Locale) {
+  return getLocalizedPath(locale, "/opengraph-image");
+}
+
+export function getSocialImageUrl(locale: Locale) {
+  return getLocalizedUrl(locale, "/opengraph-image");
+}
+
 export function getLanguageAlternates(pathname = "") {
   const languages = Object.fromEntries(
     locales.map((locale) => [localeToHtmlLang[locale], getLocalizedUrl(locale, pathname)]),
@@ -57,7 +65,7 @@ export function buildPageMetadata({
   title,
   description,
   pathname = "",
-  image = "/icon.png",
+  image,
   type = "website",
   index = true,
 }: {
@@ -70,7 +78,10 @@ export function buildPageMetadata({
   index?: boolean;
 }): Metadata {
   const canonical = getLocalizedPath(locale, pathname);
-  const imageUrl = image.startsWith("http") ? image : `${getSiteUrl()}${image}`;
+  const resolvedImage = image ?? getSocialImagePath(locale);
+  const imageUrl = resolvedImage.startsWith("http")
+    ? resolvedImage
+    : `${getSiteUrl()}${resolvedImage}`;
 
   return {
     title,
@@ -90,6 +101,8 @@ export function buildPageMetadata({
         {
           url: imageUrl,
           alt: title,
+          width: 1200,
+          height: 630,
         },
       ],
     },
