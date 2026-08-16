@@ -5,6 +5,7 @@ import Image from "next/image";
 import Container from "@/components/ui/Container";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
+import { assetUrl } from "@/lib/cdnAssets";
 
 export default function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
 
@@ -25,7 +26,7 @@ export default function Footer({ locale, dict }: { locale: Locale; dict: Diction
         <div className="order-1 md:order-2">
           <Link href={`/${locale}`} className="flex items-center justify-center">
             <Image
-              src="/assets/img/LOGOTIPO-TOPO.png"
+              src={assetUrl("assets/images/LOGOTIPO-TOPO.webp")}
               alt="Fluent Too Logo"
               width={200}
               height={73}

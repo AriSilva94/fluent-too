@@ -10,6 +10,7 @@ import LanguageSwitcher from "@/components/home/LanguageSwitcher";
 import MobileMenu from "@/components/home/MobileMenu";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
+import { assetUrl } from "@/lib/cdnAssets";
 import { buildHomeAnchorHref, shouldHandleHomeAnchorScroll } from "./headerNavigation";
 
 export default function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
@@ -46,7 +47,7 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
       <Container className="flex items-center justify-between py-2 md:py-4">
         <Link href={`/${locale}`} className="flex-shrink-0">
           <Image
-            src="/assets/img/LOGOTIPO-TOPO.png"
+            src={assetUrl("assets/images/LOGOTIPO-TOPO.webp")}
             alt="Fluent Too Logo"
             width={200}
             height={73}

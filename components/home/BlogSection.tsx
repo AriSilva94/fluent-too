@@ -5,6 +5,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
 import { blogData } from "@/lib/blogData";
+import { assetUrl } from "@/lib/cdnAssets";
 
 export default function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const posts = blogData[locale].slice(0, 6);
@@ -27,7 +28,7 @@ export default function BlogSection({ locale, dict }: { locale: Locale; dict: Di
               {/* Image Container */}
               <div className="relative h-52 w-full">
                 <Image
-                  src={post.coverImage || "/assets/img/BLOGPOST.png"}
+                  src={post.coverImage || assetUrl("assets/images/BLOGPOST.webp")}
                   alt={post.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
