@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import Container from "@/components/ui/Container";
+import AuthStatus from "@/components/auth/AuthStatus";
 import LanguageSwitcher from "@/components/home/LanguageSwitcher";
 import MobileMenu from "@/components/home/MobileMenu";
 import type { Locale } from "@/lib/i18n";
@@ -41,7 +42,6 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
   return (
     <header className="sticky top-0 z-50 bg-brand-orange shadow-md transition-all">
       <Container className="flex items-center justify-between py-2 md:py-4">
-        {/* Logo */}
         <Link href={`/${locale}`} className="flex-shrink-0">
           <Image
             src="/assets/img/LOGOTIPO-TOPO.png"
@@ -53,7 +53,6 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
           />
         </Link>
 
-        {/* Desktop Navigation */}
         <nav aria-label={dict.nav.mainMenu} className="hidden items-center gap-6 lg:flex">
           <ul className="flex items-center gap-6">
             {navLinks.map((link) => (
@@ -71,9 +70,12 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
           <div className="ml-4 border-l pl-4 border-white/30">
             <LanguageSwitcher locale={locale} variant="header" />
           </div>
+          <AuthStatus
+            locale={locale}
+            labels={{ login: dict.login.submit, dashboard: dict.dashboard.title, logout: dict.auth.logout }}
+          />
         </nav>
 
-        {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-4 lg:hidden">
           <LanguageSwitcher locale={locale} variant="header" />
           <button
@@ -109,12 +111,17 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
         </div>
       </Container>
 
-      {/* Mobile Navigation Menu */}
       <MobileMenu
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
         navLinks={navLinks}
         scrollToSection={scrollToSection}
+        authSlot={
+          <AuthStatus
+            locale={locale}
+            labels={{ login: dict.login.submit, dashboard: dict.dashboard.title, logout: dict.auth.logout }}
+          />
+        }
       />
     </header>
   );

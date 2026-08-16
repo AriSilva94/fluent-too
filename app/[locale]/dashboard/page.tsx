@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import SkeletonBox from "@/components/ui/SkeletonBox";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
+import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
+import { createStrapiClient } from "@/lib/auth/strapi-client";
+import { resolveSession } from "@/lib/auth/session";
 
 const dashboardDescriptions: Record<Locale, string> = {
   "pt-br": "Painel do aluno na Fluent Too com progresso, atividades e dados privados.",
@@ -38,40 +42,41 @@ export default async function DashboardPage({
   if (!isValidLocale(locale)) notFound();
 
   const dict = await getDictionary(locale as Locale);
+  const cookieStore = await cookies();
+  const session = await resolveSession(
+    {
+      accessToken: cookieStore.get(AUTH_COOKIE_NAMES.access)?.value,
+      refreshToken: cookieStore.get(AUTH_COOKIE_NAMES.refresh)?.value,
+    },
+    createStrapiClient()
+  );
+
+  if (session.status === "anonymous") redirect(`/${locale}/login?returnTo=/${locale}/dashboard`);
+  const user = session.user;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16">
       <h1 className="text-3xl font-bold text-gray-900">{dict.dashboard.title}</h1>
       <p className="mt-1 text-gray-500">{dict.dashboard.welcome}</p>
 
-      {/* Stats row */}
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-xl border border-gray-200 bg-white p-5">
-            <SkeletonBox className="h-3 w-20" />
-            <SkeletonBox className="mt-3 h-8 w-16" />
-          </div>
-        ))}
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <section className="rounded-lg border border-gray-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-gray-500">{dict.login.emailLabel}</h2>
+          <p className="mt-2 text-lg font-medium text-gray-900">{user.email}</p>
+        </section>
+        <section className="rounded-lg border border-gray-200 bg-white p-5">
+          <h2 className="text-sm font-semibold text-gray-500">{dict.auth.changePasswordTitle}</h2>
+          <Link href={`/${locale}/dashboard/security`} className="mt-2 inline-flex text-sm font-medium text-brand-orange hover:underline">
+            {dict.auth.changePasswordSubmit}
+          </Link>
+        </section>
       </div>
 
-      {/* Recent activity */}
       <div className="mt-10">
         <h2 className="text-lg font-semibold text-gray-900">{dict.dashboard.recentActivity}</h2>
-        <div className="mt-4 space-y-3">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white px-5 py-4"
-            >
-              <SkeletonBox className="h-10 w-10 rounded-full" />
-              <div className="flex-1 space-y-2">
-                <SkeletonBox className="h-3 w-1/3" />
-                <SkeletonBox className="h-3 w-1/2" />
-              </div>
-              <SkeletonBox className="h-3 w-16" />
-            </div>
-          ))}
-        </div>
+        <p className="mt-4 rounded-lg border border-gray-200 bg-white px-5 py-4 text-sm text-gray-600">
+          {dict.dashboard.welcome}
+        </p>
       </div>
     </div>
   );

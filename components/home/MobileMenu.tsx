@@ -5,6 +5,7 @@ interface MobileMenuProps {
     onClose: () => void;
     navLinks: { href: string; label: string }[];
     scrollToSection: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+    authSlot?: React.ReactNode;
 }
 
 export default function MobileMenu({
@@ -12,6 +13,7 @@ export default function MobileMenu({
     onClose,
     navLinks,
     scrollToSection,
+    authSlot,
 }: MobileMenuProps) {
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
         scrollToSection(e, href);
@@ -39,6 +41,7 @@ export default function MobileMenu({
                         </li>
                     ))}
                 </ul>
+                {authSlot ? <div className="mt-8 border-t border-white/20 pt-6">{authSlot}</div> : null}
             </div>
         </div>
     );
