@@ -81,7 +81,13 @@
     "meaning": "Signification",
     "didntKnow": "Je ne savais pas",
     "knewIt": "Je savais",
-    "noQuizzesFound": "Aucun quiz trouvé pour ce niveau."
+    "noQuizzesFound": "Aucun quiz trouvé pour ce niveau.",
+    "saveSuccess": "Résultat enregistré dans votre historique.",
+    "saveFailed": "Impossible d'enregistrer ce résultat pour le moment.",
+    "saveSignInTitle": "Vous voulez suivre vos progrès ?",
+    "saveSignInSubtitle": "Créez un compte pour sauvegarder votre historique d'étude et suivre vos résultats.",
+    "createAccount": "Créer un compte",
+    "signIn": "Se connecter"
   },
   "login": {
     "title": "Connexion",
@@ -93,6 +99,8 @@
   },
   "auth": {
     "google": "Continuer avec Google",
+    "visualTitle": "Fluent Too",
+    "visualText": "Apprenez les langues avec une pratique guidée, des quiz par niveau et un historique d'étude.",
     "registerTitle": "Créer un compte",
     "registerSubtitle": "Inscrivez-vous pour accéder à votre espace d'étude.",
     "registerSubmit": "Créer un compte",
@@ -140,7 +148,14 @@
   "dashboard": {
     "title": "Tableau de bord",
     "welcome": "Bon retour ! Voici votre aperçu.",
-    "recentActivity": "Activité récente"
+    "recentActivity": "Activité récente",
+    "noActivity": "Terminez un quiz pour commencer votre historique d'étude.",
+    "profileTitle": "Compte élève",
+    "securityTitle": "Sécurité du compte",
+    "totalAttempts": "Quiz terminés",
+    "averageScore": "Moyenne générale",
+    "bestScore": "Meilleur résultat",
+    "continueStudying": "Continuer à étudier"
   },
   "admin": {
     "title": "Panneau d'administration",

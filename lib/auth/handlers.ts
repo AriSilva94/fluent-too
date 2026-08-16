@@ -20,6 +20,7 @@ import type {
   ChangePasswordPayload,
   ForgotPasswordPayload,
   LoginPayload,
+  RegistrationSuccess,
   RegisterPayload,
   ResetPasswordPayload,
 } from "./contracts";
@@ -32,12 +33,12 @@ type HandlerResult = {
 
 type AuthClient = {
   login?(payload: LoginPayload): Promise<AuthResponse<AuthSuccess>>;
-  register?(payload: RegisterPayload): Promise<AuthResponse<AuthSuccess>>;
+  register?(payload: RegisterPayload): Promise<AuthResponse<RegistrationSuccess>>;
   forgotPassword?(payload: ForgotPasswordPayload): Promise<AuthResponse<{ ok: true }>>;
   resetPassword?(payload: ResetPasswordPayload): Promise<AuthResponse<AuthSuccess>>;
   resendConfirmation?(payload: ForgotPasswordPayload): Promise<AuthResponse<{ ok: true }>>;
   changePassword?(accessToken: string, payload: ChangePasswordPayload): Promise<AuthResponse<AuthSuccess>>;
-  logout?(refreshToken: string): Promise<AuthResponse<unknown>>;
+  logout?(accessToken: string, refreshToken: string): Promise<AuthResponse<unknown>>;
   me?(accessToken: string): Promise<AuthResponse<AuthUser>>;
   refresh?(refreshToken: string): Promise<AuthResponse<{ tokens: AuthTokens }>>;
 };
@@ -65,7 +66,7 @@ export async function handleRegister(request: Request, options: RequestHandlerOp
   if (!payload.ok) return { status: 400, body: { ok: false, fieldErrors: payload.fieldErrors } };
 
   const response = await options.client.register?.(payload.data);
-  return authResponseToHandler(response, options.secureCookies);
+  return registrationResponseToHandler(response, options.secureCookies);
 }
 
 export async function handleForgotPassword(request: Request, options: RequestHandlerOptions): Promise<HandlerResult> {
@@ -135,10 +136,10 @@ export async function handleSession(
 }
 
 export async function handleLogout(
-  tokens: { refreshToken?: string },
+  tokens: { accessToken?: string; refreshToken?: string },
   options: { client: AuthClient }
 ): Promise<HandlerResult> {
-  if (tokens.refreshToken) await options.client.logout?.(tokens.refreshToken);
+  if (tokens.accessToken && tokens.refreshToken) await options.client.logout?.(tokens.accessToken, tokens.refreshToken);
   return { status: 200, body: { ok: true }, cookies: buildClearCookieInstructions() };
 }
 
@@ -154,6 +155,19 @@ function authResponseToHandler(response: AuthResponse<AuthSuccess> | undefined, 
     status: 200,
     body: { ok: true, user: response.data.user },
     cookies: buildCookieInstructions(response.data.tokens, secureCookies),
+  };
+}
+
+function registrationResponseToHandler(
+  response: AuthResponse<RegistrationSuccess> | undefined,
+  secureCookies?: boolean
+): HandlerResult {
+  if (!response) return { status: 503, body: { ok: false, error: "SERVICE_UNAVAILABLE" } };
+  if (!response.ok) return { status: mapClientStatus(response.error, response.status), body: { ok: false, error: response.error } };
+  return {
+    status: 200,
+    body: { ok: true, user: response.data.user },
+    cookies: response.data.tokens ? buildCookieInstructions(response.data.tokens, secureCookies) : undefined,
   };
 }
 

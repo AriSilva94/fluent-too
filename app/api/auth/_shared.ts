@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
+import { AUTH_COOKIE_NAMES, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { getSiteUrl } from "@/lib/auth/request";
 import type { CookieInstruction } from "@/lib/auth/cookies";
@@ -8,7 +8,7 @@ export function routeOptions(request: Request) {
   return {
     client: createStrapiClient(),
     siteUrl: getSiteUrl(request),
-    secureCookies: process.env.AUTH_COOKIE_SECURE !== "false",
+    secureCookies: resolveAuthCookieSecure(request.url),
   };
 }
 

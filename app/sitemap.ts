@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { blogData } from "@/lib/blogData";
 import { defaultLocale, locales } from "@/lib/i18n";
-import { quizzes } from "@/lib/quizzes/data";
+import { getQuizzes } from "@/lib/quizzes/data";
 import { getLocalizedUrl } from "@/lib/seo";
 
 const publicPaths = ["", "/about", "/blog", "/quizzes"];
@@ -17,7 +17,7 @@ function getLocaleFromTargetLanguage(targetLanguage: "pt" | "en" | "fr") {
   }
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = locales.flatMap((locale) =>
     publicPaths.map((pathname) => ({
       url: getLocalizedUrl(locale, pathname),
@@ -34,6 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
+  const quizzes = await getQuizzes();
   const quizRoutes = quizzes.map((quiz) => {
     const locale = getLocaleFromTargetLanguage(quiz.targetLanguage);
 

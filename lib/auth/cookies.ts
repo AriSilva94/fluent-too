@@ -36,6 +36,13 @@ export function buildCookieInstructions(tokens: AuthTokens, secure = process.env
   ];
 }
 
+export function resolveAuthCookieSecure(url?: string | URL) {
+  if (process.env.AUTH_COOKIE_SECURE) return process.env.AUTH_COOKIE_SECURE !== "false";
+  if (!url) return process.env.NODE_ENV === "production";
+  const parsed = typeof url === "string" ? new URL(url) : url;
+  return parsed.protocol === "https:";
+}
+
 export function buildClearCookieInstructions() {
   return [
     { name: AUTH_COOKIE_NAMES.access, value: "", options: buildAuthCookieOptions(0, false) },

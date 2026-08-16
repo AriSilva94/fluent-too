@@ -4,7 +4,7 @@ import { useState } from "react";
 import AuthForm from "@/components/auth/AuthForm";
 import type { Dictionary } from "@/lib/getDictionary";
 
-export default function ChangePasswordForm({ dict }: { dict: Dictionary }) {
+export default function ChangePasswordForm({ dict, email }: { dict: Dictionary; email: string }) {
   const [saved, setSaved] = useState(false);
 
   return (
@@ -15,6 +15,14 @@ export default function ChangePasswordForm({ dict }: { dict: Dictionary }) {
         subtitle={dict.auth.changePasswordSubtitle}
         submitLabel={dict.auth.changePasswordSubmit}
         fields={[
+          {
+            name: "username",
+            label: dict.login.emailLabel,
+            type: "hidden",
+            autoComplete: "username",
+            value: email,
+            submit: false,
+          },
           {
             name: "currentPassword",
             label: dict.auth.currentPasswordLabel,
@@ -30,6 +38,9 @@ export default function ChangePasswordForm({ dict }: { dict: Dictionary }) {
           },
         ]}
         messages={dict.auth.errors}
+        visualTitle={dict.auth.visualTitle}
+        visualText={dict.auth.visualText}
+        surface="embedded"
         onSubmit={async (values) => {
           const response = await fetch("/api/auth/change-password", {
             method: "POST",

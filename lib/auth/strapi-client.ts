@@ -7,6 +7,7 @@ import type {
   ChangePasswordPayload,
   ForgotPasswordPayload,
   LoginPayload,
+  RegistrationSuccess,
   RegisterPayload,
   ResetPasswordPayload,
 } from "./contracts";
@@ -63,11 +64,7 @@ export function createStrapiClient(options: ClientOptions = {}) {
       return auth("/api/auth/local", { identifier: payload.email, password: payload.password });
     },
     register(payload: RegisterPayload) {
-      return auth("/api/auth/local/register", {
-        username: payload.email,
-        email: payload.email,
-        password: payload.password,
-      });
+      return register(payload);
     },
     async me(accessToken: string): Promise<AuthResponse<AuthUser>> {
       return request<AuthUser>("/api/users/me", { headers: { Authorization: `Bearer ${accessToken}` } });
@@ -82,8 +79,12 @@ export function createStrapiClient(options: ClientOptions = {}) {
       if (!tokens) return { ok: false, error: "UNKNOWN_ERROR", status: 502 };
       return { ok: true, data: { tokens } };
     },
-    logout(refreshToken: string) {
-      return request<{ ok: true }>("/api/auth/logout", { method: "POST", body: JSON.stringify({ refreshToken }) });
+    logout(accessToken: string, refreshToken: string) {
+      return request<{ ok: true }>("/api/auth/logout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ refreshToken }),
+      });
     },
     forgotPassword(payload: ForgotPasswordPayload) {
       return request<{ ok: true }>("/api/auth/forgot-password", { method: "POST", body: JSON.stringify(payload) });
@@ -105,6 +106,21 @@ export function createStrapiClient(options: ClientOptions = {}) {
       return auth(`/api/auth/google/callback?access_token=${encodeURIComponent(accessToken)}`, { provider: "google" });
     },
   };
+
+  async function register(payload: RegisterPayload): Promise<AuthResponse<RegistrationSuccess>> {
+    const response = await request<StrapiAuthBody>("/api/auth/local/register", {
+      method: "POST",
+      body: JSON.stringify({
+        username: payload.email,
+        email: payload.email,
+        password: payload.password,
+      }),
+    });
+    if (!response.ok) return response;
+    if (!response.data.user) return { ok: false, error: "UNKNOWN_ERROR", status: 502 };
+    const tokens = extractTokens(response.data);
+    return { ok: true, data: { user: response.data.user, ...(tokens ? { tokens } : {}) } };
+  }
 }
 
 async function parseBody(response: Response) {

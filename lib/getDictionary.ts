@@ -84,6 +84,12 @@ export type Dictionary = {
     didntKnow: string;
     knewIt: string;
     noQuizzesFound: string;
+    saveSuccess: string;
+    saveFailed: string;
+    saveSignInTitle: string;
+    saveSignInSubtitle: string;
+    createAccount: string;
+    signIn: string;
   };
   login: {
     title: string;
@@ -95,6 +101,8 @@ export type Dictionary = {
   };
   auth: {
     google: string;
+    visualTitle: string;
+    visualText: string;
     registerTitle: string;
     registerSubtitle: string;
     registerSubmit: string;
@@ -128,6 +136,13 @@ export type Dictionary = {
     title: string;
     welcome: string;
     recentActivity: string;
+    noActivity: string;
+    profileTitle: string;
+    securityTitle: string;
+    totalAttempts: string;
+    averageScore: string;
+    bestScore: string;
+    continueStudying: string;
   };
   admin: {
     title: string;

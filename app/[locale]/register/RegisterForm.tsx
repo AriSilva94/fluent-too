@@ -22,6 +22,9 @@ export default function RegisterForm({ dict, locale }: { dict: Dictionary; local
         },
       ]}
       messages={dict.auth.errors}
+      visualTitle={dict.auth.visualTitle}
+      visualText={dict.auth.visualText}
+      homeHref={`/${locale}/`}
       googleHref={`/api/auth/google?returnTo=${encodeURIComponent(`/${locale}/dashboard`)}`}
       googleLabel={dict.auth.google}
       onSubmit={async (values) => {

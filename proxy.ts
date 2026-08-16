@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { locales, defaultLocale, isValidLocale, localeToLangTag } from "@/lib/i18n";
-import { AUTH_COOKIE_NAMES, buildClearCookieInstructions, buildCookieInstructions } from "@/lib/auth/cookies";
+import { AUTH_COOKIE_NAMES, buildClearCookieInstructions, buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { resolveSession } from "@/lib/auth/session";
 import { decideAuthNavigation } from "@/lib/auth/proxy";
@@ -75,7 +75,7 @@ export async function proxy(request: NextRequest) {
   response.headers.set("x-locale", firstSegment);
 
   if (session.status === "refreshed") {
-    for (const cookie of buildCookieInstructions(session.tokens, process.env.AUTH_COOKIE_SECURE !== "false")) {
+    for (const cookie of buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.nextUrl))) {
       response.cookies.set(cookie.name, cookie.value, cookie.options);
     }
   }

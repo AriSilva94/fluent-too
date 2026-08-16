@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
 import { isValidLocale, Locale } from '@/lib/i18n';
 import Container from '@/components/ui/Container';
-import { getQuizById, quizzes } from '@/lib/quizzes/data';
+import { getQuizById, getQuizzes } from '@/lib/quizzes/data';
 import QuizRenderer from '@/components/quiz/QuizRenderer';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
@@ -14,6 +14,7 @@ interface Props {
 }
 
 export async function generateStaticParams() {
+  const quizzes = await getQuizzes();
   return quizzes.map((quiz) => ({
     locale:
       quiz.targetLanguage === 'pt' ? 'pt-br' : quiz.targetLanguage === 'en' ? 'en-us' : 'fr-fr',
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = await params;
   if (!isValidLocale(locale)) return {};
 
-  const quiz = getQuizById(id, locale);
+  const quiz = await getQuizById(id, locale);
   if (!quiz) return {};
 
   return buildPageMetadata({
@@ -41,7 +42,7 @@ export default async function QuizDetailPage({ params }: Props) {
   if (!isValidLocale(locale)) notFound();
 
   const dict = await getDictionary(locale as Locale);
-  const quiz = getQuizById(id, locale as Locale);
+  const quiz = await getQuizById(id, locale as Locale);
 
   if (!quiz) {
     notFound();
@@ -67,7 +68,7 @@ export default async function QuizDetailPage({ params }: Props) {
         </div>
 
         <div className="bg-neutral-50 p-6 md:p-8 rounded-2xl border border-neutral-200">
-           <QuizRenderer quiz={quiz} dict={dict} />
+           <QuizRenderer quiz={quiz} dict={dict} locale={locale as Locale} />
         </div>
       </div>
     </Container>

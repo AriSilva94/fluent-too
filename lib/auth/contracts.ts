@@ -71,3 +71,8 @@ export type AuthSuccess = {
   user: AuthUser;
   tokens: AuthTokens;
 };
+
+export type RegistrationSuccess = {
+  user: AuthUser;
+  tokens?: AuthTokens;
+};

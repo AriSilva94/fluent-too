@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 interface MobileMenuProps {
     isOpen: boolean;
     onClose: () => void;
-    navLinks: { href: string; label: string }[];
-    scrollToSection: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+    navLinks: { hash: string; href: string; label: string }[];
+    scrollToSection: (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => void;
     authSlot?: React.ReactNode;
 }
 
@@ -15,8 +15,8 @@ export default function MobileMenu({
     scrollToSection,
     authSlot,
 }: MobileMenuProps) {
-    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-        scrollToSection(e, href);
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+        scrollToSection(e, hash);
         onClose();
     };
 
@@ -30,10 +30,10 @@ export default function MobileMenu({
             <div className="flex h-full flex-col pt-24 px-6 pb-6">
                 <ul className="space-y-4">
                     {navLinks.map((link) => (
-                        <li key={link.href}>
+                        <li key={link.hash}>
                             <a
                                 href={link.href}
-                                onClick={(e) => handleClick(e, link.href)}
+                                onClick={(e) => handleClick(e, link.hash)}
                                 className="block text-xl font-medium text-white/90 cursor-pointer"
                             >
                                 {link.label}

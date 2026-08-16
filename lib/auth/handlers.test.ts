@@ -55,6 +55,33 @@ describe("auth handlers", () => {
     ).resolves.toEqual({ status: 401, body: { ok: false, error: "INVALID_CREDENTIALS" } });
   });
 
+  it("retorna usuario sem cookies quando cadastro exige confirmacao de email", async () => {
+    const client = {
+      register: vi.fn(async () => ({
+        ok: true as const,
+        data: { user: { ...user, confirmed: false } },
+      })),
+    };
+
+    await expect(
+      handleRegister(
+        new Request("https://app.example.com/api/auth/register", {
+          method: "POST",
+          headers: { Origin: "https://app.example.com" },
+          body: JSON.stringify({
+            email: "user@example.com",
+            password: "secret123",
+            passwordConfirmation: "secret123",
+          }),
+        }),
+        { client, siteUrl: "https://app.example.com", secureCookies: true }
+      )
+    ).resolves.toEqual({
+      status: 200,
+      body: { ok: true, user: { ...user, confirmed: false } },
+    });
+  });
+
   it("responde recuperacao de senha de forma neutra", async () => {
     const client = { forgotPassword: vi.fn(async () => ({ ok: false as const, error: "SERVICE_UNAVAILABLE" as const, status: 503 })) };
 
@@ -83,10 +110,18 @@ describe("auth handlers", () => {
     ).resolves.toEqual({ status: 403, body: { ok: false, error: "INVALID_ORIGIN" } });
   });
 
+  it("envia access token para revogar logout no Strapi", async () => {
+    const client = { logout: vi.fn(async () => ({ ok: true as const, data: { ok: true } })) };
+
+    await handleLogout({ accessToken: "access", refreshToken: "refresh" }, { client });
+
+    expect(client.logout).toHaveBeenCalledWith("access", "refresh");
+  });
+
   it("limpa cookies no logout mesmo com Strapi indisponivel", async () => {
     const client = { logout: vi.fn(async () => ({ ok: false as const, error: "SERVICE_UNAVAILABLE" as const, status: 503 })) };
 
-    await expect(handleLogout({ refreshToken: "refresh" }, { client })).resolves.toEqual({
+    await expect(handleLogout({ accessToken: "access", refreshToken: "refresh" }, { client })).resolves.toEqual({
       status: 200,
       body: { ok: true },
       cookies: expect.arrayContaining([

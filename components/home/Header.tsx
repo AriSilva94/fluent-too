@@ -2,29 +2,31 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Container from "@/components/ui/Container";
 import AuthStatus from "@/components/auth/AuthStatus";
 import LanguageSwitcher from "@/components/home/LanguageSwitcher";
 import MobileMenu from "@/components/home/MobileMenu";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
+import { buildHomeAnchorHref, shouldHandleHomeAnchorScroll } from "./headerNavigation";
 
 export default function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const navLinks = [
-    { href: "#inicio", label: dict.nav.home },
-    { href: "#recursos", label: dict.nav.resources },
-    { href: "#blog", label: dict.nav.blog },
-    // { href: "#sou-aluno", label: dict.nav.student },
-    // { href: "#agenda", label: dict.nav.schedule },
-    { href: "#contato", label: dict.nav.contact },
+    { hash: "#inicio", href: buildHomeAnchorHref(locale, "#inicio"), label: dict.nav.home },
+    { hash: "#recursos", href: buildHomeAnchorHref(locale, "#recursos"), label: dict.nav.resources },
+    { hash: "#blog", href: buildHomeAnchorHref(locale, "#blog"), label: dict.nav.blog },
+    { hash: "#contato", href: buildHomeAnchorHref(locale, "#contato"), label: dict.nav.contact },
   ];
 
-  const scrollToSection = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    if (!shouldHandleHomeAnchorScroll(pathname, locale)) return;
     e.preventDefault();
-    const id = href.replace("#", "");
+    const id = hash.replace("#", "");
 
     if (id === "inicio") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -37,7 +39,7 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: elementPosition - headerOffset, behavior: "smooth" });
     }
-  }, []);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-brand-orange shadow-md transition-all">
@@ -56,10 +58,10 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
         <nav aria-label={dict.nav.mainMenu} className="hidden items-center gap-6 lg:flex">
           <ul className="flex items-center gap-6">
             {navLinks.map((link) => (
-              <li key={link.href}>
+              <li key={link.hash}>
                 <a
                   href={link.href}
-                  onClick={(e) => scrollToSection(e, link.href)}
+                  onClick={(e) => scrollToSection(e, link.hash)}
                   className="cursor-pointer text-[16px] font-medium text-white transition-colors hover:text-white/80"
                 >
                   {link.label}

@@ -1,33 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Dictionary } from '@/lib/getDictionary';
+import type { Locale } from '@/lib/i18n';
 import { FlashcardQuiz, QuizResult } from '@/lib/quizzes/types';
 import Button from '@/components/ui/Button';
 import { gradeQuiz } from '@/lib/quizzes/grade';
-import QuizResultSummary from './QuizResultSummary';
+import { createQuizAttemptKey, saveQuizAttemptResult, type QuizAttemptSaveState } from '@/lib/quiz-attempts/save';
+import QuizAttemptResult from './QuizAttemptResult';
 
 interface Props {
   quiz: FlashcardQuiz;
   dict: Dictionary;
+  locale: Locale;
 }
 
-export default function FlashcardQuizComponent({ quiz, dict }: Props) {
+export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [answers, setAnswers] = useState<Record<string, boolean>>({}); // id -> true (knew) / false (didn't know)
+  const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [result, setResult] = useState<QuizResult | null>(null);
+  const [saveState, setSaveState] = useState<QuizAttemptSaveState>('idle');
+  const saveLockRef = useRef(false);
 
   const currentQuestion = quiz.questions[currentCardIndex];
   const isLastCard = currentCardIndex === quiz.questions.length - 1;
 
-  const handleRate = (knewIt: boolean) => {
+  const handleRate = async (knewIt: boolean) => {
     const newAnswers = { ...answers, [currentQuestion.id]: knewIt };
     setAnswers(newAnswers);
 
     if (isLastCard) {
+      if (saveLockRef.current) return;
+      saveLockRef.current = true;
       const graded = gradeQuiz(quiz, newAnswers);
       setResult(graded);
+      setSaveState('idle');
+      const nextSaveState = await saveQuizAttemptResult({ quiz, result: graded, answers: newAnswers, attemptKey: createQuizAttemptKey() });
+      setSaveState(nextSaveState);
     } else {
       setIsFlipped(false);
       setCurrentCardIndex((prev) => prev + 1);
@@ -35,18 +45,23 @@ export default function FlashcardQuizComponent({ quiz, dict }: Props) {
   };
 
   const resetQuiz = () => {
+    saveLockRef.current = false;
     setAnswers({});
     setResult(null);
+    setSaveState('idle');
     setCurrentCardIndex(0);
     setIsFlipped(false);
   };
 
   if (result) {
     return (
-      <QuizResultSummary
+      <QuizAttemptResult
+        quiz={quiz}
         result={result}
+        saveState={saveState}
         onRetry={resetQuiz}
         dict={dict}
+        locale={locale}
       />
     );
   }
@@ -69,7 +84,6 @@ export default function FlashcardQuizComponent({ quiz, dict }: Props) {
             isFlipped ? 'rotate-y-180' : ''
           }`}
         >
-          {/* Front */}
           <div className="absolute w-full h-full backface-hidden bg-white rounded-xl flex items-center justify-center p-8 text-center">
             <div>
               <p className="text-xs uppercase tracking-widest text-neutral-400 mb-2">{dict.quizzes.term}</p>
@@ -78,7 +92,6 @@ export default function FlashcardQuizComponent({ quiz, dict }: Props) {
             </div>
           </div>
 
-          {/* Back */}
           <div className="absolute w-full h-full backface-hidden bg-amber-50 rounded-xl flex items-center justify-center p-8 text-center rotate-y-180">
             <div>
               <p className="text-xs uppercase tracking-widest text-amber-600 mb-2">{dict.quizzes.meaning}</p>

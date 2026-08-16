@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import AuthForm from "@/components/auth/AuthForm";
+import AuthFeedback from "@/components/auth/AuthFeedback";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
 
@@ -11,13 +11,15 @@ export default function ForgotPasswordForm({ dict, locale }: { dict: Dictionary;
 
   if (sent) {
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">{dict.auth.forgotTitle}</h1>
-        <p className="mt-3 text-sm text-gray-600">{dict.auth.forgotSuccess}</p>
-        <Link href={`/${locale}/login`} className="mt-6 text-sm font-medium text-brand-orange hover:underline">
-          {dict.auth.loginLink}
-        </Link>
-      </div>
+      <AuthFeedback
+        title={dict.auth.forgotTitle}
+        message={dict.auth.forgotSuccess}
+        actionHref={`/${locale}/login`}
+        actionLabel={dict.auth.loginLink}
+        homeHref={`/${locale}/`}
+        visualTitle={dict.auth.visualTitle}
+        visualText={dict.auth.visualText}
+      />
     );
   }
 
@@ -28,6 +30,9 @@ export default function ForgotPasswordForm({ dict, locale }: { dict: Dictionary;
       submitLabel={dict.auth.forgotSubmit}
       fields={[{ name: "email", label: dict.login.emailLabel, type: "email", autoComplete: "email" }]}
       messages={dict.auth.errors}
+      visualTitle={dict.auth.visualTitle}
+      visualText={dict.auth.visualText}
+      homeHref={`/${locale}/`}
       onSubmit={async (values) => {
         await fetch("/api/auth/forgot-password", {
           method: "POST",

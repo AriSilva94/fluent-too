@@ -14,5 +14,5 @@ export default async function EmailConfirmationPage({
   if (!isValidLocale(locale)) notFound();
   const dict = await getDictionary(locale as Locale);
   const { email } = await searchParams;
-  return <ResendConfirmationForm dict={dict} email={email} />;
+  return <ResendConfirmationForm dict={dict} email={email} locale={locale as Locale} />;
 }

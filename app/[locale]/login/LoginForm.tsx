@@ -20,6 +20,9 @@ export default function LoginForm({ dict, locale }: { dict: Dictionary; locale: 
         { name: "password", label: dict.login.passwordLabel, type: "password", autoComplete: "current-password" },
       ]}
       messages={dict.auth.errors}
+      visualTitle={dict.auth.visualTitle}
+      visualText={dict.auth.visualText}
+      homeHref={`/${locale}/`}
       googleHref={`/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`}
       googleLabel={dict.auth.google}
       onSubmit={async (values) => {

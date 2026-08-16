@@ -1,20 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Dictionary } from '@/lib/getDictionary';
+import type { Locale } from '@/lib/i18n';
 import { FillGapQuiz, QuizResult } from '@/lib/quizzes/types';
 import Button from '@/components/ui/Button';
 import { gradeQuiz } from '@/lib/quizzes/grade';
-import QuizResultSummary from './QuizResultSummary';
+import { createQuizAttemptKey, saveQuizAttemptResult, type QuizAttemptSaveState } from '@/lib/quiz-attempts/save';
+import QuizAttemptResult from './QuizAttemptResult';
 
 interface Props {
   quiz: FillGapQuiz;
   dict: Dictionary;
+  locale: Locale;
 }
 
-export default function FillGapQuizComponent({ quiz, dict }: Props) {
+export default function FillGapQuizComponent({ quiz, dict, locale }: Props) {
   const [answers, setAnswers] = useState<Record<string, string[]>>({});
   const [result, setResult] = useState<QuizResult | null>(null);
+  const [saveState, setSaveState] = useState<QuizAttemptSaveState>('idle');
+  const saveLockRef = useRef(false);
 
   const handleInputChange = (questionId: string, answerIndex: number, value: string) => {
     setAnswers((prev) => {
@@ -25,31 +30,38 @@ export default function FillGapQuizComponent({ quiz, dict }: Props) {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (saveLockRef.current) return;
+    saveLockRef.current = true;
     const graded = gradeQuiz(quiz, answers);
     setResult(graded);
+    setSaveState('idle');
+    const nextSaveState = await saveQuizAttemptResult({ quiz, result: graded, answers, attemptKey: createQuizAttemptKey() });
+    setSaveState(nextSaveState);
   };
 
   const resetQuiz = () => {
+    saveLockRef.current = false;
     setAnswers({});
     setResult(null);
+    setSaveState('idle');
   };
 
   if (result) {
     return (
-      <QuizResultSummary
+      <QuizAttemptResult
+        quiz={quiz}
         result={result}
+        saveState={saveState}
         onRetry={resetQuiz}
         dict={dict}
+        locale={locale}
       />
     );
   }
 
-  // Check if all fields have at least some input. 
-  // Stricter: check if strictly all gaps are filled.
   const allAnswered = quiz.questions.every((q) => {
     const userAns = answers[q.id] || [];
-    // Must have an entry for each gap (correctAnswers correspond to gaps)
     return userAns.length === q.correctAnswers.length && userAns.every((a) => a && a.trim() !== '');
   });
 

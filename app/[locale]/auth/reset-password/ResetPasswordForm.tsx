@@ -1,16 +1,20 @@
 "use client";
 
 import AuthForm from "@/components/auth/AuthForm";
+import AuthFeedback from "@/components/auth/AuthFeedback";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
 
 export default function ResetPasswordForm({ dict, locale, code }: { dict: Dictionary; locale: Locale; code?: string }) {
   if (!code) {
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col justify-center px-4 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">{dict.auth.resetTitle}</h1>
-        <p className="mt-3 text-sm text-gray-600">{dict.auth.resetMissingCode}</p>
-      </div>
+      <AuthFeedback
+        title={dict.auth.resetTitle}
+        message={dict.auth.resetMissingCode}
+        homeHref={`/${locale}/`}
+        visualTitle={dict.auth.visualTitle}
+        visualText={dict.auth.visualText}
+      />
     );
   }
 
@@ -29,6 +33,9 @@ export default function ResetPasswordForm({ dict, locale, code }: { dict: Dictio
         },
       ]}
       messages={dict.auth.errors}
+      visualTitle={dict.auth.visualTitle}
+      visualText={dict.auth.visualText}
+      homeHref={`/${locale}/`}
       onSubmit={async (values) => {
         const response = await fetch("/api/auth/reset-password", {
           method: "POST",

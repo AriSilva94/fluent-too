@@ -1,9 +1,13 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import AuthForm from "./AuthForm";
 
 describe("AuthForm", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it("desabilita envio durante request e exibe erro acessivel", async () => {
     const user = userEvent.setup();
     const submit = vi.fn(async () => ({ ok: false as const, error: "INVALID_CREDENTIALS" }));
@@ -19,6 +23,8 @@ describe("AuthForm", () => {
         ]}
         onSubmit={submit}
         messages={{ INVALID_CREDENTIALS: "Credenciais invalidas" }}
+        visualTitle="Fluent Too"
+        visualText="Aprenda idiomas com pratica guiada."
         googleHref="/api/auth/google?returnTo=%2Fpt-br%2Fdashboard"
         googleLabel="Continuar com Google"
       />
@@ -33,5 +39,44 @@ describe("AuthForm", () => {
       "href",
       "/api/auth/google?returnTo=%2Fpt-br%2Fdashboard"
     );
+  });
+
+  it("renderiza campo escondido de username sem enviar para o submit", async () => {
+    const user = userEvent.setup();
+    const submit = vi.fn(async () => ({ ok: true as const }));
+
+    const { container } = render(
+      <AuthForm
+        title="Seguranca"
+        subtitle="Atualize sua senha"
+        submitLabel="Salvar senha"
+        fields={[
+          {
+            name: "username",
+            label: "E-mail",
+            type: "hidden",
+            autoComplete: "username",
+            value: "user@example.com",
+            submit: false,
+          },
+          { name: "password", label: "Nova senha", type: "password", autoComplete: "new-password" },
+        ]}
+        onSubmit={submit}
+        messages={{}}
+        visualTitle="Fluent Too"
+        visualText="Aprenda idiomas com pratica guiada."
+      />
+    );
+
+    const username = container.querySelector<HTMLInputElement>('input[name="username"]');
+    expect(username).toHaveAttribute("autocomplete", "username");
+    expect(username).toHaveClass("sr-only");
+
+    const password = screen.getByLabelText("Nova senha");
+    await user.type(password, "Password@123");
+    expect(password).toHaveValue("Password@123");
+    await user.click(screen.getByRole("button", { name: "Salvar senha" }));
+
+    expect(submit).toHaveBeenCalledWith({ password: "Password@123" });
   });
 });

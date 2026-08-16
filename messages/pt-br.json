@@ -81,7 +81,13 @@
     "meaning": "Significado",
     "didntKnow": "Nao sabia",
     "knewIt": "Sabia",
-    "noQuizzesFound": "Nenhum quiz encontrado para este nível."
+    "noQuizzesFound": "Nenhum quiz encontrado para este nível.",
+    "saveSuccess": "Resultado salvo no seu histórico.",
+    "saveFailed": "Não foi possível salvar no histórico agora.",
+    "saveSignInTitle": "Quer acompanhar sua evolução?",
+    "saveSignInSubtitle": "Crie uma conta para salvar seu histórico de estudos e acompanhar seus resultados.",
+    "createAccount": "Criar conta",
+    "signIn": "Entrar"
   },
   "login": {
     "title": "Entrar",
@@ -93,6 +99,8 @@
   },
   "auth": {
     "google": "Continuar com Google",
+    "visualTitle": "Fluent Too",
+    "visualText": "Aprenda idiomas com prática guiada, quizzes por nível e histórico de evolução.",
     "registerTitle": "Criar conta",
     "registerSubtitle": "Cadastre-se para acessar sua área de estudos.",
     "registerSubmit": "Criar conta",
@@ -140,7 +148,14 @@
   "dashboard": {
     "title": "Painel",
     "welcome": "Bem-vindo de volta! Aqui está seu resumo.",
-    "recentActivity": "Atividade recente"
+    "recentActivity": "Atividade recente",
+    "noActivity": "Finalize um quiz para começar seu histórico de estudos.",
+    "profileTitle": "Conta do aluno",
+    "securityTitle": "Segurança da conta",
+    "totalAttempts": "Quizzes finalizados",
+    "averageScore": "Média geral",
+    "bestScore": "Melhor resultado",
+    "continueStudying": "Continuar estudando"
   },
   "admin": {
     "title": "Painel administrativo",

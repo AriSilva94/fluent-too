@@ -5,6 +5,7 @@ import { isValidLocale, Locale } from '@/lib/i18n';
 import Container from '@/components/ui/Container';
 import SectionHeading from '@/components/ui/SectionHeading';
 import { getQuizzes, getQuizzesByLevel } from '@/lib/quizzes/data';
+import type { QuizLevel } from '@/lib/quizzes/types';
 import { LevelTabs, QuizCard } from '@/components/quiz/Shared';
 import { buildPageMetadata } from '@/lib/seo';
 
@@ -33,11 +34,11 @@ export default async function QuizListPage({ params, searchParams }: Props) {
   const { level } = await searchParams;
   
   const dict = await getDictionary(locale as Locale);
-  const currentLevel = typeof level === 'string' ? level : undefined;
+  const currentLevel = isQuizLevel(level) ? level : undefined;
   
   const quizzes = currentLevel 
-    ? getQuizzesByLevel(currentLevel, locale as Locale) 
-    : getQuizzes(locale as Locale);
+    ? await getQuizzesByLevel(currentLevel, locale as Locale) 
+    : await getQuizzes(locale as Locale);
 
   const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -71,4 +72,8 @@ export default async function QuizListPage({ params, searchParams }: Props) {
       </div>
     </Container>
   );
+}
+
+function isQuizLevel(value: unknown): value is QuizLevel {
+  return value === 'A1' || value === 'A2' || value === 'B1' || value === 'B2' || value === 'C1' || value === 'C2';
 }

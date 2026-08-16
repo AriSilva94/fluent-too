@@ -81,7 +81,13 @@
     "meaning": "Meaning",
     "didntKnow": "Didn't know",
     "knewIt": "Knew it",
-    "noQuizzesFound": "No quizzes found for this level."
+    "noQuizzesFound": "No quizzes found for this level.",
+    "saveSuccess": "Result saved to your history.",
+    "saveFailed": "Could not save this result right now.",
+    "saveSignInTitle": "Want to track your progress?",
+    "saveSignInSubtitle": "Create an account to save your study history and track your results.",
+    "createAccount": "Create account",
+    "signIn": "Sign in"
   },
   "login": {
     "title": "Sign in",
@@ -93,6 +99,8 @@
   },
   "auth": {
     "google": "Continue with Google",
+    "visualTitle": "Fluent Too",
+    "visualText": "Learn languages with guided practice, level-based quizzes, and study history.",
     "registerTitle": "Create account",
     "registerSubtitle": "Sign up to access your study area.",
     "registerSubmit": "Create account",
@@ -140,7 +148,14 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back! Here is your overview.",
-    "recentActivity": "Recent Activity"
+    "recentActivity": "Recent Activity",
+    "noActivity": "Finish a quiz to start your study history.",
+    "profileTitle": "Student account",
+    "securityTitle": "Account security",
+    "totalAttempts": "Completed quizzes",
+    "averageScore": "Overall average",
+    "bestScore": "Best result",
+    "continueStudying": "Keep studying"
   },
   "admin": {
     "title": "Admin Panel",

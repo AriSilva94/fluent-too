@@ -38,4 +38,38 @@ describe("createStrapiClient", () => {
       })
     );
   });
+
+  it("normaliza cadastro sem tokens quando confirmacao de email esta ativa", async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({
+      user: { id: 1, email: "user@example.com", username: "user@example.com", confirmed: false, blocked: false },
+    })));
+    const client = createStrapiClient({ baseUrl: "https://api.internal", fetcher });
+
+    await expect(
+      client.register({
+        email: "user@example.com",
+        password: "secret123",
+        passwordConfirmation: "secret123",
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        user: { id: 1, email: "user@example.com", username: "user@example.com", confirmed: false, blocked: false },
+      },
+    });
+  });
+
+  it("envia bearer token no logout", async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ ok: true })));
+    const client = createStrapiClient({ baseUrl: "https://api.internal", fetcher });
+
+    await expect(client.logout("access", "refresh")).resolves.toEqual({ ok: true, data: { ok: true } });
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://api.internal/api/auth/logout",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({ Authorization: "Bearer access" }),
+      })
+    );
+  });
 });
