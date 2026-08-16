@@ -39,5 +39,5 @@ export default async function LoginPage({
 
   const dict = await getDictionary(locale as Locale);
 
-  return <LoginForm dict={dict} />;
+  return <LoginForm dict={dict} locale={locale as Locale} />;
 }

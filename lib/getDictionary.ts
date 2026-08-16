@@ -93,6 +93,37 @@ export type Dictionary = {
     submit: string;
     orContinueWith: string;
   };
+  auth: {
+    google: string;
+    registerTitle: string;
+    registerSubtitle: string;
+    registerSubmit: string;
+    registerLink: string;
+    loginLink: string;
+    forgotPassword: string;
+    forgotTitle: string;
+    forgotSubtitle: string;
+    forgotSubmit: string;
+    forgotSuccess: string;
+    resetTitle: string;
+    resetSubtitle: string;
+    resetSubmit: string;
+    resetMissingCode: string;
+    emailConfirmationTitle: string;
+    emailConfirmationSubtitle: string;
+    resendConfirmation: string;
+    emailConfirmedTitle: string;
+    emailConfirmedSubtitle: string;
+    changePasswordTitle: string;
+    changePasswordSubtitle: string;
+    currentPasswordLabel: string;
+    newPasswordLabel: string;
+    confirmPasswordLabel: string;
+    changePasswordSubmit: string;
+    changePasswordSuccess: string;
+    logout: string;
+    errors: Record<string, string>;
+  };
   dashboard: {
     title: string;
     welcome: string;

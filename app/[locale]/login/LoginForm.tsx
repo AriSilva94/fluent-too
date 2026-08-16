@@ -1,62 +1,47 @@
 "use client";
 
-import SkeletonBox from "@/components/ui/SkeletonBox";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import AuthForm from "@/components/auth/AuthForm";
 import type { Dictionary } from "@/lib/getDictionary";
+import type { Locale } from "@/lib/i18n";
 
-export default function LoginForm({ dict }: { dict: Dictionary }) {
+export default function LoginForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo") ?? `/${locale}/dashboard`;
+
   return (
-    <div className="flex min-h-[80vh] items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">{dict.login.title}</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {dict.login.subtitle}
-          </p>
+    <AuthForm
+      title={dict.login.title}
+      subtitle={dict.login.subtitle}
+      submitLabel={dict.login.submit}
+      fields={[
+        { name: "email", label: dict.login.emailLabel, type: "email", autoComplete: "email" },
+        { name: "password", label: dict.login.passwordLabel, type: "password", autoComplete: "current-password" },
+      ]}
+      messages={dict.auth.errors}
+      googleHref={`/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`}
+      googleLabel={dict.auth.google}
+      onSubmit={async (values) => {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+        });
+        const body = await response.json();
+        if (!response.ok || !body.ok) return { ok: false, error: body.error, fieldErrors: body.fieldErrors };
+        return { ok: true, redirectTo: returnTo };
+      }}
+      footer={
+        <div className="space-y-2">
+          <Link href={`/${locale}/forgot-password`} className="block text-brand-orange hover:underline">
+            {dict.auth.forgotPassword}
+          </Link>
+          <Link href={`/${locale}/register`} className="block text-brand-orange hover:underline">
+            {dict.auth.registerLink}
+          </Link>
         </div>
-
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              {dict.login.emailLabel}
-            </label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              {dict.login.passwordLabel}
-            </label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-700"
-          >
-            {dict.login.submit}
-          </button>
-        </form>
-
-        <div className="space-y-3">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-2 text-gray-400">
-                {dict.login.orContinueWith}
-              </span>
-            </div>
-          </div>
-          <SkeletonBox className="h-10 w-full" />
-        </div>
-      </div>
-    </div>
+      }
+    />
   );
 }
