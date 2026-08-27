@@ -20,6 +20,10 @@ type StrapiCollectionResponse = {
   data?: unknown[];
 };
 
+type StrapiMedia = {
+  url?: unknown;
+};
+
 type StrapiQuizRecord = {
   id?: number | string;
   attributes?: unknown;
@@ -116,6 +120,8 @@ function mapQuiz(input: unknown): Quiz | null {
 
   if (!slug || !title || !description || !level || !type || !targetLanguage || !questions) return null;
 
+  const image = readImageUrl(source.image);
+
   return {
     id: slug,
     title,
@@ -124,8 +130,18 @@ function mapQuiz(input: unknown): Quiz | null {
     type,
     targetLanguage,
     questions,
-    ...(readString(source.image) ? { image: readString(source.image) } : {}),
+    ...(image ? { image } : {}),
   } as Quiz;
+}
+
+function readImageUrl(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const media = value as StrapiMedia;
+  const url = readString(media.url);
+  if (!url) return null;
+  if (/^https?:\/\//.test(url)) return url;
+  const base = process.env.NEXT_PUBLIC_ASSET_BASE_URL || process.env.STRAPI_PUBLIC_URL || "";
+  return base ? `${base.replace(/\/$/, "")}${url}` : url;
 }
 
 function getTargetLanguageByLocale(locale: Locale): TargetLanguage {
