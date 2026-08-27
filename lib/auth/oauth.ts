@@ -1,5 +1,6 @@
 import { buildCookieInstructions, type CookieInstruction } from "./cookies";
 import { safeRedirect } from "./redirect";
+import { defaultLocale, isValidLocale } from "@/lib/i18n";
 import type { AuthResponse, AuthSuccess } from "./contracts";
 
 type GoogleClient = {
@@ -29,16 +30,27 @@ export async function handleGoogleCallback(
   options: { client: GoogleClient; secureCookies?: boolean }
 ): Promise<{ status: number; redirectTo: string; cookies?: CookieInstruction[] }> {
   const parsed = parseGoogleCallback(url);
-  if (!parsed.ok) return { status: 302, redirectTo: `/pt-br/login?error=${parsed.code}` };
+  if (!parsed.ok) return { status: 302, redirectTo: `/${localeFromState(url)}/login?error=${parsed.code}` };
 
   const response = await options.client.googleCallback(parsed.accessToken);
-  if (!response.ok) return { status: 302, redirectTo: `/pt-br/login?error=${response.error}` };
+  if (!response.ok) {
+    return { status: 302, redirectTo: `/${localeFromReturnTo(parsed.returnTo)}/login?error=${response.error}` };
+  }
 
   return {
     status: 302,
     redirectTo: parsed.returnTo,
     cookies: buildCookieInstructions(response.data.tokens, options.secureCookies),
   };
+}
+
+function localeFromState(url: URL) {
+  return localeFromReturnTo(safeRedirect(url.searchParams.get("state"), `/${defaultLocale}/dashboard`));
+}
+
+function localeFromReturnTo(returnTo: string) {
+  const segment = returnTo.split("/")[1] ?? "";
+  return isValidLocale(segment) ? segment : defaultLocale;
 }
 
 function trimTrailingSlash(value: string) {

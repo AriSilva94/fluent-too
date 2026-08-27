@@ -12,6 +12,9 @@ export function mapStrapiError(status: number, message: unknown): AuthErrorCode 
   if (normalized.includes("email is not confirmed") || normalized.includes("account email is not confirmed")) {
     return "EMAIL_NOT_CONFIRMED";
   }
+  if (normalized.includes("email is already taken")) {
+    return "EMAIL_ALREADY_REGISTERED";
+  }
   if (normalized.includes("token")) return "INVALID_TOKEN";
 
   return "UNKNOWN_ERROR";

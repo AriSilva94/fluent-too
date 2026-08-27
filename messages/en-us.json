@@ -135,6 +135,7 @@
       "REQUIRED": "Required field.",
       "INVALID_CREDENTIALS": "Invalid email or password.",
       "EMAIL_NOT_CONFIRMED": "Confirm your email before signing in.",
+      "EMAIL_ALREADY_REGISTERED": "This email already has a password account. Sign in with email and password instead of Google.",
       "RATE_LIMITED": "Too many attempts. Try again shortly.",
       "SERVICE_UNAVAILABLE": "Service is currently unavailable.",
       "UNAUTHORIZED": "Session expired. Sign in again.",

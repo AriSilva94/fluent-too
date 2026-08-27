@@ -135,6 +135,7 @@
       "REQUIRED": "Champ obligatoire.",
       "INVALID_CREDENTIALS": "E-mail ou mot de passe invalide.",
       "EMAIL_NOT_CONFIRMED": "Confirmez votre e-mail avant de vous connecter.",
+      "EMAIL_ALREADY_REGISTERED": "Cet e-mail possède déjà un compte avec mot de passe. Connectez-vous avec e-mail et mot de passe plutôt qu'avec Google.",
       "RATE_LIMITED": "Trop de tentatives. Réessayez dans quelques instants.",
       "SERVICE_UNAVAILABLE": "Service momentanément indisponible.",
       "UNAUTHORIZED": "Session expirée. Connectez-vous à nouveau.",

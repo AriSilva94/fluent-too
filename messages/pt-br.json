@@ -135,6 +135,7 @@
       "REQUIRED": "Campo obrigatório.",
       "INVALID_CREDENTIALS": "E-mail ou senha inválidos.",
       "EMAIL_NOT_CONFIRMED": "Confirme seu e-mail antes de entrar.",
+      "EMAIL_ALREADY_REGISTERED": "Este e-mail já tem uma conta com senha. Entre com e-mail e senha em vez de Google.",
       "RATE_LIMITED": "Muitas tentativas. Tente novamente em instantes.",
       "SERVICE_UNAVAILABLE": "Serviço indisponível no momento.",
       "UNAUTHORIZED": "Sessão expirada. Entre novamente.",

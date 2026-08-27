@@ -9,6 +9,7 @@ import type { Locale } from "@/lib/i18n";
 export default function LoginForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo") ?? `/${locale}/dashboard`;
+  const initialError = searchParams.get("error") ?? undefined;
 
   return (
     <AuthForm
@@ -20,6 +21,7 @@ export default function LoginForm({ dict, locale }: { dict: Dictionary; locale: 
         { name: "password", label: dict.login.passwordLabel, type: "password", autoComplete: "current-password" },
       ]}
       messages={dict.auth.errors}
+      initialError={initialError}
       visualTitle={dict.auth.visualTitle}
       visualText={dict.auth.visualText}
       homeHref={`/${locale}/`}

@@ -30,6 +30,7 @@ type AuthFormProps = {
   visualText: string;
   homeHref?: string;
   surface?: "auth" | "embedded";
+  initialError?: string;
 };
 
 export default function AuthForm({
@@ -46,9 +47,12 @@ export default function AuthForm({
   visualText,
   homeHref,
   surface = "auth",
+  initialError,
 }: AuthFormProps) {
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    initialError ? (messages[initialError] ?? messages.UNKNOWN_ERROR ?? initialError) : null
+  );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   async function submit(event: FormEvent<HTMLFormElement>) {
