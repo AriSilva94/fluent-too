@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/getDictionary';
 import { isValidLocale, Locale } from '@/lib/i18n';
 import Container from '@/components/ui/Container';
-import { getQuizById, getQuizzes } from '@/lib/quizzes/data';
+import { getQuizById } from '@/lib/quizzes/data';
 import QuizRenderer from '@/components/quiz/QuizRenderer';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
@@ -11,15 +11,6 @@ import { buildPageMetadata } from '@/lib/seo';
 
 interface Props {
   params: Promise<{ locale: string; id: string }>;
-}
-
-export async function generateStaticParams() {
-  const quizzes = await getQuizzes();
-  return quizzes.map((quiz) => ({
-    locale:
-      quiz.targetLanguage === 'pt' ? 'pt-br' : quiz.targetLanguage === 'en' ? 'en-us' : 'fr-fr',
-    id: quiz.id,
-  }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
