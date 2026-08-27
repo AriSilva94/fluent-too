@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import AuthShell from "./AuthShell";
 
@@ -145,7 +144,7 @@ export default function AuthForm({
             <span className="text-xs font-black uppercase tracking-[0.18em] text-brand-blue/60">Google</span>
             <div className="h-px flex-1 bg-brand-blue/15" />
           </div>
-          <Link
+          <a
             href={googleHref}
             className="flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-white px-4 text-base font-black text-brand-blue ring-1 ring-brand-blue/20 transition-colors hover:bg-[#f5f8ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
           >
@@ -153,7 +152,7 @@ export default function AuthForm({
               G
             </span>
             {googleLabel}
-          </Link>
+          </a>
         </div>
       ) : null}
 
