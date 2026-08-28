@@ -56,3 +56,25 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger Dokploy deploy (develop)
+        if: github.ref_name == 'develop'
+        env:
+          WEBHOOK_URL: ${{ secrets.DOKPLOY_DEV_WEBHOOK_URL }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "DOKPLOY_DEV_WEBHOOK_URL secret not set, skipping."
+            exit 0
+          fi
+          curl -fsS -X GET "$WEBHOOK_URL"
+
+      - name: Trigger Dokploy deploy (main)
+        if: github.ref_name == 'main'
+        env:
+          WEBHOOK_URL: ${{ secrets.DOKPLOY_PROD_WEBHOOK_URL }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "DOKPLOY_PROD_WEBHOOK_URL secret not set, skipping."
+            exit 0
+          fi
+          curl -fsS -X GET "$WEBHOOK_URL"
