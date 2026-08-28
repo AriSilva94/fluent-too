@@ -171,7 +171,9 @@
     "totalAttempts": "Completed quizzes",
     "averageScore": "Overall average",
     "bestScore": "Best result",
-    "continueStudying": "Keep studying"
+    "continueStudying": "Keep studying",
+    "teacherPendingTitle": "Teacher application under review",
+    "teacherPendingText": "We received your application to become a teacher and our team is reviewing it. You will be notified as soon as a decision is made."
   },
   "admin": {
     "title": "Admin Panel",

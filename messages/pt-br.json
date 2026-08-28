@@ -171,7 +171,9 @@
     "totalAttempts": "Quizzes finalizados",
     "averageScore": "Média geral",
     "bestScore": "Melhor resultado",
-    "continueStudying": "Continuar estudando"
+    "continueStudying": "Continuar estudando",
+    "teacherPendingTitle": "Candidatura de professor em análise",
+    "teacherPendingText": "Recebemos sua candidatura para se tornar professor e nossa equipe está avaliando. Você será notificado assim que houver uma decisão."
   },
   "admin": {
     "title": "Painel administrativo",

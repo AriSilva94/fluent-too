@@ -9,6 +9,7 @@ import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { resolveSession } from "@/lib/auth/session";
 import { createQuizAttemptsClient } from "@/lib/quiz-attempts/client";
+import { isPendingTeacher } from "@/lib/auth/roles";
 
 const dashboardDescriptions: Record<Locale, string> = {
   "pt-br": "Painel do aluno na Fluent Too com progresso, atividades e dados privados.",
@@ -68,6 +69,12 @@ export default async function DashboardPage({
   return (
     <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+        {isPendingTeacher(user.role?.type) && (
+          <section className="mb-6 rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(255,103,0,0.12)]">
+            <h2 className="text-xl font-black text-brand-orange">{dict.dashboard.teacherPendingTitle}</h2>
+            <p className="mt-2 text-base font-medium leading-7 text-neutral-600">{dict.dashboard.teacherPendingText}</p>
+          </section>
+        )}
         <section className="overflow-hidden rounded-2xl bg-brand-blue shadow-[0_24px_80px_rgba(65,132,249,0.22)]">
           <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end lg:p-10">
             <div>

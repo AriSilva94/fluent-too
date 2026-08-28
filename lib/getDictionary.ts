@@ -155,6 +155,8 @@ export type Dictionary = {
     averageScore: string;
     bestScore: string;
     continueStudying: string;
+    teacherPendingTitle: string;
+    teacherPendingText: string;
   };
   admin: {
     title: string;
