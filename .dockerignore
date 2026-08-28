@@ -5,5 +5,12 @@ coverage
 .env
 .env.*
 npm-debug.log*
+*.log
 Dockerfile
 .worktrees
+docs
+README.md
+.vscode
+.idea
+.DS_Store
+Thumbs.db
