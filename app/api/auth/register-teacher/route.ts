@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { mapStrapiError } from "@/lib/auth/errors";
 import { getSiteUrl, isTrustedOrigin } from "@/lib/auth/request";
 import { validateAttachment, validateTeacherRegister } from "@/lib/auth/teacher-registration";
 
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
 
   if (!response.ok) {
     const body = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
-    const error = body.error?.message ?? "UNKNOWN_ERROR";
+    const error = mapStrapiError(response.status, body.error?.message);
     return NextResponse.json({ ok: false, error }, { status: response.status });
   }
 

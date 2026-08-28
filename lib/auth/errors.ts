@@ -1,7 +1,19 @@
 import type { AuthErrorCode } from "./contracts";
 
+const PASSTHROUGH_CODES: AuthErrorCode[] = [
+  "EMAIL_ALREADY_REGISTERED",
+  "FILE_TOO_LARGE",
+  "INVALID_FILE_TYPE",
+  "REQUIRED",
+  "INVALID_EMAIL",
+  "WEAK_PASSWORD",
+];
+
 export function mapStrapiError(status: number, message: unknown): AuthErrorCode {
-  const normalized = String(message ?? "").toLowerCase();
+  const raw = String(message ?? "");
+  if (PASSTHROUGH_CODES.includes(raw as AuthErrorCode)) return raw as AuthErrorCode;
+
+  const normalized = raw.toLowerCase();
 
   if (status === 401) return "UNAUTHORIZED";
   if (status === 429) return "RATE_LIMITED";

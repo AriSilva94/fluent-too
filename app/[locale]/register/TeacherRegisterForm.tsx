@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRef, useState, type FormEvent } from "react";
 import AuthShell from "@/components/auth/AuthShell";
+import { useAuthFormHeader } from "@/components/auth/AuthFormHeader";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
 
@@ -13,6 +14,7 @@ export default function TeacherRegisterForm({ dict, locale }: { dict: Dictionary
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const header = useAuthFormHeader();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -43,6 +45,7 @@ export default function TeacherRegisterForm({ dict, locale }: { dict: Dictionary
   return (
     <AuthShell homeHref={`/${locale}/`} visualTitle={dict.auth.visualTitle} visualText={dict.auth.visualText}>
       <div className="rounded-2xl bg-white p-6 shadow-[0_24px_80px_rgba(65,132,249,0.16)] sm:p-8">
+        {header ? <div className="mb-6">{header}</div> : null}
         <div>
           <h1 className="text-3xl font-black leading-tight text-brand-blue sm:text-4xl">{dict.auth.registerTitle}</h1>
           <p className="mt-3 text-base font-medium leading-7 text-neutral-600">{dict.auth.registerSubtitle}</p>
@@ -89,10 +92,13 @@ export default function TeacherRegisterForm({ dict, locale }: { dict: Dictionary
               name="bio"
               rows={3}
               aria-invalid={Boolean(fieldErrors.bio)}
+              aria-describedby={fieldErrors.bio ? "bio-error" : undefined}
               className="w-full rounded-lg border-0 bg-[#f5f8ff] px-4 py-3 text-base font-semibold text-gray-900 caret-brand-orange ring-1 ring-brand-blue/18 transition-shadow placeholder:text-brand-blue/50 focus:outline-none focus:ring-2 focus:ring-brand-orange"
             />
             {fieldErrors.bio ? (
-              <p className="text-sm font-semibold text-red-700">{dict.auth.errors[fieldErrors.bio] ?? fieldErrors.bio}</p>
+              <p id="bio-error" className="text-sm font-semibold text-red-700">
+                {dict.auth.errors[fieldErrors.bio] ?? fieldErrors.bio}
+              </p>
             ) : null}
           </div>
 
@@ -105,16 +111,21 @@ export default function TeacherRegisterForm({ dict, locale }: { dict: Dictionary
               name="experience"
               rows={3}
               aria-invalid={Boolean(fieldErrors.experience)}
+              aria-describedby={fieldErrors.experience ? "experience-error" : undefined}
               className="w-full rounded-lg border-0 bg-[#f5f8ff] px-4 py-3 text-base font-semibold text-gray-900 caret-brand-orange ring-1 ring-brand-blue/18 transition-shadow placeholder:text-brand-blue/50 focus:outline-none focus:ring-2 focus:ring-brand-orange"
             />
             {fieldErrors.experience ? (
-              <p className="text-sm font-semibold text-red-700">
+              <p id="experience-error" className="text-sm font-semibold text-red-700">
                 {dict.auth.errors[fieldErrors.experience] ?? fieldErrors.experience}
               </p>
             ) : null}
           </div>
 
-          <fieldset className="space-y-2">
+          <fieldset
+            className="space-y-2"
+            aria-invalid={Boolean(fieldErrors.languages)}
+            aria-describedby={fieldErrors.languages ? "languages-error" : undefined}
+          >
             <legend className="block text-sm font-black text-brand-blue">{dict.auth.teacherLanguagesLabel}</legend>
             <div className="flex flex-wrap gap-4">
               {LANGUAGE_OPTIONS.map((language) => (
@@ -125,7 +136,7 @@ export default function TeacherRegisterForm({ dict, locale }: { dict: Dictionary
               ))}
             </div>
             {fieldErrors.languages ? (
-              <p className="text-sm font-semibold text-red-700">
+              <p id="languages-error" className="text-sm font-semibold text-red-700">
                 {dict.auth.errors[fieldErrors.languages] ?? fieldErrors.languages}
               </p>
             ) : null}
