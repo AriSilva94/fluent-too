@@ -76,11 +76,11 @@ export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
 
       <div
         key={currentQuestion.id}
-        className="perspective-1000 w-full h-64 cursor-pointer mb-8 group animate-in fade-in zoom-in-95 duration-300"
+        className="perspective-[1000px] w-full h-64 cursor-pointer mb-8 group animate-in fade-in zoom-in-95 duration-300"
         onClick={() => setIsFlipped(!isFlipped)}
       >
         <div
-          className={`relative w-full h-full transition-transform duration-500 transform-style-3d shadow-lg rounded-xl border border-neutral-200 ${
+          className={`relative w-full h-full transition-transform duration-500 transform-3d shadow-lg rounded-xl border border-neutral-200 ${
             isFlipped ? 'rotate-y-180' : ''
           }`}
         >

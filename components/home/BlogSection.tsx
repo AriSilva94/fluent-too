@@ -4,11 +4,11 @@ import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
-import { blogData } from "@/lib/blogData";
+import { getBlogPosts } from "@/lib/blog/strapi";
 import { assetUrl } from "@/lib/cdnAssets";
 
-export default function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
-  const posts = blogData[locale].slice(0, 6);
+export default async function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+  const posts = (await getBlogPosts(locale)).slice(0, 6);
 
   return (
     <section id="blog" className="bg-white pb-8 pt-0 md:pb-14 md:pt-1">

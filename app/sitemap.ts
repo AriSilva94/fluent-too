@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { blogData } from "@/lib/blogData";
+import { getBlogPosts } from "@/lib/blog/strapi";
 import { defaultLocale, locales } from "@/lib/i18n";
 import { getQuizzes } from "@/lib/quizzes/data";
 import { getLocalizedUrl } from "@/lib/seo";
@@ -26,8 +26,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  const blogRoutes = locales.flatMap((locale) =>
-    blogData[locale].map((post) => ({
+  const blogPostsByLocale = await Promise.all(locales.map((locale) => getBlogPosts(locale)));
+  const blogRoutes = locales.flatMap((locale, index) =>
+    blogPostsByLocale[index].map((post) => ({
       url: getLocalizedUrl(locale, `/blog/${post.slug}`),
       changeFrequency: "monthly" as const,
       priority: locale === defaultLocale ? 0.7 : 0.6,

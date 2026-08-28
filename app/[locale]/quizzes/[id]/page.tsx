@@ -9,6 +9,8 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { buildPageMetadata } from '@/lib/seo';
 
+export const dynamic = 'force-dynamic';
+
 interface Props {
   params: Promise<{ locale: string; id: string }>;
 }

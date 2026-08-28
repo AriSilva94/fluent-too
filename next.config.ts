@@ -19,6 +19,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.fluent-too.com",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "1337",
+      },
     ],
   },
 };

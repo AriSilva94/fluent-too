@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
-import { blogData } from "@/lib/blogData";
+import { getBlogPosts } from "@/lib/blog/strapi";
 import { buildPageMetadata } from "@/lib/seo";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -34,7 +36,7 @@ export default async function BlogListPage({
   if (!isValidLocale(locale)) notFound();
 
   const dict = await getDictionary(locale as Locale);
-  const posts = blogData[locale as Locale] || [];
+  const posts = await getBlogPosts(locale as Locale);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16">
