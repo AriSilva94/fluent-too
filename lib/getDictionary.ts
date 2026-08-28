@@ -161,6 +161,16 @@ export type Dictionary = {
   admin: {
     title: string;
     subtitle: string;
+    teachersTitle: string;
+    teachersEmpty: string;
+    teachersFilterPending: string;
+    teachersFilterApproved: string;
+    teachersFilterRejected: string;
+    teachersApprove: string;
+    teachersReject: string;
+    teachersRejectNoteLabel: string;
+    teachersRejectNoteRequired: string;
+    teachersAlreadyReviewed: string;
   };
   notFound: {
     badge: string;

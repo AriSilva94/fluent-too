@@ -177,7 +177,17 @@
   },
   "admin": {
     "title": "Admin Panel",
-    "subtitle": "Manage content, users, and settings."
+    "subtitle": "Manage content, users, and settings.",
+    "teachersTitle": "Teacher applications",
+    "teachersEmpty": "No applications found.",
+    "teachersFilterPending": "Pending",
+    "teachersFilterApproved": "Approved",
+    "teachersFilterRejected": "Rejected",
+    "teachersApprove": "Approve",
+    "teachersReject": "Reject",
+    "teachersRejectNoteLabel": "Rejection reason",
+    "teachersRejectNoteRequired": "Enter a reason before rejecting.",
+    "teachersAlreadyReviewed": "This application has already been reviewed by another admin."
   },
   "notFound": {
     "badge": "Routing error",

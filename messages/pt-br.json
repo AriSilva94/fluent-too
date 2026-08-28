@@ -177,7 +177,17 @@
   },
   "admin": {
     "title": "Painel administrativo",
-    "subtitle": "Gerencie conteúdo, usuários e configurações."
+    "subtitle": "Gerencie conteúdo, usuários e configurações.",
+    "teachersTitle": "Candidaturas de professores",
+    "teachersEmpty": "Nenhuma candidatura encontrada.",
+    "teachersFilterPending": "Pendentes",
+    "teachersFilterApproved": "Aprovadas",
+    "teachersFilterRejected": "Rejeitadas",
+    "teachersApprove": "Aprovar",
+    "teachersReject": "Rejeitar",
+    "teachersRejectNoteLabel": "Motivo da rejeição",
+    "teachersRejectNoteRequired": "Informe um motivo antes de rejeitar.",
+    "teachersAlreadyReviewed": "Esta candidatura já foi revisada por outro administrador."
   },
   "notFound": {
     "badge": "Erro de rota",

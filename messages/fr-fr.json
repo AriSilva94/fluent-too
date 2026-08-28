@@ -177,7 +177,17 @@
   },
   "admin": {
     "title": "Panneau d'administration",
-    "subtitle": "Gérez le contenu, les utilisateurs et les paramètres."
+    "subtitle": "Gérez le contenu, les utilisateurs et les paramètres.",
+    "teachersTitle": "Candidatures d'enseignants",
+    "teachersEmpty": "Aucune candidature trouvée.",
+    "teachersFilterPending": "En attente",
+    "teachersFilterApproved": "Approuvées",
+    "teachersFilterRejected": "Rejetées",
+    "teachersApprove": "Approuver",
+    "teachersReject": "Rejeter",
+    "teachersRejectNoteLabel": "Motif du rejet",
+    "teachersRejectNoteRequired": "Indiquez un motif avant de rejeter.",
+    "teachersAlreadyReviewed": "Cette candidature a déjà été examinée par un autre administrateur."
   },
   "notFound": {
     "badge": "Erreur de parcours",
