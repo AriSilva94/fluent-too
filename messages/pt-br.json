@@ -187,7 +187,8 @@
     "teachersReject": "Rejeitar",
     "teachersRejectNoteLabel": "Motivo da rejeição",
     "teachersRejectNoteRequired": "Informe um motivo antes de rejeitar.",
-    "teachersAlreadyReviewed": "Esta candidatura já foi revisada por outro administrador."
+    "teachersAlreadyReviewed": "Esta candidatura já foi revisada por outro administrador.",
+    "teachersReviewError": "Não foi possível concluir a ação. Tente novamente."
   },
   "notFound": {
     "badge": "Erro de rota",

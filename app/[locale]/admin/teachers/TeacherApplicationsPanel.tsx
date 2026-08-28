@@ -94,7 +94,7 @@ export default function TeacherApplicationsPanel({
           ? dict.admin.teachersAlreadyReviewed
           : body.error === "REVIEW_NOTE_REQUIRED"
             ? dict.admin.teachersRejectNoteRequired
-            : body.error;
+            : dict.admin.teachersReviewError;
       setErrors((current) => ({ ...current, [id]: message }));
       return;
     }

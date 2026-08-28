@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
-import { readTokenCookies } from "@/app/api/auth/_shared";
+import { applyCookies, readTokenCookies } from "@/app/api/auth/_shared";
+import { buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { getSiteUrl, isTrustedOrigin } from "@/lib/auth/request";
+import { createStrapiClient } from "@/lib/auth/strapi-client";
+import { resolveSession } from "@/lib/auth/session";
 import { createTeacherApplicationsClient } from "@/lib/teacher-applications/client";
 
 type ReviewAction = "approve" | "reject";
 
 export function parseReviewAction(value: string): ReviewAction | null {
   return value === "approve" || value === "reject" ? value : null;
+}
+
+export function parseApplicationId(value: string): number | null {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : null;
 }
 
 export function validateRejectNote(value: unknown): { ok: true; note: string } | { ok: false; error: "REVIEW_NOTE_REQUIRED" } {
@@ -16,7 +24,7 @@ export function validateRejectNote(value: unknown): { ok: true; note: string } |
 }
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string; action: string }> }) {
-  const { id, action: rawAction } = await params;
+  const { id: rawId, action: rawAction } = await params;
   const action = parseReviewAction(rawAction);
   if (!action) return NextResponse.json({ ok: false, error: "NOT_FOUND" }, { status: 404 });
 
@@ -24,23 +32,31 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ ok: false, error: "INVALID_ORIGIN" }, { status: 403 });
   }
 
-  const { accessToken } = readTokenCookies(request);
+  const tokens = readTokenCookies(request);
+  const session = await resolveSession(tokens, createStrapiClient());
+  if (session.status === "anonymous") return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+
+  const accessToken = session.status === "refreshed" ? session.tokens.accessToken : tokens.accessToken;
   if (!accessToken) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+
+  const id = parseApplicationId(rawId);
+  if (!id) return NextResponse.json({ ok: false, error: "INVALID_ID" }, { status: 400 });
 
   const body = (await request.json().catch(() => ({}))) as { reviewNote?: unknown };
   const client = createTeacherApplicationsClient();
 
-  const result =
-    action === "approve"
-      ? await client.approve(accessToken, Number(id))
-      : await reject(client, accessToken, Number(id), body.reviewNote);
+  const result = action === "approve" ? await client.approve(accessToken, id) : await reject(client, accessToken, id, body.reviewNote);
 
   if (!result.ok) {
     const status = result.error === "ALREADY_REVIEWED" ? 409 : result.error === "REVIEW_NOTE_REQUIRED" ? 400 : 502;
     return NextResponse.json({ ok: false, error: result.error }, { status });
   }
 
-  return NextResponse.json({ ok: true });
+  const response = NextResponse.json({ ok: true });
+  if (session.status === "refreshed") {
+    applyCookies(response, buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.url)));
+  }
+  return response;
 }
 
 async function reject(

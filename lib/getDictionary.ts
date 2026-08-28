@@ -171,6 +171,7 @@ export type Dictionary = {
     teachersRejectNoteLabel: string;
     teachersRejectNoteRequired: string;
     teachersAlreadyReviewed: string;
+    teachersReviewError: string;
   };
   notFound: {
     badge: string;

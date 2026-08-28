@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { readTokenCookies } from "@/app/api/auth/_shared";
+import { applyCookies, readTokenCookies } from "@/app/api/auth/_shared";
+import { buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
+import { createStrapiClient } from "@/lib/auth/strapi-client";
+import { resolveSession } from "@/lib/auth/session";
 import { createTeacherApplicationsClient } from "@/lib/teacher-applications/client";
 
 const VALID_STATUSES = ["pending", "approved", "rejected"] as const;
@@ -10,10 +13,18 @@ export function parseStatusParam(value: string | null): TeacherApplicationStatus
 }
 
 export async function GET(request: Request) {
-  const { accessToken } = readTokenCookies(request);
+  const tokens = readTokenCookies(request);
+  const session = await resolveSession(tokens, createStrapiClient());
+  if (session.status === "anonymous") return NextResponse.json({ ok: false, data: [] }, { status: 401 });
+
+  const accessToken = session.status === "refreshed" ? session.tokens.accessToken : tokens.accessToken;
   if (!accessToken) return NextResponse.json({ ok: false, data: [] }, { status: 401 });
 
   const status = parseStatusParam(new URL(request.url).searchParams.get("status"));
   const data = await createTeacherApplicationsClient().list(accessToken, status);
-  return NextResponse.json({ ok: true, data });
+  const response = NextResponse.json({ ok: true, data });
+  if (session.status === "refreshed") {
+    applyCookies(response, buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.url)));
+  }
+  return response;
 }

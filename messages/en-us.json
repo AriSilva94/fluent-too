@@ -187,7 +187,8 @@
     "teachersReject": "Reject",
     "teachersRejectNoteLabel": "Rejection reason",
     "teachersRejectNoteRequired": "Enter a reason before rejecting.",
-    "teachersAlreadyReviewed": "This application has already been reviewed by another admin."
+    "teachersAlreadyReviewed": "This application has already been reviewed by another admin.",
+    "teachersReviewError": "Could not complete the action. Please try again."
   },
   "notFound": {
     "badge": "Routing error",

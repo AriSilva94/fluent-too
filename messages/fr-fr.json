@@ -187,7 +187,8 @@
     "teachersReject": "Rejeter",
     "teachersRejectNoteLabel": "Motif du rejet",
     "teachersRejectNoteRequired": "Indiquez un motif avant de rejeter.",
-    "teachersAlreadyReviewed": "Cette candidature a déjà été examinée par un autre administrateur."
+    "teachersAlreadyReviewed": "Cette candidature a déjà été examinée par un autre administrateur.",
+    "teachersReviewError": "Impossible de terminer l'action. Veuillez réessayer."
   },
   "notFound": {
     "badge": "Erreur de parcours",
