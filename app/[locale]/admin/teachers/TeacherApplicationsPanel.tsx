@@ -38,15 +38,18 @@ const STATUS_FILTERS: ApplicationStatus[] = ["pending", "approved", "rejected"];
 export default function TeacherApplicationsPanel({
   dict,
   initialApplications,
+  initialFailed = false,
   initialStatus,
 }: {
   dict: Dictionary;
   initialApplications: unknown[];
+  initialFailed?: boolean;
   initialStatus: ApplicationStatus;
 }) {
   const router = useRouter();
   const [status, setStatus] = useState<ApplicationStatus>(initialStatus);
   const [applications, setApplications] = useState<TeacherApplication[]>(initialApplications as TeacherApplication[]);
+  const [listFailed, setListFailed] = useState(initialFailed);
   const [loading, setLoading] = useState(false);
   const [rejecting, setRejecting] = useState<number | null>(null);
   const [notes, setNotes] = useState<Record<number, string>>({});
@@ -63,7 +66,17 @@ export default function TeacherApplicationsPanel({
     setLoading(true);
     try {
       const response = await fetch(`/api/teacher-applications?status=${nextStatus}`);
-      const body = await response.json().catch(() => ({ data: [] }));
+      const body = await response.json().catch(() => ({ ok: false }));
+
+      // Falha da API mostra estado de erro, nunca o estado vazio: os dois significam
+      // coisas opostas para quem revisa a fila.
+      if (!response.ok || !body.ok) {
+        setListFailed(true);
+        setApplications([]);
+        return;
+      }
+
+      setListFailed(false);
       setApplications(Array.isArray(body.data) ? body.data : []);
     } finally {
       setLoading(false);
@@ -145,7 +158,16 @@ export default function TeacherApplicationsPanel({
         </div>
 
         <section className="mt-6 space-y-4">
-          {!loading && applications.length === 0 ? (
+          {!loading && listFailed ? (
+            <p
+              role="alert"
+              className="rounded-2xl bg-red-50 px-6 py-8 text-base font-semibold text-red-700 ring-1 ring-red-200"
+            >
+              {dict.admin.teachersLoadError}
+            </p>
+          ) : null}
+
+          {!loading && !listFailed && applications.length === 0 ? (
             <p className="rounded-2xl bg-white px-6 py-8 text-base font-semibold text-neutral-600 shadow-[0_18px_54px_rgba(65,132,249,0.12)]">
               {dict.admin.teachersEmpty}
             </p>

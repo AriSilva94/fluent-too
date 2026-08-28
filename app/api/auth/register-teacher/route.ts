@@ -5,9 +5,28 @@ import { validateAttachment, validateTeacherRegister } from "@/lib/auth/teacher-
 
 const STRAPI_URL = process.env.STRAPI_INTERNAL_URL ?? "http://localhost:1337";
 
+// 5 MB de anexo (o limite de `validateAttachment`) + folga para os demais campos de
+// texto do multipart e para os cabeçalhos de cada parte.
+export const MAX_REGISTER_TEACHER_BODY_BYTES = 5 * 1024 * 1024 + 256 * 1024;
+
+/**
+ * `request.formData()` materializa o corpo inteiro em memória. Sem teto, alguns POSTs
+ * concorrentes de centenas de MB derrubam o servidor Next — por isso a recusa acontece
+ * pelo content-length, antes de ler o corpo.
+ */
+export function isBodyWithinLimit(contentLength: string | null, maxBytes = MAX_REGISTER_TEACHER_BODY_BYTES) {
+  if (contentLength === null) return false;
+  const length = Number(contentLength);
+  return Number.isFinite(length) && length >= 0 && length <= maxBytes;
+}
+
 export async function POST(request: Request) {
   if (!isTrustedOrigin(request.headers.get("origin"), getSiteUrl(request))) {
     return NextResponse.json({ ok: false, error: "INVALID_ORIGIN" }, { status: 403 });
+  }
+
+  if (!isBodyWithinLimit(request.headers.get("content-length"))) {
+    return NextResponse.json({ ok: false, error: "FILE_TOO_LARGE" }, { status: 413 });
   }
 
   const form = await request.formData();

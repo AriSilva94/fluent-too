@@ -180,6 +180,7 @@
     "subtitle": "Gerencie conteúdo, usuários e configurações.",
     "teachersTitle": "Candidaturas de professores",
     "teachersEmpty": "Nenhuma candidatura encontrada.",
+    "teachersLoadError": "Não foi possível carregar as candidaturas. Tente novamente em instantes.",
     "teachersFilterPending": "Pendentes",
     "teachersFilterApproved": "Aprovadas",
     "teachersFilterRejected": "Rejeitadas",

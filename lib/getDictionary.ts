@@ -163,6 +163,7 @@ export type Dictionary = {
     subtitle: string;
     teachersTitle: string;
     teachersEmpty: string;
+    teachersLoadError: string;
     teachersFilterPending: string;
     teachersFilterApproved: string;
     teachersFilterRejected: string;

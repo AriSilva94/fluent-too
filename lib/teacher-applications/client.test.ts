@@ -12,20 +12,37 @@ describe("cliente de candidaturas", () => {
 
     const result = await client.list("token-admin", "pending");
 
-    expect(result).toEqual([{ id: 1, status: "pending" }]);
+    expect(result).toEqual({ ok: true, data: [{ id: 1, status: "pending" }] });
     expect(fetcher).toHaveBeenCalledWith(
       "http://api/api/teacher-applications?status=pending",
       expect.objectContaining({ headers: { Authorization: "Bearer token-admin" } })
     );
   });
 
-  it("devolve lista vazia quando a API falha", async () => {
+  it("distingue falha da API de fila vazia", async () => {
     const client = createTeacherApplicationsClient({
       baseUrl: "http://api",
-      fetcher: fetcherReturning({}, 500),
+      fetcher: fetcherReturning({ error: { message: "ServiceUnavailable" } }, 500),
     });
 
-    expect(await client.list("token-admin")).toEqual([]);
+    expect(await client.list("token-admin")).toEqual({ ok: false, error: "ServiceUnavailable" });
+  });
+
+  it("devolve ok com lista vazia quando não há candidaturas", async () => {
+    const client = createTeacherApplicationsClient({ baseUrl: "http://api", fetcher: fetcherReturning({ data: [] }) });
+
+    expect(await client.list("token-admin")).toEqual({ ok: true, data: [] });
+  });
+
+  it("sinaliza falha quando o fetch lança", async () => {
+    const client = createTeacherApplicationsClient({
+      baseUrl: "http://api",
+      fetcher: async () => {
+        throw new Error("rede fora");
+      },
+    });
+
+    expect(await client.list("token-admin")).toEqual({ ok: false, error: "UNKNOWN_ERROR" });
   });
 
   it("rejeita enviando a nota", async () => {

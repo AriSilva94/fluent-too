@@ -180,6 +180,7 @@
     "subtitle": "Manage content, users, and settings.",
     "teachersTitle": "Teacher applications",
     "teachersEmpty": "No applications found.",
+    "teachersLoadError": "We could not load the applications. Try again in a moment.",
     "teachersFilterPending": "Pending",
     "teachersFilterApproved": "Approved",
     "teachersFilterRejected": "Rejected",

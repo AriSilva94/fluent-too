@@ -59,7 +59,16 @@ export default async function AdminTeachersPage({
   if (!canReviewTeachers(session.user.role?.type)) notFound();
 
   const accessToken = session.status === "refreshed" ? session.tokens.accessToken : cookieStore.get(AUTH_COOKIE_NAMES.access)?.value;
-  const applications = accessToken ? await createTeacherApplicationsClient().list(accessToken, "pending") : [];
+  const result = accessToken
+    ? await createTeacherApplicationsClient().list(accessToken, "pending")
+    : ({ ok: false, error: "UNKNOWN_ERROR" } as const);
 
-  return <TeacherApplicationsPanel dict={dict} initialApplications={applications} initialStatus="pending" />;
+  return (
+    <TeacherApplicationsPanel
+      dict={dict}
+      initialApplications={result.ok ? result.data : []}
+      initialFailed={!result.ok}
+      initialStatus="pending"
+    />
+  );
 }

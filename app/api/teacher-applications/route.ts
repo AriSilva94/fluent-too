@@ -21,8 +21,13 @@ export async function GET(request: Request) {
   if (!accessToken) return NextResponse.json({ ok: false, data: [] }, { status: 401 });
 
   const status = parseStatusParam(new URL(request.url).searchParams.get("status"));
-  const data = await createTeacherApplicationsClient().list(accessToken, status);
-  const response = NextResponse.json({ ok: true, data });
+  const result = await createTeacherApplicationsClient().list(accessToken, status);
+
+  // Uma falha do backend não pode virar 200 com lista vazia: o admin leria isso como
+  // "não há candidaturas" enquanto professores esperam na fila.
+  const response = result.ok
+    ? NextResponse.json({ ok: true, data: result.data })
+    : NextResponse.json({ ok: false, error: result.error }, { status: 502 });
   if (session.status === "refreshed") {
     applyCookies(response, buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.url)));
   }

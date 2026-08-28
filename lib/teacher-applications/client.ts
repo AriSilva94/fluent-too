@@ -10,13 +10,19 @@ type TeacherApplicationStatus = "pending" | "approved" | "rejected";
 
 type ReviewResult = { ok: true } | { ok: false; error: string };
 
+/**
+ * A listagem precisa distinguir "fila vazia" de "backend fora do ar": devolver `[]` nos
+ * dois casos fazia o admin ver o estado vazio e concluir que não havia nada para revisar.
+ */
+export type ListResult = { ok: true; data: unknown[] } | { ok: false; error: string };
+
 export function createTeacherApplicationsClient(options: ClientOptions = {}) {
   const baseUrl = trimTrailingSlash(options.baseUrl ?? process.env.STRAPI_INTERNAL_URL ?? "http://localhost:1337");
   const fetcher = options.fetcher ?? fetch;
   const timeoutMs = options.timeoutMs ?? 10000;
 
   return {
-    async list(accessToken: string, status?: TeacherApplicationStatus) {
+    async list(accessToken: string, status?: TeacherApplicationStatus): Promise<ListResult> {
       try {
         const params = new URLSearchParams();
         if (status) params.set("status", status);
@@ -30,12 +36,12 @@ export function createTeacherApplicationsClient(options: ClientOptions = {}) {
           signal: AbortSignal.timeout(timeoutMs),
         });
 
-        if (!response.ok) return [];
+        if (!response.ok) return { ok: false, error: await readErrorMessage(response) };
 
         const body = (await response.json()) as { data?: unknown[] };
-        return Array.isArray(body.data) ? body.data : [];
+        return { ok: true, data: Array.isArray(body.data) ? body.data : [] };
       } catch {
-        return [];
+        return { ok: false, error: "UNKNOWN_ERROR" };
       }
     },
 
