@@ -128,6 +128,18 @@
     "changePasswordSubmit": "Change password",
     "changePasswordSuccess": "Password changed successfully.",
     "logout": "Sign out",
+    "profileTitle": "How do you want to sign up?",
+    "profileStudent": "I'm a student",
+    "profileStudentHint": "I want to learn languages with lessons and quizzes.",
+    "profileTeacher": "I'm a teacher",
+    "profileTeacherHint": "I want to teach on the platform.",
+    "teacherBioLabel": "Bio",
+    "teacherExperienceLabel": "Experience",
+    "teacherLanguagesLabel": "Languages you teach",
+    "teacherCredentialLabel": "Credential link (optional)",
+    "teacherAttachmentLabel": "Attachment (optional)",
+    "teacherAttachmentHint": "PDF, PNG, or JPEG, up to 5 MB.",
+    "teacherSubmit": "Submit application",
     "errors": {
       "INVALID_EMAIL": "Enter a valid email.",
       "WEAK_PASSWORD": "Use a password between 8 and 72 characters.",
@@ -143,7 +155,10 @@
       "GOOGLE_AUTH_FAILED": "Could not sign in with Google.",
       "INVALID_ORIGIN": "Request origin is not allowed.",
       "PAYLOAD_TOO_LARGE": "Submitted data exceeds the limit.",
-      "UNKNOWN_ERROR": "Could not complete the operation."
+      "UNKNOWN_ERROR": "Could not complete the operation.",
+      "TEACHER_APPLICATION_EXISTS": "You already have a teacher application under review.",
+      "FILE_TOO_LARGE": "The uploaded file exceeds the 5 MB limit.",
+      "INVALID_FILE_TYPE": "File type not allowed. Upload a PDF, PNG, or JPEG."
     }
   },
   "dashboard": {

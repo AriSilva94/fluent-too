@@ -128,6 +128,18 @@
     "changePasswordSubmit": "Changer le mot de passe",
     "changePasswordSuccess": "Mot de passe modifié avec succès.",
     "logout": "Se déconnecter",
+    "profileTitle": "Comment voulez-vous vous inscrire ?",
+    "profileStudent": "Je suis étudiant",
+    "profileStudentHint": "Je veux apprendre des langues avec des cours et des quiz.",
+    "profileTeacher": "Je suis professeur",
+    "profileTeacherHint": "Je veux enseigner sur la plateforme.",
+    "teacherBioLabel": "Bio",
+    "teacherExperienceLabel": "Expérience",
+    "teacherLanguagesLabel": "Langues que vous enseignez",
+    "teacherCredentialLabel": "Lien de justificatif (optionnel)",
+    "teacherAttachmentLabel": "Pièce jointe (optionnel)",
+    "teacherAttachmentHint": "PDF, PNG ou JPEG, jusqu'à 5 Mo.",
+    "teacherSubmit": "Envoyer la candidature",
     "errors": {
       "INVALID_EMAIL": "Indiquez un e-mail valide.",
       "WEAK_PASSWORD": "Utilisez un mot de passe entre 8 et 72 caractères.",
@@ -143,7 +155,10 @@
       "GOOGLE_AUTH_FAILED": "Connexion avec Google impossible.",
       "INVALID_ORIGIN": "Origine de requête non autorisée.",
       "PAYLOAD_TOO_LARGE": "Les données envoyées dépassent la limite.",
-      "UNKNOWN_ERROR": "Impossible de terminer l'opération."
+      "UNKNOWN_ERROR": "Impossible de terminer l'opération.",
+      "TEACHER_APPLICATION_EXISTS": "Vous avez déjà une candidature de professeur en cours d'examen.",
+      "FILE_TOO_LARGE": "Le fichier envoyé dépasse la limite de 5 Mo.",
+      "INVALID_FILE_TYPE": "Type de fichier non autorisé. Envoyez un PDF, PNG ou JPEG."
     }
   },
   "dashboard": {

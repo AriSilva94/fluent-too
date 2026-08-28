@@ -130,6 +130,18 @@ export type Dictionary = {
     changePasswordSubmit: string;
     changePasswordSuccess: string;
     logout: string;
+    profileTitle: string;
+    profileStudent: string;
+    profileStudentHint: string;
+    profileTeacher: string;
+    profileTeacherHint: string;
+    teacherBioLabel: string;
+    teacherExperienceLabel: string;
+    teacherLanguagesLabel: string;
+    teacherCredentialLabel: string;
+    teacherAttachmentLabel: string;
+    teacherAttachmentHint: string;
+    teacherSubmit: string;
     errors: Record<string, string>;
   };
   dashboard: {

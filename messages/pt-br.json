@@ -128,6 +128,18 @@
     "changePasswordSubmit": "Alterar senha",
     "changePasswordSuccess": "Senha alterada com sucesso.",
     "logout": "Sair",
+    "profileTitle": "Como você quer se cadastrar?",
+    "profileStudent": "Sou estudante",
+    "profileStudentHint": "Quero aprender idiomas com aulas e quizzes.",
+    "profileTeacher": "Sou professor",
+    "profileTeacherHint": "Quero dar aulas na plataforma.",
+    "teacherBioLabel": "Bio",
+    "teacherExperienceLabel": "Experiência",
+    "teacherLanguagesLabel": "Idiomas que você ensina",
+    "teacherCredentialLabel": "Link de credencial (opcional)",
+    "teacherAttachmentLabel": "Anexo (opcional)",
+    "teacherAttachmentHint": "PDF, PNG ou JPEG, até 5 MB.",
+    "teacherSubmit": "Enviar candidatura",
     "errors": {
       "INVALID_EMAIL": "Informe um e-mail válido.",
       "WEAK_PASSWORD": "Use uma senha entre 8 e 72 caracteres.",
@@ -143,7 +155,10 @@
       "GOOGLE_AUTH_FAILED": "Não foi possível entrar com Google.",
       "INVALID_ORIGIN": "Origem da requisição não permitida.",
       "PAYLOAD_TOO_LARGE": "Dados enviados acima do limite.",
-      "UNKNOWN_ERROR": "Não foi possível concluir a operação."
+      "UNKNOWN_ERROR": "Não foi possível concluir a operação.",
+      "TEACHER_APPLICATION_EXISTS": "Você já tem uma candidatura de professor em análise.",
+      "FILE_TOO_LARGE": "O arquivo enviado ultrapassa o limite de 5 MB.",
+      "INVALID_FILE_TYPE": "Formato de arquivo não permitido. Envie PDF, PNG ou JPEG."
     }
   },
   "dashboard": {
