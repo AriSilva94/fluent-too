@@ -9,7 +9,7 @@ import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { resolveSession } from "@/lib/auth/session";
 import { createQuizAttemptsClient } from "@/lib/quiz-attempts/client";
-import { isPendingTeacher, isUnassigned } from "@/lib/auth/roles";
+import { hasProfile, isPendingTeacher } from "@/lib/auth/roles";
 
 const dashboardDescriptions: Record<Locale, string> = {
   "pt-br": "Painel do aluno na Fluent Too com progresso, atividades e dados privados.",
@@ -54,7 +54,7 @@ export default async function DashboardPage({
   );
 
   if (session.status === "anonymous") redirect(`/${locale}/login?returnTo=/${locale}/dashboard`);
-  if (isUnassigned(session.user.role?.type)) redirect(`/${locale}/onboarding`);
+  if (!hasProfile(session.user.role?.type)) redirect(`/${locale}/onboarding`);
   const user = session.user;
   const accessToken = session.status === "refreshed" ? session.tokens.accessToken : cookieStore.get(AUTH_COOKIE_NAMES.access)?.value;
   const attempts = accessToken ? await createQuizAttemptsClient().list(accessToken) : { ok: false as const, data: [] };

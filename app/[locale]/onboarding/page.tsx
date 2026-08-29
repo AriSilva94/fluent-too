@@ -5,7 +5,7 @@ import { isValidLocale, type Locale } from "@/lib/i18n";
 import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { resolveSession } from "@/lib/auth/session";
-import { isUnassigned } from "@/lib/auth/roles";
+import { hasProfile } from "@/lib/auth/roles";
 import OnboardingChooser from "./OnboardingChooser";
 
 export default async function OnboardingPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -23,7 +23,7 @@ export default async function OnboardingPage({ params }: { params: Promise<{ loc
   );
 
   if (session.status === "anonymous") redirect(`/${locale}/login`);
-  if (!isUnassigned(session.user.role?.type)) redirect(`/${locale}/dashboard`);
+  if (hasProfile(session.user.role?.type)) redirect(`/${locale}/dashboard`);
 
   return <OnboardingChooser dict={dict} locale={locale as Locale} />;
 }
