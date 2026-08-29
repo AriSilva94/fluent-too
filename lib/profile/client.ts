@@ -77,11 +77,28 @@ export function createProfileClient(options: ClientOptions = {}) {
   };
 }
 
+// Só os códigos que os endpoints de perfil realmente devolvem. Qualquer outra string
+// vinda do upstream (mensagem inesperada, texto livre, HTML de um proxy no meio do
+// caminho) cai em UNKNOWN_ERROR em vez de ser repassada como se fosse um AuthErrorCode
+// válido — sem essa lista, `as AuthErrorCode` mentiria sobre o tipo de retorno.
+const KNOWN_ERROR_CODES: readonly AuthErrorCode[] = [
+  "PROFILE_ALREADY_SET",
+  "TEACHER_APPLICATION_EXISTS",
+  "FILE_TOO_LARGE",
+  "INVALID_FILE_TYPE",
+  "REQUIRED",
+  "UNAUTHORIZED",
+];
+
+function isKnownErrorCode(value: string): value is AuthErrorCode {
+  return (KNOWN_ERROR_CODES as readonly string[]).includes(value);
+}
+
 async function readErrorCode(response: Response): Promise<AuthErrorCode> {
   try {
     const body = (await response.json()) as { error?: { message?: unknown } };
     const message = body.error?.message;
-    return typeof message === "string" ? (message as AuthErrorCode) : "UNKNOWN_ERROR";
+    return typeof message === "string" && isKnownErrorCode(message) ? message : "UNKNOWN_ERROR";
   } catch {
     return "UNKNOWN_ERROR";
   }

@@ -86,6 +86,19 @@ describe("cliente de perfil", () => {
     expect(await client.myApplication("token-prof")).toEqual({ ok: true, data: null });
   });
 
+  it("não repassa mensagem de erro desconhecida do upstream", async () => {
+    const client = createProfileClient({
+      baseUrl: "http://api",
+      fetcher: fetcherReturning({ error: { message: "<html>Bad Gateway</html>" } }, 502),
+    });
+
+    expect(await client.becomeStudent("token-aluno")).toEqual({
+      ok: false,
+      error: "UNKNOWN_ERROR",
+      status: 502,
+    });
+  });
+
   it("sinaliza falha de rede sem lançar", async () => {
     const client = createProfileClient({
       baseUrl: "http://api",
