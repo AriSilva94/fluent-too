@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/lib/getDictionary";
+import Breadcrumbs from "@/components/navigation/Breadcrumbs";
 import { isHttpUrl } from "@/lib/auth/teacher-registration";
 
 type ApplicationStatus = "pending" | "approved" | "rejected";
@@ -35,25 +36,29 @@ type TeacherApplication = {
 };
 
 const STATUS_FILTERS: ApplicationStatus[] = ["pending", "approved", "rejected"];
+type ReviewDialogState = { applicationId: number; action: "approve" | "reject" } | null;
 
 export default function TeacherApplicationsPanel({
   dict,
   initialApplications,
   initialFailed = false,
   initialStatus,
+  dashboardHref,
 }: {
   dict: Dictionary;
   initialApplications: unknown[];
   initialFailed?: boolean;
   initialStatus: ApplicationStatus;
+  dashboardHref: string;
 }) {
   const router = useRouter();
   const [status, setStatus] = useState<ApplicationStatus>(initialStatus);
   const [applications, setApplications] = useState<TeacherApplication[]>(initialApplications as TeacherApplication[]);
   const [listFailed, setListFailed] = useState(initialFailed);
   const [loading, setLoading] = useState(false);
-  const [rejecting, setRejecting] = useState<number | null>(null);
-  const [notes, setNotes] = useState<Record<number, string>>({});
+  const [reviewDialog, setReviewDialog] = useState<ReviewDialogState>(null);
+  const [rejectNote, setRejectNote] = useState("");
+  const [dialogError, setDialogError] = useState("");
   const [errors, setErrors] = useState<Record<number, string>>({});
   const [pendingAction, setPendingAction] = useState<number | null>(null);
 
@@ -113,29 +118,60 @@ export default function TeacherApplicationsPanel({
       return;
     }
 
-    setRejecting(null);
-    setNotes((current) => ({ ...current, [id]: "" }));
+    closeReviewDialog();
     router.refresh();
     await loadApplications(status);
   }
 
+  function openReviewDialog(applicationId: number, action: "approve" | "reject") {
+    setReviewDialog({ applicationId, action });
+    setRejectNote("");
+    setDialogError("");
+    setErrors((current) => ({ ...current, [applicationId]: "" }));
+  }
+
+  function closeReviewDialog() {
+    setReviewDialog(null);
+    setRejectNote("");
+    setDialogError("");
+  }
+
+  function confirmReviewDialog() {
+    if (!reviewDialog) return;
+
+    if (reviewDialog.action === "reject") {
+      const note = rejectNote.trim();
+      if (!note) {
+        setDialogError(dict.admin.teachersRejectNoteRequired);
+        return;
+      }
+      void decide(reviewDialog.applicationId, "reject", note);
+      return;
+    }
+
+    void decide(reviewDialog.applicationId, "approve");
+  }
+
   function startReject(id: number) {
-    setRejecting(id);
+    openReviewDialog(id, "reject");
     setErrors((current) => ({ ...current, [id]: "" }));
   }
 
-  function submitReject(id: number) {
-    const note = (notes[id] ?? "").trim();
-    if (!note) {
-      setErrors((current) => ({ ...current, [id]: dict.admin.teachersRejectNoteRequired }));
-      return;
-    }
-    void decide(id, "reject", note);
-  }
+  const selectedApplication = reviewDialog
+    ? applications.find((application) => application.id === reviewDialog.applicationId)
+    : null;
+  const isRejectDialog = reviewDialog?.action === "reject";
 
   return (
     <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+        <Breadcrumbs
+          items={[
+            { label: dict.dashboard.title, href: dashboardHref },
+            { label: dict.admin.teachersTitle },
+          ]}
+        />
+
         <section className="overflow-hidden rounded-2xl bg-brand-blue shadow-[0_24px_80px_rgba(65,132,249,0.22)]">
           <div className="p-6 sm:p-8 lg:p-10">
             <h1 className="text-4xl font-black leading-none text-white sm:text-5xl">{dict.admin.teachersTitle}</h1>
@@ -176,7 +212,6 @@ export default function TeacherApplicationsPanel({
 
           {applications.map((application) => {
             const errorId = `application-${application.id}-error`;
-            const noteId = `application-${application.id}-note`;
             const error = errors[application.id];
 
             return (
@@ -233,54 +268,95 @@ export default function TeacherApplicationsPanel({
                   <div className="mt-5 flex flex-wrap items-start gap-3">
                     <button
                       type="button"
-                      onClick={() => decide(application.id, "approve")}
+                      onClick={() => openReviewDialog(application.id, "approve")}
                       disabled={pendingAction === application.id}
                       className="min-h-11 rounded-lg bg-brand-blue px-5 text-sm font-black text-white transition-colors hover:bg-brand-blue/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {dict.admin.teachersApprove}
                     </button>
 
-                    {rejecting === application.id ? (
-                      <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-start">
-                        <div className="flex-1">
-                          <label htmlFor={noteId} className="sr-only">
-                            {dict.admin.teachersRejectNoteLabel}
-                          </label>
-                          <textarea
-                            id={noteId}
-                            rows={2}
-                            value={notes[application.id] ?? ""}
-                            onChange={(event) => setNotes((current) => ({ ...current, [application.id]: event.target.value }))}
-                            aria-invalid={Boolean(error)}
-                            aria-describedby={error ? errorId : undefined}
-                            placeholder={dict.admin.teachersRejectNoteLabel}
-                            className="w-full min-w-[16rem] rounded-lg border-0 bg-[#f5f8ff] px-4 py-3 text-sm font-semibold text-gray-900 caret-brand-orange ring-1 ring-brand-blue/18 transition-shadow placeholder:text-brand-blue/50 focus:outline-none focus:ring-2 focus:ring-brand-orange"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => submitReject(application.id)}
-                          disabled={pendingAction === application.id}
-                          className="min-h-11 shrink-0 rounded-lg bg-brand-orange px-5 text-sm font-black text-white transition-colors hover:bg-brand-orange/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {dict.admin.teachersReject}
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => startReject(application.id)}
-                        className="min-h-11 rounded-lg bg-white px-5 text-sm font-black text-brand-orange ring-1 ring-brand-orange/40 transition-colors hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
-                      >
-                        {dict.admin.teachersReject}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => startReject(application.id)}
+                      className="min-h-11 rounded-lg bg-white px-5 text-sm font-black text-brand-orange ring-1 ring-brand-orange/40 transition-colors hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
+                    >
+                      {dict.admin.teachersReject}
+                    </button>
                   </div>
                 ) : null}
               </article>
             );
           })}
         </section>
+
+        {reviewDialog && selectedApplication ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/55 px-4 py-6">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="teacher-review-dialog-title"
+              aria-describedby="teacher-review-dialog-description"
+              className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-[0_28px_90px_rgba(17,24,39,0.28)]"
+            >
+              <h2 id="teacher-review-dialog-title" className="text-2xl font-black leading-tight text-brand-blue">
+                {isRejectDialog ? dict.admin.teachersRejectConfirmTitle : dict.admin.teachersApproveConfirmTitle}
+              </h2>
+              <p id="teacher-review-dialog-description" className="mt-3 text-base font-medium leading-7 text-neutral-600">
+                {isRejectDialog ? dict.admin.teachersRejectConfirmText : dict.admin.teachersApproveConfirmText}
+              </p>
+              <p className="mt-4 break-words rounded-lg bg-[#f5f8ff] px-4 py-3 text-sm font-black text-brand-blue">
+                {selectedApplication.user?.email}
+              </p>
+
+              {isRejectDialog ? (
+                <div className="mt-5">
+                  <label htmlFor="teacher-review-note" className="text-sm font-black text-brand-blue">
+                    {dict.admin.teachersRejectNoteLabel}
+                  </label>
+                  <textarea
+                    id="teacher-review-note"
+                    rows={4}
+                    value={rejectNote}
+                    onChange={(event) => {
+                      setRejectNote(event.target.value);
+                      if (dialogError) setDialogError("");
+                    }}
+                    aria-invalid={Boolean(dialogError)}
+                    aria-describedby={dialogError ? "teacher-review-dialog-error" : undefined}
+                    className="mt-2 w-full rounded-lg border-0 bg-[#f5f8ff] px-4 py-3 text-sm font-semibold text-gray-900 caret-brand-orange ring-1 ring-brand-blue/18 transition-shadow placeholder:text-brand-blue/50 focus:outline-none focus:ring-2 focus:ring-brand-orange"
+                  />
+                  {dialogError ? (
+                    <p id="teacher-review-dialog-error" role="alert" className="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-200">
+                      {dialogError}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeReviewDialog}
+                  className="min-h-11 rounded-lg bg-white px-5 text-sm font-black text-brand-blue ring-1 ring-brand-blue/25 transition-colors hover:bg-brand-blue/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2"
+                >
+                  {dict.admin.cancel}
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmReviewDialog}
+                  disabled={pendingAction === reviewDialog.applicationId}
+                  className={`min-h-11 rounded-lg px-5 text-sm font-black text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                    isRejectDialog
+                      ? "bg-brand-orange hover:bg-brand-orange/90 focus-visible:ring-brand-blue"
+                      : "bg-brand-blue hover:bg-brand-blue/90 focus-visible:ring-brand-orange"
+                  }`}
+                >
+                  {isRejectDialog ? dict.admin.teachersRejectConfirmCta : dict.admin.teachersApproveConfirmCta}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

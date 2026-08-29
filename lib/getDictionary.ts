@@ -186,6 +186,13 @@ export type Dictionary = {
     teachersRejectNoteRequired: string;
     teachersAlreadyReviewed: string;
     teachersReviewError: string;
+    teachersApproveConfirmTitle: string;
+    teachersApproveConfirmText: string;
+    teachersApproveConfirmCta: string;
+    teachersRejectConfirmTitle: string;
+    teachersRejectConfirmText: string;
+    teachersRejectConfirmCta: string;
+    cancel: string;
   };
   notFound: {
     badge: string;

@@ -205,7 +205,14 @@
     "teachersRejectNoteLabel": "Motivo da rejeição",
     "teachersRejectNoteRequired": "Informe um motivo antes de rejeitar.",
     "teachersAlreadyReviewed": "Esta candidatura já foi revisada por outro administrador.",
-    "teachersReviewError": "Não foi possível concluir a ação. Tente novamente."
+    "teachersReviewError": "Não foi possível concluir a ação. Tente novamente.",
+    "teachersApproveConfirmTitle": "Aprovar candidatura?",
+    "teachersApproveConfirmText": "Este usuário passará a ter acesso como professor.",
+    "teachersApproveConfirmCta": "Aprovar professor",
+    "teachersRejectConfirmTitle": "Rejeitar candidatura?",
+    "teachersRejectConfirmText": "Informe o motivo para o candidato.",
+    "teachersRejectConfirmCta": "Rejeitar candidatura",
+    "cancel": "Cancelar"
   },
   "notFound": {
     "badge": "Erro de rota",

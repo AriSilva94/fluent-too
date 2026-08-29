@@ -205,7 +205,14 @@
     "teachersRejectNoteLabel": "Motif du rejet",
     "teachersRejectNoteRequired": "Indiquez un motif avant de rejeter.",
     "teachersAlreadyReviewed": "Cette candidature a déjà été examinée par un autre administrateur.",
-    "teachersReviewError": "Impossible de terminer l'action. Veuillez réessayer."
+    "teachersReviewError": "Impossible de terminer l'action. Veuillez réessayer.",
+    "teachersApproveConfirmTitle": "Approuver la candidature ?",
+    "teachersApproveConfirmText": "Cet utilisateur recevra l'accès professeur.",
+    "teachersApproveConfirmCta": "Approuver le professeur",
+    "teachersRejectConfirmTitle": "Rejeter la candidature ?",
+    "teachersRejectConfirmText": "Indiquez le motif pour le candidat.",
+    "teachersRejectConfirmCta": "Rejeter la candidature",
+    "cancel": "Annuler"
   },
   "notFound": {
     "badge": "Erreur de parcours",

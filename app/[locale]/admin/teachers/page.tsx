@@ -70,6 +70,7 @@ export default async function AdminTeachersPage({
       initialApplications={result.ok ? result.data : []}
       initialFailed={!result.ok}
       initialStatus="pending"
+      dashboardHref={`/${locale}/dashboard`}
     />
   );
 }

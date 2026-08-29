@@ -205,7 +205,14 @@
     "teachersRejectNoteLabel": "Rejection reason",
     "teachersRejectNoteRequired": "Enter a reason before rejecting.",
     "teachersAlreadyReviewed": "This application has already been reviewed by another admin.",
-    "teachersReviewError": "Could not complete the action. Please try again."
+    "teachersReviewError": "Could not complete the action. Please try again.",
+    "teachersApproveConfirmTitle": "Approve application?",
+    "teachersApproveConfirmText": "This user will receive teacher access.",
+    "teachersApproveConfirmCta": "Approve teacher",
+    "teachersRejectConfirmTitle": "Reject application?",
+    "teachersRejectConfirmText": "Enter the reason for the candidate.",
+    "teachersRejectConfirmCta": "Reject application",
+    "cancel": "Cancel"
   },
   "notFound": {
     "badge": "Routing error",
