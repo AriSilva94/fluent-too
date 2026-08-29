@@ -87,7 +87,9 @@
     "saveSignInTitle": "Want to track your progress?",
     "saveSignInSubtitle": "Create an account to save your study history and track your results.",
     "createAccount": "Create account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "saveProfileRequired": "Choose your profile to start saving your results.",
+    "saveProfileRequiredCta": "Choose my profile"
   },
   "login": {
     "title": "Sign in",
@@ -159,14 +161,18 @@
       "TEACHER_APPLICATION_EXISTS": "You already have a teacher application under review.",
       "FILE_TOO_LARGE": "The uploaded file exceeds the 5 MB limit.",
       "INVALID_FILE_TYPE": "File type not allowed. Upload a PDF, PNG, or JPEG.",
-      "PROFILE_ALREADY_SET": "Your profile has already been set."
+      "PROFILE_ALREADY_SET": "Your profile has already been set.",
+      "ROLE_UNAVAILABLE": "This profile is unavailable right now. Try again later.",
+      "INVALID_URL": "Enter a valid link starting with http:// or https://."
     }
   },
   "onboarding": {
     "title": "How do you want to use Fluent Too?",
-    "subtitle": "Choose your profile to continue. You can submit a teacher application at any time.",
+    "subtitle": "Choose your profile to continue. This choice is permanent and cannot be changed later.",
     "studentCta": "I'm a student",
-    "teacherCta": "I'm a teacher"
+    "teacherCta": "I'm a teacher",
+    "studentConfirmText": "Once confirmed, your account is a student account for good. You will not be able to apply as a teacher later.",
+    "studentConfirmCta": "Confirm as student"
   },
   "dashboard": {
     "title": "Dashboard",

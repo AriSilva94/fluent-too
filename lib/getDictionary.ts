@@ -86,6 +86,8 @@ export type Dictionary = {
     noQuizzesFound: string;
     saveSuccess: string;
     saveFailed: string;
+    saveProfileRequired: string;
+    saveProfileRequiredCta: string;
     saveSignInTitle: string;
     saveSignInSubtitle: string;
     createAccount: string;
@@ -149,6 +151,8 @@ export type Dictionary = {
     subtitle: string;
     studentCta: string;
     teacherCta: string;
+    studentConfirmText: string;
+    studentConfirmCta: string;
   };
   dashboard: {
     title: string;

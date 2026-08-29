@@ -87,7 +87,9 @@
     "saveSignInTitle": "Vous voulez suivre vos progrès ?",
     "saveSignInSubtitle": "Créez un compte pour sauvegarder votre historique d'étude et suivre vos résultats.",
     "createAccount": "Créer un compte",
-    "signIn": "Se connecter"
+    "signIn": "Se connecter",
+    "saveProfileRequired": "Choisissez votre profil pour commencer à enregistrer vos résultats.",
+    "saveProfileRequiredCta": "Choisir mon profil"
   },
   "login": {
     "title": "Connexion",
@@ -159,14 +161,18 @@
       "TEACHER_APPLICATION_EXISTS": "Vous avez déjà une candidature de professeur en cours d'examen.",
       "FILE_TOO_LARGE": "Le fichier envoyé dépasse la limite de 5 Mo.",
       "INVALID_FILE_TYPE": "Type de fichier non autorisé. Envoyez un PDF, PNG ou JPEG.",
-      "PROFILE_ALREADY_SET": "Votre profil a déjà été défini."
+      "PROFILE_ALREADY_SET": "Votre profil a déjà été défini.",
+      "ROLE_UNAVAILABLE": "Ce profil est indisponible pour le moment. Réessayez plus tard.",
+      "INVALID_URL": "Indiquez un lien valide commençant par http:// ou https://."
     }
   },
   "onboarding": {
     "title": "Comment voulez-vous utiliser Fluent Too ?",
-    "subtitle": "Choisissez votre profil pour continuer. Vous pourrez soumettre une candidature de professeur à tout moment.",
+    "subtitle": "Choisissez votre profil pour continuer. Ce choix est définitif et ne pourra pas être modifié.",
     "studentCta": "Je suis étudiant",
-    "teacherCta": "Je suis professeur"
+    "teacherCta": "Je suis professeur",
+    "studentConfirmText": "Une fois confirmé, votre compte restera un compte étudiant. Vous ne pourrez plus postuler comme professeur.",
+    "studentConfirmCta": "Confirmer comme étudiant"
   },
   "dashboard": {
     "title": "Tableau de bord",

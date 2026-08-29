@@ -35,7 +35,9 @@ export type AuthErrorCode =
   | "INVALID_FILE_TYPE"
   | "REVIEW_NOTE_REQUIRED"
   | "ALREADY_REVIEWED"
-  | "PROFILE_ALREADY_SET";
+  | "PROFILE_ALREADY_SET"
+  | "ROLE_UNAVAILABLE"
+  | "INVALID_URL";
 
 export type AuthResponse<T> =
   | { ok: true; data: T }
@@ -43,7 +45,7 @@ export type AuthResponse<T> =
 
 export type FieldErrorCode = Extract<
   AuthErrorCode,
-  "INVALID_EMAIL" | "WEAK_PASSWORD" | "PASSWORDS_DO_NOT_MATCH" | "REQUIRED"
+  "INVALID_EMAIL" | "WEAK_PASSWORD" | "PASSWORDS_DO_NOT_MATCH" | "REQUIRED" | "INVALID_URL"
 >;
 
 export type ValidationResult<T> =

@@ -15,7 +15,7 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function chooseStudent() {
+  async function confirmStudent() {
     setPending(true);
     setError(null);
 
@@ -29,6 +29,11 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
     }
 
     router.replace(`/${locale}/dashboard`);
+  }
+
+  function selectProfile(next: Profile) {
+    setError(null);
+    setProfile(next);
   }
 
   return (
@@ -46,9 +51,12 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
         ) : null}
 
         <div className="mt-6 grid grid-cols-2 gap-3">
+          {/* A escolha é permanente: o card só seleciona, quem envia é o botão de
+              confirmação abaixo — igual ao caminho de professor. Um clique errado
+              aqui não define mais o perfil. */}
           <button
             type="button"
-            onClick={chooseStudent}
+            onClick={() => selectProfile("student")}
             disabled={pending}
             aria-pressed={profile === "student"}
             className={`rounded-lg px-4 py-3 text-left text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${
@@ -64,7 +72,7 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
           </button>
           <button
             type="button"
-            onClick={() => setProfile("teacher")}
+            onClick={() => selectProfile("teacher")}
             disabled={pending}
             aria-pressed={profile === "teacher"}
             className={`rounded-lg px-4 py-3 text-left text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${
@@ -79,6 +87,21 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
             </span>
           </button>
         </div>
+
+        {profile === "student" ? (
+          <div className="mt-6">
+            <div className="mb-6 h-px bg-brand-blue/10" />
+            <p className="text-sm font-medium leading-6 text-neutral-600">{dict.onboarding.studentConfirmText}</p>
+            <button
+              type="button"
+              onClick={confirmStudent}
+              disabled={pending}
+              className="mt-4 w-full rounded-lg bg-brand-orange px-4 py-3 text-sm font-black text-white shadow-[0_14px_34px_rgba(255,103,0,0.28)] transition-opacity disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {dict.onboarding.studentConfirmCta}
+            </button>
+          </div>
+        ) : null}
 
         {profile === "teacher" ? (
           <div className="mt-6">

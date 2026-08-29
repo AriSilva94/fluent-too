@@ -31,6 +31,24 @@ describe("validação da candidatura de professor", () => {
       fieldErrors: { languages: "REQUIRED" },
     });
   });
+
+  it("rejeita credentialUrl javascript:, que executaria no admin que revisa", () => {
+    expect(validateTeacherApplication({ ...valid, credentialUrl: "javascript:alert(1)" })).toEqual({
+      ok: false,
+      fieldErrors: { credentialUrl: "INVALID_URL" },
+    });
+  });
+
+  it("rejeita credentialUrl relativo, que não é uma URL absoluta", () => {
+    expect(validateTeacherApplication({ ...valid, credentialUrl: "/cert.pdf" })).toEqual({
+      ok: false,
+      fieldErrors: { credentialUrl: "INVALID_URL" },
+    });
+    expect(validateTeacherApplication({ ...valid, credentialUrl: "example.com/cert" })).toEqual({
+      ok: false,
+      fieldErrors: { credentialUrl: "INVALID_URL" },
+    });
+  });
 });
 
 describe("validação do anexo", () => {

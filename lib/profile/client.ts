@@ -88,6 +88,10 @@ const KNOWN_ERROR_CODES: readonly AuthErrorCode[] = [
   "INVALID_FILE_TYPE",
   "REQUIRED",
   "UNAUTHORIZED",
+  // Os dois endpoints de perfil devolvem isto quando a role correspondente não existe
+  // no banco; sem estar na lista, viraria um UNKNOWN_ERROR sem explicação.
+  "ROLE_UNAVAILABLE",
+  "INVALID_URL",
 ];
 
 function isKnownErrorCode(value: string): value is AuthErrorCode {

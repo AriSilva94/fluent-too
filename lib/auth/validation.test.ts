@@ -74,3 +74,30 @@ describe("password flows", () => {
     });
   });
 });
+
+describe("corpo sem e-mail", () => {
+  // `normalizeEmail(undefined)` estourava no `.trim()`, e a rota respondia 500
+  // em vez do 400 de campo invalido.
+  it("recusa login sem e-mail com INVALID_EMAIL, sem estourar", () => {
+    expect(validateLogin({ password: "secret123" } as never)).toEqual({
+      ok: false,
+      fieldErrors: { email: "INVALID_EMAIL" },
+    });
+  });
+
+  it("recusa cadastro sem e-mail com INVALID_EMAIL, sem estourar", () => {
+    expect(
+      validateRegister({ password: "secret123", passwordConfirmation: "secret123" } as never)
+    ).toEqual({
+      ok: false,
+      fieldErrors: { email: "INVALID_EMAIL" },
+    });
+  });
+
+  it("recusa recuperacao sem e-mail com INVALID_EMAIL, sem estourar", () => {
+    expect(validateForgotPassword({} as never)).toEqual({
+      ok: false,
+      fieldErrors: { email: "INVALID_EMAIL" },
+    });
+  });
+});

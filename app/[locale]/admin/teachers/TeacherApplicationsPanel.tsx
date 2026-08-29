@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/lib/getDictionary";
+import { isHttpUrl } from "@/lib/auth/teacher-registration";
 
 type ApplicationStatus = "pending" | "approved" | "rejected";
 
@@ -187,7 +188,10 @@ export default function TeacherApplicationsPanel({
                       <p className="mt-1 text-sm font-bold text-neutral-500">{application.languages.join(", ").toUpperCase()}</p>
                     ) : null}
                   </div>
-                  {application.credentialUrl ? (
+                  {/* Os validadores já barram `javascript:` na entrada, mas candidaturas
+                      gravadas antes disso ainda podem ter um link hostil: aqui é o `href`
+                      que executaria na origem autenticada de quem revisa. */}
+                  {application.credentialUrl && isHttpUrl(application.credentialUrl) ? (
                     <a
                       href={application.credentialUrl}
                       target="_blank"
