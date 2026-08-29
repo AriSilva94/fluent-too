@@ -11,7 +11,8 @@ import { resolveSession } from "@/lib/auth/session";
 import { createQuizAttemptsClient } from "@/lib/quiz-attempts/client";
 import { createProfileClient } from "@/lib/profile/client";
 import { hasProfile, isPendingTeacher } from "@/lib/auth/roles";
-import TeacherApplicationStatus, { resolveTeacherApplicationView } from "./TeacherApplicationStatus";
+import TeacherApplicationStatus from "./TeacherApplicationStatus";
+import { resolveTeacherApplicationView } from "./teacher-application-view";
 
 const dashboardDescriptions: Record<Locale, string> = {
   "pt-br": "Painel do aluno na Fluent Too com progresso, atividades e dados privados.",

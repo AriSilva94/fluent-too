@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveTeacherApplicationView } from "./TeacherApplicationStatus";
+import { resolveTeacherApplicationView } from "./teacher-application-view";
 import type { ApplicationResult } from "@/lib/profile/client";
 
 describe("resolveTeacherApplicationView", () => {

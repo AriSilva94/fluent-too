@@ -3,26 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/lib/getDictionary";
-import type { ApplicationResult } from "@/lib/profile/client";
-
-export type TeacherApplicationView = "pending" | "rejected";
-
-/**
- * Decide o que mostrar a um `teacher_pending` a partir do resultado da busca da
- * própria candidatura. Qualquer falha (rede, resposta não-ok, corpo vazio) ou um
- * status que não seja `rejected` cai em "pending" sem motivo: é o lado seguro de
- * errar — dizer "em análise" para quem já foi aprovado/rejeitado é inofensivo,
- * mas mostrar a tela de recusa por engano não é.
- */
-export function resolveTeacherApplicationView(result: ApplicationResult): {
-  view: TeacherApplicationView;
-  reviewNote: string | null;
-} {
-  if (!result.ok || !result.data || result.data.status !== "rejected") {
-    return { view: "pending", reviewNote: null };
-  }
-  return { view: "rejected", reviewNote: result.data.reviewNote };
-}
+import type { TeacherApplicationView } from "./teacher-application-view";
 
 export default function TeacherApplicationStatus({
   dict,
