@@ -1,4 +1,4 @@
-export type AppRole = "super_admin" | "app_admin" | "teacher" | "teacher_pending" | "student";
+export type AppRole = "super_admin" | "app_admin" | "teacher" | "teacher_pending" | "student" | "unassigned";
 
 export type AuthUser = {
   id: number;
@@ -34,7 +34,8 @@ export type AuthErrorCode =
   | "FILE_TOO_LARGE"
   | "INVALID_FILE_TYPE"
   | "REVIEW_NOTE_REQUIRED"
-  | "ALREADY_REVIEWED";
+  | "ALREADY_REVIEWED"
+  | "PROFILE_ALREADY_SET";
 
 export type AuthResponse<T> =
   | { ok: true; data: T }
@@ -86,10 +87,7 @@ export type RegistrationSuccess = {
   tokens?: AuthTokens;
 };
 
-export type TeacherRegisterPayload = {
-  email: string;
-  password: string;
-  passwordConfirmation: string;
+export type TeacherApplicationPayload = {
   bio: string;
   experience: string;
   languages: string[];

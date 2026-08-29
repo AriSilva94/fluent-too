@@ -1,22 +1,14 @@
-import type { AuthErrorCode, TeacherRegisterPayload } from "./contracts";
-import { validateRegister } from "./validation";
+import type { AuthErrorCode, TeacherApplicationPayload } from "./contracts";
 
 const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
 const ALLOWED_ATTACHMENT_TYPES = ["application/pdf", "image/png", "image/jpeg"];
 const SUPPORTED_LANGUAGES = ["pt", "en", "fr"];
 
-export type TeacherRegisterResult =
-  | { ok: true; data: TeacherRegisterPayload }
-  | { ok: false; fieldErrors: Record<string, "REQUIRED" | "INVALID_EMAIL" | "WEAK_PASSWORD" | "PASSWORDS_DO_NOT_MATCH"> };
+export type TeacherApplicationResult =
+  | { ok: true; data: TeacherApplicationPayload }
+  | { ok: false; fieldErrors: Record<string, "REQUIRED"> };
 
-export function validateTeacherRegister(input: TeacherRegisterPayload): TeacherRegisterResult {
-  const base = validateRegister({
-    email: input.email,
-    password: input.password,
-    passwordConfirmation: input.passwordConfirmation,
-  });
-  if (!base.ok) return base;
-
+export function validateTeacherApplication(input: TeacherApplicationPayload): TeacherApplicationResult {
   const bio = (input.bio ?? "").trim();
   const experience = (input.experience ?? "").trim();
   const languages = (input.languages ?? []).filter((language) => SUPPORTED_LANGUAGES.includes(language));
@@ -28,7 +20,6 @@ export function validateTeacherRegister(input: TeacherRegisterPayload): TeacherR
   return {
     ok: true,
     data: {
-      ...base.data,
       bio,
       experience,
       languages,

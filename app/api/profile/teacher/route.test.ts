@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { isBodyWithinLimit, MAX_REGISTER_TEACHER_BODY_BYTES, POST } from "./route";
+import { isBodyWithinLimit, MAX_TEACHER_APPLICATION_BODY_BYTES, POST } from "./route";
 
-describe("limite de corpo do cadastro de professor", () => {
+describe("limite de corpo da candidatura de professor", () => {
   it("aceita um corpo dentro do limite", () => {
     expect(isBodyWithinLimit(String(5 * 1024 * 1024))).toBe(true);
-    expect(isBodyWithinLimit(String(MAX_REGISTER_TEACHER_BODY_BYTES))).toBe(true);
+    expect(isBodyWithinLimit(String(MAX_TEACHER_APPLICATION_BODY_BYTES))).toBe(true);
   });
 
   it("recusa um corpo acima do limite", () => {
-    expect(isBodyWithinLimit(String(MAX_REGISTER_TEACHER_BODY_BYTES + 1))).toBe(false);
+    expect(isBodyWithinLimit(String(MAX_TEACHER_APPLICATION_BODY_BYTES + 1))).toBe(false);
     expect(isBodyWithinLimit(String(500 * 1024 * 1024))).toBe(false);
   });
 
@@ -18,7 +18,7 @@ describe("limite de corpo do cadastro de professor", () => {
   });
 
   it("responde FILE_TOO_LARGE sem materializar o formData", async () => {
-    const request = new Request("http://localhost/api/auth/register-teacher", {
+    const request = new Request("http://localhost/api/profile/teacher", {
       method: "POST",
       headers: { "content-length": String(500 * 1024 * 1024) },
     });
@@ -32,5 +32,16 @@ describe("limite de corpo do cadastro de professor", () => {
 
     expect(response.status).toBe(413);
     await expect(response.json()).resolves.toEqual({ ok: false, error: "FILE_TOO_LARGE" });
+  });
+
+  it("responde 401 sem token, mesmo com corpo dentro do limite", async () => {
+    const request = new Request("http://localhost/api/profile/teacher", {
+      method: "POST",
+      headers: { "content-length": "10" },
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(401);
   });
 });

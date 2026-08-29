@@ -1,35 +1,32 @@
 import { describe, expect, it } from "vitest";
-import { validateAttachment, validateTeacherRegister } from "./teacher-registration";
+import { validateAttachment, validateTeacherApplication } from "./teacher-registration";
 
 const valid = {
-  email: "Prof@Example.com",
-  password: "senha-forte-123",
-  passwordConfirmation: "senha-forte-123",
   bio: "Professor de inglês.",
   experience: "CELTA, 8 anos.",
   languages: ["en"],
 };
 
-describe("validação do cadastro de professor", () => {
-  it("aceita payload completo normalizando o e-mail", () => {
-    const result = validateTeacherRegister(valid);
+describe("validação da candidatura de professor", () => {
+  it("aceita payload completo", () => {
+    const result = validateTeacherApplication(valid);
 
-    expect(result).toEqual({ ok: true, data: { ...valid, email: "prof@example.com" } });
+    expect(result).toEqual({ ok: true, data: valid });
   });
 
-  it("reaproveita as regras de senha do registro comum", () => {
-    const result = validateTeacherRegister({ ...valid, passwordConfirmation: "outra" });
+  it("mantém a URL de credencial quando informada", () => {
+    const result = validateTeacherApplication({ ...valid, credentialUrl: "https://example.com/cert" });
 
-    expect(result).toEqual({ ok: false, fieldErrors: { passwordConfirmation: "PASSWORDS_DO_NOT_MATCH" } });
+    expect(result).toEqual({ ok: true, data: { ...valid, credentialUrl: "https://example.com/cert" } });
   });
 
   it("exige bio, experiência e idioma", () => {
-    expect(validateTeacherRegister({ ...valid, bio: " " })).toEqual({ ok: false, fieldErrors: { bio: "REQUIRED" } });
-    expect(validateTeacherRegister({ ...valid, experience: "" })).toEqual({
+    expect(validateTeacherApplication({ ...valid, bio: " " })).toEqual({ ok: false, fieldErrors: { bio: "REQUIRED" } });
+    expect(validateTeacherApplication({ ...valid, experience: "" })).toEqual({
       ok: false,
       fieldErrors: { experience: "REQUIRED" },
     });
-    expect(validateTeacherRegister({ ...valid, languages: [] })).toEqual({
+    expect(validateTeacherApplication({ ...valid, languages: [] })).toEqual({
       ok: false,
       fieldErrors: { languages: "REQUIRED" },
     });
