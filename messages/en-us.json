@@ -180,7 +180,10 @@
     "bestScore": "Best result",
     "continueStudying": "Keep studying",
     "teacherPendingTitle": "Teacher application under review",
-    "teacherPendingText": "We received your application to become a teacher and our team is reviewing it. You will be notified as soon as a decision is made."
+    "teacherPendingText": "We received your application to become a teacher and our team is reviewing it. You will be notified as soon as a decision is made.",
+    "teacherRejectedTitle": "Teacher application not approved",
+    "teacherRejectedText": "Your application to become a teacher was not approved this time.",
+    "teacherRejectedCta": "Continue as a student"
   },
   "admin": {
     "title": "Admin Panel",

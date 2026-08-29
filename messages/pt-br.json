@@ -180,7 +180,10 @@
     "bestScore": "Melhor resultado",
     "continueStudying": "Continuar estudando",
     "teacherPendingTitle": "Candidatura de professor em análise",
-    "teacherPendingText": "Recebemos sua candidatura para se tornar professor e nossa equipe está avaliando. Você será notificado assim que houver uma decisão."
+    "teacherPendingText": "Recebemos sua candidatura para se tornar professor e nossa equipe está avaliando. Você será notificado assim que houver uma decisão.",
+    "teacherRejectedTitle": "Candidatura de professor não aprovada",
+    "teacherRejectedText": "Sua candidatura para se tornar professor não foi aprovada desta vez.",
+    "teacherRejectedCta": "Continuar como estudante"
   },
   "admin": {
     "title": "Painel administrativo",

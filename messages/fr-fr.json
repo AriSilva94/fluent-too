@@ -180,7 +180,10 @@
     "bestScore": "Meilleur résultat",
     "continueStudying": "Continuer à étudier",
     "teacherPendingTitle": "Candidature d'enseignant en cours d'examen",
-    "teacherPendingText": "Nous avons bien reçu votre candidature pour devenir enseignant et notre équipe l'examine actuellement. Vous serez averti dès qu'une décision sera prise."
+    "teacherPendingText": "Nous avons bien reçu votre candidature pour devenir enseignant et notre équipe l'examine actuellement. Vous serez averti dès qu'une décision sera prise.",
+    "teacherRejectedTitle": "Candidature d'enseignant non approuvée",
+    "teacherRejectedText": "Votre candidature pour devenir enseignant n'a pas été approuvée cette fois-ci.",
+    "teacherRejectedCta": "Continuer en tant qu'élève"
   },
   "admin": {
     "title": "Panneau d'administration",

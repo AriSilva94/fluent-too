@@ -163,6 +163,9 @@ export type Dictionary = {
     continueStudying: string;
     teacherPendingTitle: string;
     teacherPendingText: string;
+    teacherRejectedTitle: string;
+    teacherRejectedText: string;
+    teacherRejectedCta: string;
   };
   admin: {
     title: string;
