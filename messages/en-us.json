@@ -158,8 +158,15 @@
       "UNKNOWN_ERROR": "Could not complete the operation.",
       "TEACHER_APPLICATION_EXISTS": "You already have a teacher application under review.",
       "FILE_TOO_LARGE": "The uploaded file exceeds the 5 MB limit.",
-      "INVALID_FILE_TYPE": "File type not allowed. Upload a PDF, PNG, or JPEG."
+      "INVALID_FILE_TYPE": "File type not allowed. Upload a PDF, PNG, or JPEG.",
+      "PROFILE_ALREADY_SET": "Your profile has already been set."
     }
+  },
+  "onboarding": {
+    "title": "How do you want to use Fluent Too?",
+    "subtitle": "Choose your profile to continue. You can submit a teacher application at any time.",
+    "studentCta": "I'm a student",
+    "teacherCta": "I'm a teacher"
   },
   "dashboard": {
     "title": "Dashboard",

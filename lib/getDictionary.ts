@@ -144,6 +144,12 @@ export type Dictionary = {
     teacherSubmit: string;
     errors: Record<string, string>;
   };
+  onboarding: {
+    title: string;
+    subtitle: string;
+    studentCta: string;
+    teacherCta: string;
+  };
   dashboard: {
     title: string;
     welcome: string;

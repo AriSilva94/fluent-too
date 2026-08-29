@@ -158,8 +158,15 @@
       "UNKNOWN_ERROR": "Não foi possível concluir a operação.",
       "TEACHER_APPLICATION_EXISTS": "Você já tem uma candidatura de professor em análise.",
       "FILE_TOO_LARGE": "O arquivo enviado ultrapassa o limite de 5 MB.",
-      "INVALID_FILE_TYPE": "Formato de arquivo não permitido. Envie PDF, PNG ou JPEG."
+      "INVALID_FILE_TYPE": "Formato de arquivo não permitido. Envie PDF, PNG ou JPEG.",
+      "PROFILE_ALREADY_SET": "Seu perfil já foi definido."
     }
+  },
+  "onboarding": {
+    "title": "Como você quer usar a Fluent Too?",
+    "subtitle": "Escolha seu perfil para continuar. Você poderá enviar uma candidatura de professor a qualquer momento.",
+    "studentCta": "Sou estudante",
+    "teacherCta": "Sou professor"
   },
   "dashboard": {
     "title": "Painel",
