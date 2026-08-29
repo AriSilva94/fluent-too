@@ -11,6 +11,7 @@ import { resolveSession } from "@/lib/auth/session";
 import { createQuizAttemptsClient } from "@/lib/quiz-attempts/client";
 import { createProfileClient } from "@/lib/profile/client";
 import { hasProfile, isPendingTeacher } from "@/lib/auth/roles";
+import DashboardAdminActions from "./DashboardAdminActions";
 import TeacherApplicationStatus from "./TeacherApplicationStatus";
 import { resolveTeacherApplicationView } from "./teacher-application-view";
 
@@ -98,6 +99,16 @@ export default async function DashboardPage({
             </Link>
           </div>
         </section>
+
+        <DashboardAdminActions
+          locale={locale as Locale}
+          role={user.role?.type}
+          labels={{
+            title: dict.admin.title,
+            subtitle: dict.admin.subtitle,
+            teachersTitle: dict.admin.teachersTitle,
+          }}
+        />
 
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           {metricCards.map((metric) => (
