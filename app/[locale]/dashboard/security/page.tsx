@@ -5,6 +5,7 @@ import { isValidLocale, type Locale } from "@/lib/i18n";
 import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { resolveSession } from "@/lib/auth/session";
+import { hasProfile } from "@/lib/auth/roles";
 import ChangePasswordForm from "./ChangePasswordForm";
 
 export default async function SecurityPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -21,6 +22,7 @@ export default async function SecurityPage({ params }: { params: Promise<{ local
   );
 
   if (session.status === "anonymous") redirect(`/${locale}/login?returnTo=/${locale}/dashboard/security`);
+  if (!hasProfile(session.user.role?.type)) redirect(`/${locale}/onboarding`);
 
   return <ChangePasswordForm dict={dict} email={session.user.email} />;
 }

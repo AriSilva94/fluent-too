@@ -1,5 +1,8 @@
 export function isTrustedOrigin(origin: string | null, siteUrl: string) {
-  if (!origin) return true;
+  // Todas as chamadas mutáveis destes handlers vêm de `fetch` do próprio app, que
+  // sempre envia Origin em requisições same-origin com método diferente de GET/HEAD.
+  // Aceitar ausência de Origin abriria espaço para clientes que a omitam de propósito.
+  if (!origin) return false;
   try {
     return new URL(origin).origin === new URL(siteUrl).origin;
   } catch {

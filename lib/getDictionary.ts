@@ -86,6 +86,8 @@ export type Dictionary = {
     noQuizzesFound: string;
     saveSuccess: string;
     saveFailed: string;
+    saveProfileRequired: string;
+    saveProfileRequiredCta: string;
     saveSignInTitle: string;
     saveSignInSubtitle: string;
     createAccount: string;
@@ -130,7 +132,27 @@ export type Dictionary = {
     changePasswordSubmit: string;
     changePasswordSuccess: string;
     logout: string;
+    profileTitle: string;
+    profileStudent: string;
+    profileStudentHint: string;
+    profileTeacher: string;
+    profileTeacherHint: string;
+    teacherBioLabel: string;
+    teacherExperienceLabel: string;
+    teacherLanguagesLabel: string;
+    teacherCredentialLabel: string;
+    teacherAttachmentLabel: string;
+    teacherAttachmentHint: string;
+    teacherSubmit: string;
     errors: Record<string, string>;
+  };
+  onboarding: {
+    title: string;
+    subtitle: string;
+    studentCta: string;
+    teacherCta: string;
+    studentConfirmText: string;
+    studentConfirmCta: string;
   };
   dashboard: {
     title: string;
@@ -143,10 +165,34 @@ export type Dictionary = {
     averageScore: string;
     bestScore: string;
     continueStudying: string;
+    teacherPendingTitle: string;
+    teacherPendingText: string;
+    teacherRejectedTitle: string;
+    teacherRejectedText: string;
+    teacherRejectedCta: string;
   };
   admin: {
     title: string;
     subtitle: string;
+    teachersTitle: string;
+    teachersEmpty: string;
+    teachersLoadError: string;
+    teachersFilterPending: string;
+    teachersFilterApproved: string;
+    teachersFilterRejected: string;
+    teachersApprove: string;
+    teachersReject: string;
+    teachersRejectNoteLabel: string;
+    teachersRejectNoteRequired: string;
+    teachersAlreadyReviewed: string;
+    teachersReviewError: string;
+    teachersApproveConfirmTitle: string;
+    teachersApproveConfirmText: string;
+    teachersApproveConfirmCta: string;
+    teachersRejectConfirmTitle: string;
+    teachersRejectConfirmText: string;
+    teachersRejectConfirmCta: string;
+    cancel: string;
   };
   notFound: {
     badge: string;

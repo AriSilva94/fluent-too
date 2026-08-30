@@ -87,7 +87,9 @@
     "saveSignInTitle": "Quer acompanhar sua evolução?",
     "saveSignInSubtitle": "Crie uma conta para salvar seu histórico de estudos e acompanhar seus resultados.",
     "createAccount": "Criar conta",
-    "signIn": "Entrar"
+    "signIn": "Entrar",
+    "saveProfileRequired": "Escolha seu perfil para começar a salvar seus resultados.",
+    "saveProfileRequiredCta": "Escolher meu perfil"
   },
   "login": {
     "title": "Entrar",
@@ -128,6 +130,18 @@
     "changePasswordSubmit": "Alterar senha",
     "changePasswordSuccess": "Senha alterada com sucesso.",
     "logout": "Sair",
+    "profileTitle": "Como você quer se cadastrar?",
+    "profileStudent": "Sou estudante",
+    "profileStudentHint": "Quero aprender idiomas com aulas e quizzes.",
+    "profileTeacher": "Sou professor",
+    "profileTeacherHint": "Quero dar aulas na plataforma.",
+    "teacherBioLabel": "Bio",
+    "teacherExperienceLabel": "Experiência",
+    "teacherLanguagesLabel": "Idiomas que você ensina",
+    "teacherCredentialLabel": "Link de credencial (opcional)",
+    "teacherAttachmentLabel": "Anexo (opcional)",
+    "teacherAttachmentHint": "PDF, PNG ou JPEG, até 5 MB.",
+    "teacherSubmit": "Enviar candidatura",
     "errors": {
       "INVALID_EMAIL": "Informe um e-mail válido.",
       "WEAK_PASSWORD": "Use uma senha entre 8 e 72 caracteres.",
@@ -143,8 +157,22 @@
       "GOOGLE_AUTH_FAILED": "Não foi possível entrar com Google.",
       "INVALID_ORIGIN": "Origem da requisição não permitida.",
       "PAYLOAD_TOO_LARGE": "Dados enviados acima do limite.",
-      "UNKNOWN_ERROR": "Não foi possível concluir a operação."
+      "UNKNOWN_ERROR": "Não foi possível concluir a operação.",
+      "TEACHER_APPLICATION_EXISTS": "Você já tem uma candidatura de professor em análise.",
+      "FILE_TOO_LARGE": "O arquivo enviado ultrapassa o limite de 5 MB.",
+      "INVALID_FILE_TYPE": "Formato de arquivo não permitido. Envie PDF, PNG ou JPEG.",
+      "PROFILE_ALREADY_SET": "Seu perfil já foi definido.",
+      "ROLE_UNAVAILABLE": "Este perfil está indisponível no momento. Tente novamente mais tarde.",
+      "INVALID_URL": "Informe um link válido começando com http:// ou https://."
     }
+  },
+  "onboarding": {
+    "title": "Como você quer usar a Fluent Too?",
+    "subtitle": "Escolha seu perfil para continuar. Esta escolha é permanente e não pode ser alterada depois.",
+    "studentCta": "Sou estudante",
+    "teacherCta": "Sou professor",
+    "studentConfirmText": "Ao confirmar, sua conta será de estudante para sempre. Você não poderá se candidatar a professor depois.",
+    "studentConfirmCta": "Confirmar como estudante"
   },
   "dashboard": {
     "title": "Painel",
@@ -156,11 +184,35 @@
     "totalAttempts": "Quizzes finalizados",
     "averageScore": "Média geral",
     "bestScore": "Melhor resultado",
-    "continueStudying": "Continuar estudando"
+    "continueStudying": "Continuar estudando",
+    "teacherPendingTitle": "Candidatura de professor em análise",
+    "teacherPendingText": "Recebemos sua candidatura para se tornar professor e nossa equipe está avaliando. Você será notificado assim que houver uma decisão.",
+    "teacherRejectedTitle": "Candidatura de professor não aprovada",
+    "teacherRejectedText": "Sua candidatura para se tornar professor não foi aprovada desta vez.",
+    "teacherRejectedCta": "Continuar como estudante"
   },
   "admin": {
     "title": "Painel administrativo",
-    "subtitle": "Gerencie conteúdo, usuários e configurações."
+    "subtitle": "Gerencie conteúdo, usuários e configurações.",
+    "teachersTitle": "Candidaturas de professores",
+    "teachersEmpty": "Nenhuma candidatura encontrada.",
+    "teachersLoadError": "Não foi possível carregar as candidaturas. Tente novamente em instantes.",
+    "teachersFilterPending": "Pendentes",
+    "teachersFilterApproved": "Aprovadas",
+    "teachersFilterRejected": "Rejeitadas",
+    "teachersApprove": "Aprovar",
+    "teachersReject": "Rejeitar",
+    "teachersRejectNoteLabel": "Motivo da rejeição",
+    "teachersRejectNoteRequired": "Informe um motivo antes de rejeitar.",
+    "teachersAlreadyReviewed": "Esta candidatura já foi revisada por outro administrador.",
+    "teachersReviewError": "Não foi possível concluir a ação. Tente novamente.",
+    "teachersApproveConfirmTitle": "Aprovar candidatura?",
+    "teachersApproveConfirmText": "Este usuário passará a ter acesso como professor.",
+    "teachersApproveConfirmCta": "Aprovar professor",
+    "teachersRejectConfirmTitle": "Rejeitar candidatura?",
+    "teachersRejectConfirmText": "Informe o motivo para o candidato.",
+    "teachersRejectConfirmCta": "Rejeitar candidatura",
+    "cancel": "Cancelar"
   },
   "notFound": {
     "badge": "Erro de rota",

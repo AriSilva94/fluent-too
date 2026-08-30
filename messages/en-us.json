@@ -87,7 +87,9 @@
     "saveSignInTitle": "Want to track your progress?",
     "saveSignInSubtitle": "Create an account to save your study history and track your results.",
     "createAccount": "Create account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "saveProfileRequired": "Choose your profile to start saving your results.",
+    "saveProfileRequiredCta": "Choose my profile"
   },
   "login": {
     "title": "Sign in",
@@ -128,6 +130,18 @@
     "changePasswordSubmit": "Change password",
     "changePasswordSuccess": "Password changed successfully.",
     "logout": "Sign out",
+    "profileTitle": "How do you want to sign up?",
+    "profileStudent": "I'm a student",
+    "profileStudentHint": "I want to learn languages with lessons and quizzes.",
+    "profileTeacher": "I'm a teacher",
+    "profileTeacherHint": "I want to teach on the platform.",
+    "teacherBioLabel": "Bio",
+    "teacherExperienceLabel": "Experience",
+    "teacherLanguagesLabel": "Languages you teach",
+    "teacherCredentialLabel": "Credential link (optional)",
+    "teacherAttachmentLabel": "Attachment (optional)",
+    "teacherAttachmentHint": "PDF, PNG, or JPEG, up to 5 MB.",
+    "teacherSubmit": "Submit application",
     "errors": {
       "INVALID_EMAIL": "Enter a valid email.",
       "WEAK_PASSWORD": "Use a password between 8 and 72 characters.",
@@ -143,8 +157,22 @@
       "GOOGLE_AUTH_FAILED": "Could not sign in with Google.",
       "INVALID_ORIGIN": "Request origin is not allowed.",
       "PAYLOAD_TOO_LARGE": "Submitted data exceeds the limit.",
-      "UNKNOWN_ERROR": "Could not complete the operation."
+      "UNKNOWN_ERROR": "Could not complete the operation.",
+      "TEACHER_APPLICATION_EXISTS": "You already have a teacher application under review.",
+      "FILE_TOO_LARGE": "The uploaded file exceeds the 5 MB limit.",
+      "INVALID_FILE_TYPE": "File type not allowed. Upload a PDF, PNG, or JPEG.",
+      "PROFILE_ALREADY_SET": "Your profile has already been set.",
+      "ROLE_UNAVAILABLE": "This profile is unavailable right now. Try again later.",
+      "INVALID_URL": "Enter a valid link starting with http:// or https://."
     }
+  },
+  "onboarding": {
+    "title": "How do you want to use Fluent Too?",
+    "subtitle": "Choose your profile to continue. This choice is permanent and cannot be changed later.",
+    "studentCta": "I'm a student",
+    "teacherCta": "I'm a teacher",
+    "studentConfirmText": "Once confirmed, your account is a student account for good. You will not be able to apply as a teacher later.",
+    "studentConfirmCta": "Confirm as student"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -156,11 +184,35 @@
     "totalAttempts": "Completed quizzes",
     "averageScore": "Overall average",
     "bestScore": "Best result",
-    "continueStudying": "Keep studying"
+    "continueStudying": "Keep studying",
+    "teacherPendingTitle": "Teacher application under review",
+    "teacherPendingText": "We received your application to become a teacher and our team is reviewing it. You will be notified as soon as a decision is made.",
+    "teacherRejectedTitle": "Teacher application not approved",
+    "teacherRejectedText": "Your application to become a teacher was not approved this time.",
+    "teacherRejectedCta": "Continue as a student"
   },
   "admin": {
     "title": "Admin Panel",
-    "subtitle": "Manage content, users, and settings."
+    "subtitle": "Manage content, users, and settings.",
+    "teachersTitle": "Teacher applications",
+    "teachersEmpty": "No applications found.",
+    "teachersLoadError": "We could not load the applications. Try again in a moment.",
+    "teachersFilterPending": "Pending",
+    "teachersFilterApproved": "Approved",
+    "teachersFilterRejected": "Rejected",
+    "teachersApprove": "Approve",
+    "teachersReject": "Reject",
+    "teachersRejectNoteLabel": "Rejection reason",
+    "teachersRejectNoteRequired": "Enter a reason before rejecting.",
+    "teachersAlreadyReviewed": "This application has already been reviewed by another admin.",
+    "teachersReviewError": "Could not complete the action. Please try again.",
+    "teachersApproveConfirmTitle": "Approve application?",
+    "teachersApproveConfirmText": "This user will receive teacher access.",
+    "teachersApproveConfirmCta": "Approve teacher",
+    "teachersRejectConfirmTitle": "Reject application?",
+    "teachersRejectConfirmText": "Enter the reason for the candidate.",
+    "teachersRejectConfirmCta": "Reject application",
+    "cancel": "Cancel"
   },
   "notFound": {
     "badge": "Routing error",

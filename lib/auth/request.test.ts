@@ -5,7 +5,7 @@ describe("request helpers", () => {
   it("valida origem confiavel", () => {
     expect(isTrustedOrigin("https://app.example.com", "https://app.example.com")).toBe(true);
     expect(isTrustedOrigin("https://evil.example", "https://app.example.com")).toBe(false);
-    expect(isTrustedOrigin(null, "https://app.example.com")).toBe(true);
+    expect(isTrustedOrigin(null, "https://app.example.com")).toBe(false);
   });
 
   it("limita corpo JSON", async () => {
