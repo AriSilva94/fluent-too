@@ -7,37 +7,41 @@ type GoogleClient = {
   googleCallback(accessToken: string): Promise<AuthResponse<AuthSuccess>>;
 };
 
-export function buildGoogleStartUrl(strapiPublicUrl: string, callbackUrl: string, returnTo: string, nonce: string) {
+export function buildGoogleStartUrl(strapiPublicUrl: string, callbackUrl: string, returnTo: string) {
   const url = new URL("/api/connect/google", trimTrailingSlash(strapiPublicUrl));
   url.searchParams.set("callback", callbackUrl);
-  url.searchParams.set("state", encodeState(nonce, safeRedirect(returnTo, "/pt-br/dashboard")));
+  url.searchParams.set("state", safeRedirect(returnTo, "/pt-br/dashboard"));
   return url.toString();
 }
 
-export function parseGoogleCallback(url: URL, expectedNonce?: string | null) {
+/**
+ * O provider Google do Strapi (grant/purest por baixo) reconstrói a URL final do
+ * callback só com os campos do token (`access_token`, `id_token`, `raw[...]`) — ele
+ * NUNCA ecoa de volta o `state` que mandamos no início do fluxo (confirmado em
+ * produção). Por isso o nonce não pode viver no `state`: a prova de que foi ESTE
+ * navegador que iniciou o fluxo é só a presença do cookie de nonce, ainda válido
+ * (10 min). Isso fecha o ataque do S1 — atacante inicia com a própria conta e manda
+ * o link do callback pronto pra vítima: ela nunca teria o cookie certo, porque nunca
+ * visitou `/api/auth/google` por conta própria.
+ */
+export function parseGoogleCallback(url: URL, hasNonceCookie: boolean) {
   if (url.searchParams.get("error")) return { ok: false as const, code: "GOOGLE_AUTH_FAILED" as const };
   const accessToken = url.searchParams.get("access_token");
   if (!accessToken) return { ok: false as const, code: "GOOGLE_AUTH_FAILED" as const };
-
-  const state = decodeState(url.searchParams.get("state"));
-  // Sem nonce esperado (cookie ausente/expirado) ou nonce que não bate: alguém pode
-  // ter iniciado o fluxo com a própria conta e enviado este callback para a vítima.
-  if (!expectedNonce || !state || state.nonce !== expectedNonce) {
-    return { ok: false as const, code: "OAUTH_STATE_MISMATCH" as const };
-  }
+  if (!hasNonceCookie) return { ok: false as const, code: "OAUTH_STATE_MISMATCH" as const };
 
   return {
     ok: true as const,
     accessToken,
-    returnTo: state.returnTo,
+    returnTo: safeRedirect(url.searchParams.get("state"), "/pt-br/dashboard"),
   };
 }
 
 export async function handleGoogleCallback(
   url: URL,
-  options: { client: GoogleClient; secureCookies?: boolean; expectedNonce?: string | null }
+  options: { client: GoogleClient; secureCookies?: boolean; hasNonceCookie: boolean }
 ): Promise<{ status: number; redirectTo: string; cookies?: CookieInstruction[] }> {
-  const parsed = parseGoogleCallback(url, options.expectedNonce);
+  const parsed = parseGoogleCallback(url, options.hasNonceCookie);
   // O nonce é de uso único: some da resposta esteja o callback ok ou não.
   const clearNonceCookie = buildClearOAuthStateCookie();
 
@@ -65,24 +69,8 @@ export async function handleGoogleCallback(
   };
 }
 
-function encodeState(nonce: string, returnTo: string) {
-  return Buffer.from(JSON.stringify({ n: nonce, r: returnTo }), "utf8").toString("base64url");
-}
-
-function decodeState(state: string | null): { nonce: string; returnTo: string } | null {
-  if (!state) return null;
-  try {
-    const parsed = JSON.parse(Buffer.from(state, "base64url").toString("utf8")) as { n?: unknown; r?: unknown };
-    if (typeof parsed.n !== "string" || typeof parsed.r !== "string") return null;
-    return { nonce: parsed.n, returnTo: safeRedirect(parsed.r, "/pt-br/dashboard") };
-  } catch {
-    return null;
-  }
-}
-
 function localeFromState(url: URL) {
-  const state = decodeState(url.searchParams.get("state"));
-  return localeFromReturnTo(state?.returnTo ?? `/${defaultLocale}/dashboard`);
+  return localeFromReturnTo(safeRedirect(url.searchParams.get("state"), `/${defaultLocale}/dashboard`));
 }
 
 function localeFromReturnTo(returnTo: string) {

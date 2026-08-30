@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const result = await handleGoogleCallback(new URL(request.url), {
     client: createStrapiClient(),
     secureCookies: resolveAuthCookieSecure(request.url),
-    expectedNonce: request.cookies.get(OAUTH_STATE_COOKIE)?.value,
+    hasNonceCookie: Boolean(request.cookies.get(OAUTH_STATE_COOKIE)?.value),
   });
   const response = NextResponse.redirect(new URL(result.redirectTo, getSiteUrl(request)), { status: result.status });
   applyCookies(response, result.cookies);

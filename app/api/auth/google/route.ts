@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   const strapiPublicUrl = process.env.STRAPI_PUBLIC_URL ?? process.env.STRAPI_INTERNAL_URL ?? "http://localhost:1337";
   const nonce = randomBytes(16).toString("hex");
 
-  const response = NextResponse.redirect(buildGoogleStartUrl(strapiPublicUrl, callbackUrl, returnTo, nonce));
+  const response = NextResponse.redirect(buildGoogleStartUrl(strapiPublicUrl, callbackUrl, returnTo));
   const cookie = buildOAuthStateCookie(nonce, resolveAuthCookieSecure(request.url));
   response.cookies.set(cookie.name, cookie.value, cookie.options);
   return response;
