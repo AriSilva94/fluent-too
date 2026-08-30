@@ -68,8 +68,6 @@ export function validateChangePassword(input: ChangePasswordPayload): Validation
   return { ok: true, data: input };
 }
 
-// Um corpo sem `email` chega aqui como `undefined`: sem a coalescência, o `.trim()`
-// estourava e a rota respondia 500 no lugar do 400 de campo inválido.
 function normalizeEmail(email: string | undefined | null) {
   return (email ?? "").trim().toLowerCase();
 }

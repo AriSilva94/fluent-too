@@ -22,7 +22,6 @@ export default function Newsletter({ dict }: { dict: Dictionary }) {
             className="flex w-full flex-col gap-3 lg:w-auto lg:flex-row lg:items-end"
             onSubmit={(e) => e.preventDefault()}
           >
-            {/* Name field */}
             <div className="w-full lg:w-64">
               <label
                 htmlFor="newsletter-name"
@@ -38,7 +37,6 @@ export default function Newsletter({ dict }: { dict: Dictionary }) {
               />
             </div>
 
-            {/* Email field */}
             <div className="w-full lg:w-64">
               <label
                 htmlFor="newsletter-email"

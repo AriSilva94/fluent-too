@@ -66,8 +66,6 @@ export default async function DashboardPage({
   const averageScore = completedAttempts > 0 ? Math.round(attempts.data.reduce((total, attempt) => total + attempt.score, 0) / completedAttempts) : 0;
   const bestScore = completedAttempts > 0 ? Math.max(...attempts.data.map((attempt) => attempt.score)) : 0;
 
-  // Só quem está `teacher_pending` paga o custo dessa chamada extra: qualquer outra
-  // role segue direto para o dashboard normal sem buscar a candidatura.
   const teacherApplicationView = isPendingTeacher(user.role?.type)
     ? resolveTeacherApplicationView(
         accessToken ? await createProfileClient().myApplication(accessToken) : { ok: false, error: "UNKNOWN_ERROR" }

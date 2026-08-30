@@ -8,11 +8,6 @@ export type TeacherApplicationResult =
   | { ok: true; data: TeacherApplicationPayload }
   | { ok: false; fieldErrors: Record<string, "REQUIRED" | "INVALID_URL"> };
 
-/**
- * O link vira o `href` de um link vivo na fila de aprovação do admin: um
- * `javascript:` executaria na origem autenticada de quem revisa. Só http/https —
- * e uma string relativa nem chega a ser uma URL absoluta.
- */
 export function isHttpUrl(value: string): boolean {
   let parsed: URL;
   try {

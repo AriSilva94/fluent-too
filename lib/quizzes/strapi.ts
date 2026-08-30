@@ -15,9 +15,6 @@ type QuizFilters = {
   targetLanguage?: TargetLanguage;
   level?: QuizLevel;
   levels?: QuizLevel[];
-  // Strapi `fields`: restringe os atributos escalares devolvidos. Usado nas listagens
-  // pra não trazer `questions` (só necessário na página que aplica o quiz), que pode
-  // ser um payload grande por registro.
   fields?: string[];
 };
 
@@ -54,8 +51,6 @@ export function createStrapiQuizClient(options: ClientOptions = {}) {
       const params = createBaseParams();
       if (filters.targetLanguage) params.set("filters[targetLanguage][$eq]", filters.targetLanguage);
       if (filters.level) params.set("filters[level][$eq]", filters.level);
-      // Uma única chamada com `$in` troca N requisições (uma por nível) por uma só,
-      // deixando o agrupamento por nível para quem chama.
       if (filters.levels?.length) {
         filters.levels.forEach((level, index) => params.set(`filters[level][$in][${index}]`, level));
       }
@@ -112,11 +107,6 @@ export async function getQuizzesByLevels(levels: QuizLevel[], locale?: Locale) {
   return createStrapiQuizClient().getQuizzes({ targetLanguage, levels, fields: LIST_FIELDS });
 }
 
-/**
- * Busca todos os níveis pedidos numa única requisição ao Strapi e devolve já
- * agrupado por nível — usado pela Home para não fazer uma chamada por grupo
- * (A1, A2, B1, B2, C1, C2 viravam 7 requisições; aqui é 1).
- */
 export async function getQuizzesGroupedByLevels(levelGroups: QuizLevel[][], locale?: Locale) {
   const allLevels = Array.from(new Set(levelGroups.flat()));
   const quizzes = await getQuizzesByLevels(allLevels, locale);
@@ -143,8 +133,6 @@ function mapQuiz(input: unknown): Quiz | null {
   const level = readLevel(source.level);
   const type = readType(source.type);
   const targetLanguage = readTargetLanguage(source.targetLanguage);
-  // Nas listagens (`fields` sem `questions`), o Strapi nem devolve a chave: fica `[]`.
-  // Só a página de detalhe (`getQuizById`), que pede o registro completo, tem as perguntas de verdade.
   const questions = Array.isArray(source.questions) ? source.questions : [];
 
   if (!slug || !title || !description || !level || !type || !targetLanguage) return null;

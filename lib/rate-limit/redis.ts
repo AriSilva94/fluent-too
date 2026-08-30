@@ -10,8 +10,6 @@ export type RateLimitResult = { allowed: true } | { allowed: false; retryAfterSe
 
 let sharedClient: Redis | null | undefined;
 
-// Lazy + memoizado: uma conexão por processo, criada só quando o primeiro limite é
-// checado. `REDIS_URL` ausente é tratado como "sem Redis configurado", não como erro.
 function getSharedClient(): Redis | null {
   if (sharedClient !== undefined) return sharedClient;
   const url = process.env.REDIS_URL;
@@ -30,12 +28,6 @@ function getSharedClient(): Redis | null {
   return sharedClient;
 }
 
-/**
- * Janela fixa por chave (ex.: `login:203.0.113.4`): incrementa um contador com TTL
- * e barra quando passa do limite. Sem `REDIS_URL` ou com o Redis fora do ar, a
- * checagem falha aberta (não bloqueia login) — perde a proteção contra força bruta,
- * mas não derruba a autenticação inteira por causa de uma dependência opcional.
- */
 export async function checkRateLimit(
   key: string,
   limit: number,

@@ -66,9 +66,6 @@ export async function proxy(request: NextRequest) {
     process.env.STRAPI_PUBLIC_URL ?? "http://localhost:1337"
   );
 
-  // O nonce precisa existir nos dois lados: no header de requisição (pra Next aplicar
-  // aos próprios scripts que ele injeta na página) e no header de resposta (é o que o
-  // navegador de fato lê pra decidir o que a CSP permite executar).
   const nonce = generateNonce();
   const csp = buildContentSecurityPolicy(nonce, process.env.STRAPI_PUBLIC_URL ?? "http://localhost:1337");
   const requestHeaders = new Headers(request.headers);

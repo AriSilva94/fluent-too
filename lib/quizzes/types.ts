@@ -4,18 +4,18 @@ export type QuizType = 'multiple-choice' | 'flashcard' | 'fill-gap';
 
 export interface BaseQuestion {
   id: string;
-  question: string; // The prompt or question text
-  explanation?: string; // Optional explanation for the answer
+  question: string;
+  explanation?: string;
 }
 
 export interface MultipleChoiceQuestion extends BaseQuestion {
   options: string[];
-  correctAnswer: string; // The exact string matching one of the options
+  correctAnswer: string;
 }
 
 export interface FillGapQuestion extends BaseQuestion {
-  parts: string[]; // e.g. ["The cat is ", " the table."]
-  correctAnswers: string[]; // e.g. ["on"] - corresponds to the gaps between parts
+  parts: string[];
+  correctAnswers: string[];
 }
 
 export interface FlashcardQuestion extends BaseQuestion {
@@ -25,7 +25,7 @@ export interface FlashcardQuestion extends BaseQuestion {
 
 export interface QuizBase {
   id: string;
-  title: string; // Translatable key or raw text? Let's use raw text for content for now as per instructions.
+  title: string;
   description: string;
   level: QuizLevel;
   type: QuizType;
@@ -51,9 +51,9 @@ export interface FillGapQuiz extends QuizBase {
 export type Quiz = MultipleChoiceQuiz | FlashcardQuiz | FillGapQuiz;
 
 export interface QuizResult {
-  score: number; // 0 to 100
+  score: number;
   correctCount: number;
   incorrectCount: number;
   totalCount: number;
-  details?: Record<string, boolean>; // questionId -> isCorrect
+  details?: Record<string, boolean>;
 }

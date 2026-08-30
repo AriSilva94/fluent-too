@@ -14,8 +14,6 @@ type ClientOptions = {
 type BlogPostFilters = {
   targetLanguage?: TargetLanguage;
   slug?: string;
-  // Strapi `fields`: usado na listagem pra não trazer `content` (só o post aberto
-  // precisa do corpo inteiro; card de listagem mostra só `excerpt`).
   fields?: string[];
 };
 
@@ -106,8 +104,6 @@ function mapBlogPost(input: unknown): BlogPost | null {
   const title = readString(source.title);
   const category = readString(source.category);
   const excerpt = readString(source.excerpt);
-  // Nas listagens (`fields` sem `content`) o Strapi nem devolve a chave: fica ausente.
-  // Só a página do post aberto (sem restrição de `fields`) pede o corpo inteiro.
   const content = readString(source.content);
   const date = readString(source.date);
   const author = readString(source.author);

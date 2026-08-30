@@ -52,8 +52,6 @@ export function buildClearCookieInstructions() {
   ];
 }
 
-// Nonce vive 10 min: tempo suficiente para o round-trip do OAuth do Google, mas
-// curto o bastante para não sobrar reaproveitável caso o cookie vaze de algum jeito.
 export function buildOAuthStateCookie(nonce: string, secure = process.env.AUTH_COOKIE_SECURE !== "false"): CookieInstruction {
   return { name: OAUTH_STATE_COOKIE, value: nonce, options: buildAuthCookieOptions(600, secure) };
 }

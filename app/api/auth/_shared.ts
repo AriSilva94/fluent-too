@@ -7,10 +7,6 @@ import type { CookieInstruction } from "@/lib/auth/cookies";
 
 export type RateLimitConfig = { name: string; limit: number; windowSeconds: number };
 
-/**
- * Chave por IP: `x-forwarded-for` é setado pelo proxy reverso na frente do container
- * (Traefik/Dokploy) — sem ele, todo tráfego pareceria vir do mesmo IP interno.
- */
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0]!.trim();

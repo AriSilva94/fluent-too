@@ -74,8 +74,6 @@ export default function TeacherApplicationsPanel({
       const response = await fetch(`/api/teacher-applications?status=${nextStatus}`);
       const body = await response.json().catch(() => ({ ok: false }));
 
-      // Falha da API mostra estado de erro, nunca o estado vazio: os dois significam
-      // coisas opostas para quem revisa a fila.
       if (!response.ok || !body.ok) {
         setListFailed(true);
         setApplications([]);
@@ -223,9 +221,6 @@ export default function TeacherApplicationsPanel({
                       <p className="mt-1 text-sm font-bold text-neutral-500">{application.languages.join(", ").toUpperCase()}</p>
                     ) : null}
                   </div>
-                  {/* Os validadores já barram `javascript:` na entrada, mas candidaturas
-                      gravadas antes disso ainda podem ter um link hostil: aqui é o `href`
-                      que executaria na origem autenticada de quem revisa. */}
                   {application.credentialUrl && isHttpUrl(application.credentialUrl) ? (
                     <a
                       href={application.credentialUrl}

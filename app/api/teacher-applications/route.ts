@@ -23,8 +23,6 @@ export async function GET(request: Request) {
   const status = parseStatusParam(new URL(request.url).searchParams.get("status"));
   const result = await createTeacherApplicationsClient().list(accessToken, status);
 
-  // Uma falha do backend não pode virar 200 com lista vazia: o admin leria isso como
-  // "não há candidaturas" enquanto professores esperam na fila.
   const response = result.ok
     ? NextResponse.json({ ok: true, data: result.data })
     : NextResponse.json({ ok: false, error: result.error }, { status: 502 });

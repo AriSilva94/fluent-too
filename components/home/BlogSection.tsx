@@ -25,7 +25,6 @@ export default async function BlogSection({ locale, dict }: { locale: Locale; di
               href={`/${locale}/blog/${post.slug}`}
               className="group flex flex-col overflow-hidden rounded-[22px] border-2 border-brand-orange bg-white transition-all hover:shadow-lg h-full"
             >
-              {/* Image Container */}
               <div className="relative h-52 w-full">
                 <Image
                   src={post.coverImage || assetUrl("assets/images/BLOGPOST.webp")}
@@ -33,7 +32,6 @@ export default async function BlogSection({ locale, dict }: { locale: Locale; di
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                {/* Badge */}
                 <span className="absolute right-4 top-4 z-10 rounded-full bg-brand-orange px-3 py-1 text-xs font-bold text-white uppercase tracking-wider">
                   {post.category}
                 </span>

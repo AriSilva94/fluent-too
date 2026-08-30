@@ -16,11 +16,6 @@ export type ProfileApplication = {
   createdAt: string;
 };
 
-/**
- * `status` só existe quando a falha veio de uma resposta HTTP real: a rota proxy
- * precisa dela para responder com o código correto (403, 400...); numa falha de
- * rede não há resposta, então não há status para repassar.
- */
 export type ActionResult = { ok: true } | { ok: false; error: AuthErrorCode; status?: number };
 
 export type ApplicationResult =
@@ -53,8 +48,6 @@ export function createProfileClient(options: ClientOptions = {}) {
       return post("/api/profile/student", accessToken);
     },
 
-    // Repassa o `FormData` recebido sem tocar em `Content-Type`: o fetch precisa
-    // gerar sozinho o boundary do multipart.
     becomeTeacher(accessToken: string, formData: FormData): Promise<ActionResult> {
       return post("/api/profile/teacher", accessToken, formData);
     },
@@ -77,10 +70,6 @@ export function createProfileClient(options: ClientOptions = {}) {
   };
 }
 
-// Só os códigos que os endpoints de perfil realmente devolvem. Qualquer outra string
-// vinda do upstream (mensagem inesperada, texto livre, HTML de um proxy no meio do
-// caminho) cai em UNKNOWN_ERROR em vez de ser repassada como se fosse um AuthErrorCode
-// válido — sem essa lista, `as AuthErrorCode` mentiria sobre o tipo de retorno.
 const KNOWN_ERROR_CODES: readonly AuthErrorCode[] = [
   "PROFILE_ALREADY_SET",
   "TEACHER_APPLICATION_EXISTS",
@@ -88,8 +77,6 @@ const KNOWN_ERROR_CODES: readonly AuthErrorCode[] = [
   "INVALID_FILE_TYPE",
   "REQUIRED",
   "UNAUTHORIZED",
-  // Os dois endpoints de perfil devolvem isto quando a role correspondente não existe
-  // no banco; sem estar na lista, viraria um UNKNOWN_ERROR sem explicação.
   "ROLE_UNAVAILABLE",
   "INVALID_URL",
 ];

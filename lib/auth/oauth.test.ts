@@ -24,8 +24,6 @@ describe("google oauth", () => {
   });
 
   it("rejeita callback sem o cookie de nonce (navegador nunca iniciou o fluxo por aqui)", () => {
-    // O Strapi nao ecoa `state` de volta: o callback real chega só com access_token,
-    // sem nenhum parametro nosso. A unica prova possivel e a presenca do cookie.
     expect(
       parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"), false)
     ).toEqual({ ok: false, code: "OAUTH_STATE_MISMATCH" });

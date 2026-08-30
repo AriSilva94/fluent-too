@@ -4,10 +4,6 @@ import { createContext, useContext, type ReactNode } from "react";
 
 const AuthFormHeaderContext = createContext<ReactNode>(null);
 
-/**
- * Composition seam that lets a screen inject content at the top of the auth
- * card rendered by `AuthForm`, without that form component needing extra props.
- */
 export function AuthFormHeaderProvider({ value, children }: { value: ReactNode; children: ReactNode }) {
   return <AuthFormHeaderContext.Provider value={value}>{children}</AuthFormHeaderContext.Provider>;
 }

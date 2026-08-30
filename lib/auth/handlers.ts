@@ -139,9 +139,6 @@ export async function handleLogout(
   tokens: { accessToken?: string; refreshToken?: string },
   options: { client: AuthClient }
 ): Promise<HandlerResult> {
-  // Cookies locais somem de qualquer jeito: a sessão neste navegador acaba mesmo se a
-  // revogação no Strapi falhar. A falha é registrada para não mascarar um refresh
-  // token que continua válido no backend.
   if (tokens.accessToken && tokens.refreshToken) {
     const response = await options.client.logout?.(tokens.accessToken, tokens.refreshToken);
     if (response && !response.ok) {

@@ -23,7 +23,6 @@ export default function Footer({ locale, dict }: { locale: Locale; dict: Diction
           {dict.footer.copyright.replace("{year}", new Date().getFullYear().toString())}
         </p>
 
-        {/* Center: Logo */}
         <div className="order-1 md:order-2">
           <Link href={`/${locale}`} className="flex items-center justify-center">
             <Image
@@ -36,17 +35,14 @@ export default function Footer({ locale, dict }: { locale: Locale; dict: Diction
           </Link>
         </div>
 
-        {/* Right: Social Icons and developer credit */}
         <div className="flex flex-col items-center gap-3 order-3 md:items-end">
           <div className="flex items-center gap-6">
-            {/* Facebook */}
             <a href="#" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
             </a>
 
-            {/* WhatsApp */}
             <a href="#" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
@@ -54,7 +50,6 @@ export default function Footer({ locale, dict }: { locale: Locale; dict: Diction
               </svg>
             </a>
 
-            {/* Instagram */}
             <a href="#" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
@@ -77,7 +72,6 @@ export default function Footer({ locale, dict }: { locale: Locale; dict: Diction
         </div>
       </Container>
 
-      {/* Back to Top Button */}
       <button
         onClick={scrollToTop}
         className="absolute bottom-0 right-8 bg-brand-blue text-white p-2 rounded-t-md hover:bg-blue-600 transition-colors"

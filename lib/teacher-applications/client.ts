@@ -10,10 +10,6 @@ type TeacherApplicationStatus = "pending" | "approved" | "rejected";
 
 type ReviewResult = { ok: true } | { ok: false; error: string };
 
-/**
- * A listagem precisa distinguir "fila vazia" de "backend fora do ar": devolver `[]` nos
- * dois casos fazia o admin ver o estado vazio e concluir que não havia nada para revisar.
- */
 export type ListResult = { ok: true; data: unknown[] } | { ok: false; error: string };
 
 export function createTeacherApplicationsClient(options: ClientOptions = {}) {

@@ -1,11 +1,6 @@
-// Mede o peso real das imagens servidas no blog e nos quizzes (P6 do RELATORIO-AUDITORIA.md).
-// Roda contra um ambiente de verdade (precisa do Strapi respondendo): sem isso não da
-// pra saber se as imagens do R2 estao grandes demais, só especular.
-//
-// Uso: STRAPI_PUBLIC_URL=https://api-dev.fluent-too.com node scripts/measure-image-sizes.mjs
 
 const strapiUrl = (process.env.STRAPI_PUBLIC_URL ?? "http://localhost:1337").replace(/\/+$/, "");
-const OVERSIZED_BYTES = 300 * 1024; // acima disso vale otimizar/redimensionar na origem.
+const OVERSIZED_BYTES = 300 * 1024;
 
 async function fetchJson(path) {
   const response = await fetch(`${strapiUrl}${path}`);

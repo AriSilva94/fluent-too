@@ -14,16 +14,6 @@ export function buildGoogleStartUrl(strapiPublicUrl: string, callbackUrl: string
   return url.toString();
 }
 
-/**
- * O provider Google do Strapi (grant/purest por baixo) reconstrói a URL final do
- * callback só com os campos do token (`access_token`, `id_token`, `raw[...]`) — ele
- * NUNCA ecoa de volta o `state` que mandamos no início do fluxo (confirmado em
- * produção). Por isso o nonce não pode viver no `state`: a prova de que foi ESTE
- * navegador que iniciou o fluxo é só a presença do cookie de nonce, ainda válido
- * (10 min). Isso fecha o ataque do S1 — atacante inicia com a própria conta e manda
- * o link do callback pronto pra vítima: ela nunca teria o cookie certo, porque nunca
- * visitou `/api/auth/google` por conta própria.
- */
 export function parseGoogleCallback(url: URL, hasNonceCookie: boolean) {
   if (url.searchParams.get("error")) return { ok: false as const, code: "GOOGLE_AUTH_FAILED" as const };
   const accessToken = url.searchParams.get("access_token");
@@ -42,7 +32,6 @@ export async function handleGoogleCallback(
   options: { client: GoogleClient; secureCookies?: boolean; hasNonceCookie: boolean }
 ): Promise<{ status: number; redirectTo: string; cookies?: CookieInstruction[] }> {
   const parsed = parseGoogleCallback(url, options.hasNonceCookie);
-  // O nonce é de uso único: some da resposta esteja o callback ok ou não.
   const clearNonceCookie = buildClearOAuthStateCookie();
 
   if (!parsed.ok) {

@@ -10,7 +10,6 @@ function gradeFlashcard(quiz: FlashcardQuiz, answers: Record<string, boolean>): 
   const details: Record<string, boolean> = {};
 
   quiz.questions.forEach((q) => {
-    // For flashcards, if they clicked "I knew it" (true), it counts.
     const isCorrect = answers[q.id] === true;
     details[q.id] = isCorrect;
     if (isCorrect) correct++;
@@ -29,7 +28,7 @@ export function gradeQuiz(quiz: Quiz, userAnswers: QuizAnswers): QuizResult {
   switch (quiz.type) {
     case 'multiple-choice':
       return gradeMultipleChoice(quiz as MultipleChoiceQuiz, userAnswers as Record<string, string>);
-    case 'fill-gap': // fill-gap
+    case 'fill-gap':
       return gradeFillGap(quiz as FillGapQuiz, userAnswers as Record<string, string[]>);
     case 'flashcard':
       return gradeFlashcard(quiz as FlashcardQuiz, userAnswers as Record<string, boolean>);
@@ -63,9 +62,7 @@ function gradeFillGap(quiz: FillGapQuiz, answers: Record<string, string[]>): Qui
   const details: Record<string, boolean> = {};
 
   quiz.questions.forEach((q) => {
-    // answers[q.id] is an array of strings strings corresponding to the gaps
     const userAns = answers[q.id] || [];
-    // User must get ALL gaps in a single question correct to get the point for that question
     const isCorrect = 
       userAns.length === q.correctAnswers.length &&
       userAns.every((ans, i) => ans.trim().toLowerCase() === q.correctAnswers[i].trim().toLowerCase());

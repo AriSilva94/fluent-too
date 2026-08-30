@@ -1,6 +1,3 @@
-// Só lê a claim `exp` do payload, sem verificar a assinatura: usada apenas para uma
-// checagem otimista de roteamento (Proxy). A autorização de verdade continua sendo
-// feita pelo Strapi nos Server Components e Route Handlers protegidos.
 export function decodeJwtExpiry(token: string): number | null {
   const parts = token.split(".");
   if (parts.length !== 3) return null;

@@ -51,9 +51,6 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
         ) : null}
 
         <div className="mt-6 grid grid-cols-2 gap-3">
-          {/* A escolha é permanente: o card só seleciona, quem envia é o botão de
-              confirmação abaixo — igual ao caminho de professor. Um clique errado
-              aqui não define mais o perfil. */}
           <button
             type="button"
             onClick={() => selectProfile("student")}

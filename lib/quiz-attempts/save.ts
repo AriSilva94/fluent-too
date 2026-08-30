@@ -43,8 +43,6 @@ export async function saveQuizAttemptResult({ fetcher = fetch, ...options }: Sav
   if (!response) return "failed";
   if (response.status === 401) return "anonymous";
 
-  // Um usuário `unassigned` não tem para onde salvar a tentativa: o problema não é uma
-  // falha, é o onboarding pendente — dizer "não foi possível salvar" esconde a saída.
   if (response.status === 403) {
     const body = await response.json().catch(() => null);
     if (body?.error === "PROFILE_REQUIRED") return "profileRequired";

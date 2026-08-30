@@ -1,21 +1,17 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* ─── Base ─── */
   --color-background: #ffffff;
   --color-foreground: #171717;
   --font-sans: var(--font-dosis);
 
-  /* ─── Brand colours ─── */
   --color-brand-orange: #ff6700;
   --color-brand-blue: #4184f9;
   --color-neutral-text: #8b8b8b;
 
-  /* ─── Border radii ─── */
   --radius-newsletter: 19px;
   --radius-quiz: 22px;
 
-  /* ─── Responsive type scale ─── */
   --text-hero-main: clamp(2rem, 5vw + 1rem, 4.67rem);
   --text-hero-accent: clamp(3rem, 8vw + 1rem, 10.42rem);
   --text-quiz-title: clamp(2.5rem, 5vw + 1rem, 5rem);
