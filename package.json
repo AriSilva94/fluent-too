@@ -8,12 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run --configLoader bundle",
-    "test:watch": "vitest --configLoader bundle"
+    "test:watch": "vitest --configLoader bundle",
+    "measure:images": "node scripts/measure-image-sizes.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
     "country-flag-icons": "^1.6.13",
-    "next": "16.1.6",
+    "ioredis": "^6.0.0",
+    "lucide-react": "^1.33.0",
+    "next": "^16.3.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.1"
@@ -28,7 +31,7 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.5",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "^16.3.3",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
     "typescript": "^5",

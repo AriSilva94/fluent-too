@@ -1,5 +1,6 @@
-import { buildCookieInstructions, type CookieInstruction } from "./cookies";
+import { buildCookieInstructions, buildClearOAuthStateCookie, type CookieInstruction } from "./cookies";
 import { safeRedirect } from "./redirect";
+import { defaultLocale, isValidLocale } from "@/lib/i18n";
 import type { AuthResponse, AuthSuccess } from "./contracts";
 
 type GoogleClient = {
@@ -13,10 +14,12 @@ export function buildGoogleStartUrl(strapiPublicUrl: string, callbackUrl: string
   return url.toString();
 }
 
-export function parseGoogleCallback(url: URL) {
+export function parseGoogleCallback(url: URL, hasNonceCookie: boolean) {
   if (url.searchParams.get("error")) return { ok: false as const, code: "GOOGLE_AUTH_FAILED" as const };
   const accessToken = url.searchParams.get("access_token");
   if (!accessToken) return { ok: false as const, code: "GOOGLE_AUTH_FAILED" as const };
+  if (!hasNonceCookie) return { ok: false as const, code: "OAUTH_STATE_MISMATCH" as const };
+
   return {
     ok: true as const,
     accessToken,
@@ -26,19 +29,42 @@ export function parseGoogleCallback(url: URL) {
 
 export async function handleGoogleCallback(
   url: URL,
-  options: { client: GoogleClient; secureCookies?: boolean }
+  options: { client: GoogleClient; secureCookies?: boolean; hasNonceCookie: boolean }
 ): Promise<{ status: number; redirectTo: string; cookies?: CookieInstruction[] }> {
-  const parsed = parseGoogleCallback(url);
-  if (!parsed.ok) return { status: 302, redirectTo: `/pt-br/login?error=${parsed.code}` };
+  const parsed = parseGoogleCallback(url, options.hasNonceCookie);
+  const clearNonceCookie = buildClearOAuthStateCookie();
+
+  if (!parsed.ok) {
+    return {
+      status: 302,
+      redirectTo: `/${localeFromState(url)}/login?error=${parsed.code}`,
+      cookies: [clearNonceCookie],
+    };
+  }
 
   const response = await options.client.googleCallback(parsed.accessToken);
-  if (!response.ok) return { status: 302, redirectTo: `/pt-br/login?error=${response.error}` };
+  if (!response.ok) {
+    return {
+      status: 302,
+      redirectTo: `/${localeFromReturnTo(parsed.returnTo)}/login?error=${response.error}`,
+      cookies: [clearNonceCookie],
+    };
+  }
 
   return {
     status: 302,
     redirectTo: parsed.returnTo,
-    cookies: buildCookieInstructions(response.data.tokens, options.secureCookies),
+    cookies: [...buildCookieInstructions(response.data.tokens, options.secureCookies), clearNonceCookie],
   };
+}
+
+function localeFromState(url: URL) {
+  return localeFromReturnTo(safeRedirect(url.searchParams.get("state"), `/${defaultLocale}/dashboard`));
+}
+
+function localeFromReturnTo(returnTo: string) {
+  const segment = returnTo.split("/")[1] ?? "";
+  return isValidLocale(segment) ? segment : defaultLocale;
 }
 
 function trimTrailingSlash(value: string) {

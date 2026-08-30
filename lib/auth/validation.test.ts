@@ -74,3 +74,28 @@ describe("password flows", () => {
     });
   });
 });
+
+describe("corpo sem e-mail", () => {
+  it("recusa login sem e-mail com INVALID_EMAIL, sem estourar", () => {
+    expect(validateLogin({ password: "secret123" } as never)).toEqual({
+      ok: false,
+      fieldErrors: { email: "INVALID_EMAIL" },
+    });
+  });
+
+  it("recusa cadastro sem e-mail com INVALID_EMAIL, sem estourar", () => {
+    expect(
+      validateRegister({ password: "secret123", passwordConfirmation: "secret123" } as never)
+    ).toEqual({
+      ok: false,
+      fieldErrors: { email: "INVALID_EMAIL" },
+    });
+  });
+
+  it("recusa recuperacao sem e-mail com INVALID_EMAIL, sem estourar", () => {
+    expect(validateForgotPassword({} as never)).toEqual({
+      ok: false,
+      fieldErrors: { email: "INVALID_EMAIL" },
+    });
+  });
+});

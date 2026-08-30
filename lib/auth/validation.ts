@@ -68,8 +68,8 @@ export function validateChangePassword(input: ChangePasswordPayload): Validation
   return { ok: true, data: input };
 }
 
-function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
+function normalizeEmail(email: string | undefined | null) {
+  return (email ?? "").trim().toLowerCase();
 }
 
 function validateNewPassword(

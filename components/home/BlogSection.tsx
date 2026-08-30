@@ -4,10 +4,11 @@ import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
-import { blogData } from "@/lib/blogData";
+import { getBlogPosts } from "@/lib/blog/strapi";
+import { assetUrl } from "@/lib/cdnAssets";
 
-export default function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
-  const posts = blogData[locale].slice(0, 6);
+export default async function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+  const posts = (await getBlogPosts(locale)).slice(0, 6);
 
   return (
     <section id="blog" className="bg-white pb-8 pt-0 md:pb-14 md:pt-1">
@@ -24,15 +25,13 @@ export default function BlogSection({ locale, dict }: { locale: Locale; dict: Di
               href={`/${locale}/blog/${post.slug}`}
               className="group flex flex-col overflow-hidden rounded-[22px] border-2 border-brand-orange bg-white transition-all hover:shadow-lg h-full"
             >
-              {/* Image Container */}
               <div className="relative h-52 w-full">
                 <Image
-                  src={post.coverImage || "/assets/img/BLOGPOST.png"}
+                  src={post.coverImage || assetUrl("assets/images/BLOGPOST.webp")}
                   alt={post.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                {/* Badge */}
                 <span className="absolute right-4 top-4 z-10 rounded-full bg-brand-orange px-3 py-1 text-xs font-bold text-white uppercase tracking-wider">
                   {post.category}
                 </span>

@@ -33,6 +33,14 @@ export default function QuizAttemptResult({ quiz, result, saveState, onRetry, di
           {dict.quizzes.saveFailed}
         </p>
       ) : null}
+      {saveState === 'profileRequired' ? (
+        <p className="mx-auto max-w-lg rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm font-medium text-amber-800">
+          {dict.quizzes.saveProfileRequired}{' '}
+          <Link href={`/${locale}/onboarding`} className="font-bold underline">
+            {dict.quizzes.saveProfileRequiredCta}
+          </Link>
+        </p>
+      ) : null}
       {saveState === 'anonymous' ? (
         <div className="mx-auto max-w-lg rounded-lg border border-blue-200 bg-blue-50 p-5 text-center">
           <h3 className="text-lg font-bold text-blue-950">{dict.quizzes.saveSignInTitle}</h3>

@@ -3,7 +3,6 @@ import { Quiz } from '@/lib/quizzes/types';
 import Button from '@/components/ui/Button';
 import type { Dictionary } from '@/lib/getDictionary';
 
-// --- Level Tabs ---
 
 interface LevelTabsProps {
   levels: string[];
@@ -33,7 +32,6 @@ export function LevelTabs({ levels, currentLevel, dict }: LevelTabsProps) {
   );
 }
 
-// --- Quiz Card ---
 
 interface QuizCardProps {
   quiz: Quiz;

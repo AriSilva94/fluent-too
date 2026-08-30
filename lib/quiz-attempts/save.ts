@@ -3,7 +3,7 @@ import type { QuizAttemptPayload } from "./types";
 
 type Fetcher = typeof fetch;
 
-export type QuizAttemptSaveState = "idle" | "saved" | "anonymous" | "failed";
+export type QuizAttemptSaveState = "idle" | "saved" | "anonymous" | "failed" | "profileRequired";
 
 type BuildPayloadOptions = {
   quiz: Quiz;
@@ -42,6 +42,12 @@ export async function saveQuizAttemptResult({ fetcher = fetch, ...options }: Sav
 
   if (!response) return "failed";
   if (response.status === 401) return "anonymous";
+
+  if (response.status === 403) {
+    const body = await response.json().catch(() => null);
+    if (body?.error === "PROFILE_REQUIRED") return "profileRequired";
+  }
+
   return response.ok ? "saved" : "failed";
 }
 

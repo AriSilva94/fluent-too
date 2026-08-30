@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { useAuthFormHeader } from "./AuthFormHeader";
 import AuthShell from "./AuthShell";
 
 export type AuthField = {
@@ -31,6 +31,7 @@ type AuthFormProps = {
   visualText: string;
   homeHref?: string;
   surface?: "auth" | "embedded";
+  initialError?: string;
 };
 
 export default function AuthForm({
@@ -47,10 +48,14 @@ export default function AuthForm({
   visualText,
   homeHref,
   surface = "auth",
+  initialError,
 }: AuthFormProps) {
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    initialError ? (messages[initialError] ?? messages.UNKNOWN_ERROR ?? initialError) : null
+  );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const header = useAuthFormHeader();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,6 +80,7 @@ export default function AuthForm({
 
   const formContent = (
     <div className={surface === "auth" ? "rounded-2xl bg-white p-6 shadow-[0_24px_80px_rgba(65,132,249,0.16)] sm:p-8" : "w-full max-w-xl rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)] sm:p-8"}>
+      {header ? <div className="mb-6">{header}</div> : null}
       <div>
         <h1 className="text-3xl font-black leading-tight text-brand-blue sm:text-4xl">{title}</h1>
         <p className="mt-3 text-base font-medium leading-7 text-neutral-600">{subtitle}</p>
@@ -145,7 +151,7 @@ export default function AuthForm({
             <span className="text-xs font-black uppercase tracking-[0.18em] text-brand-blue/60">Google</span>
             <div className="h-px flex-1 bg-brand-blue/15" />
           </div>
-          <Link
+          <a
             href={googleHref}
             className="flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-white px-4 text-base font-black text-brand-blue ring-1 ring-brand-blue/20 transition-colors hover:bg-[#f5f8ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
           >
@@ -153,7 +159,7 @@ export default function AuthForm({
               G
             </span>
             {googleLabel}
-          </Link>
+          </a>
         </div>
       ) : null}
 

@@ -59,6 +59,29 @@ describe("createStrapiClient", () => {
     });
   });
 
+  it("envia bearer token na alteracao de senha", async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({
+      jwt: "new-access",
+      refreshToken: "new-refresh",
+      user: { id: 1, email: "user@example.com", username: "user", confirmed: true, blocked: false },
+    })));
+    const client = createStrapiClient({ baseUrl: "https://api.internal", fetcher });
+
+    await client.changePassword("access", {
+      currentPassword: "old-secret",
+      password: "new-secret1",
+      passwordConfirmation: "new-secret1",
+    });
+
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://api.internal/api/auth/change-password",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({ Authorization: "Bearer access" }),
+      })
+    );
+  });
+
   it("envia bearer token no logout", async () => {
     const fetcher = vi.fn(async () => new Response(JSON.stringify({ ok: true })));
     const client = createStrapiClient({ baseUrl: "https://api.internal", fetcher });

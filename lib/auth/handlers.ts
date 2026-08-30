@@ -139,7 +139,12 @@ export async function handleLogout(
   tokens: { accessToken?: string; refreshToken?: string },
   options: { client: AuthClient }
 ): Promise<HandlerResult> {
-  if (tokens.accessToken && tokens.refreshToken) await options.client.logout?.(tokens.accessToken, tokens.refreshToken);
+  if (tokens.accessToken && tokens.refreshToken) {
+    const response = await options.client.logout?.(tokens.accessToken, tokens.refreshToken);
+    if (response && !response.ok) {
+      console.error("Falha ao revogar refresh token no logout", response.error);
+    }
+  }
   return { status: 200, body: { ok: true }, cookies: buildClearCookieInstructions() };
 }
 

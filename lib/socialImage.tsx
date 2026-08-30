@@ -153,7 +153,6 @@ export async function createSocialImage(locale: Locale) {
                   boxShadow: "0 18px 40px rgba(65, 132, 249, 0.28)",
                 }}
               >
-                {/* next/og renders plain HTML; next/image is not supported here */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   alt="Fluent Too logo"

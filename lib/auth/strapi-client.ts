@@ -51,8 +51,17 @@ export function createStrapiClient(options: ClientOptions = {}) {
     return { ok: true, data: body as T };
   }
 
-  async function auth(path: string, body: unknown): Promise<AuthResponse<AuthSuccess>> {
-    const response = await request<StrapiAuthBody>(path, { method: "POST", body: JSON.stringify(body) });
+  async function auth(
+    path: string,
+    body: unknown,
+    method: "GET" | "POST" = "POST",
+    headers?: Record<string, string>
+  ): Promise<AuthResponse<AuthSuccess>> {
+    const response = await request<StrapiAuthBody>(path, {
+      method,
+      headers,
+      ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
+    });
     if (!response.ok) return response;
     const tokens = extractTokens(response.data);
     if (!tokens || !response.data.user) return { ok: false, error: "UNKNOWN_ERROR", status: 502 };
@@ -96,14 +105,19 @@ export function createStrapiClient(options: ClientOptions = {}) {
       return request<{ ok: true }>("/api/auth/send-email-confirmation", { method: "POST", body: JSON.stringify(payload) });
     },
     changePassword(accessToken: string, payload: ChangePasswordPayload) {
-      return auth("/api/auth/change-password", {
-        currentPassword: payload.currentPassword,
-        password: payload.password,
-        passwordConfirmation: payload.passwordConfirmation,
-      });
+      return auth(
+        "/api/auth/change-password",
+        {
+          currentPassword: payload.currentPassword,
+          password: payload.password,
+          passwordConfirmation: payload.passwordConfirmation,
+        },
+        "POST",
+        { Authorization: `Bearer ${accessToken}` }
+      );
     },
     googleCallback(accessToken: string) {
-      return auth(`/api/auth/google/callback?access_token=${encodeURIComponent(accessToken)}`, { provider: "google" });
+      return auth(`/api/auth/google/callback?access_token=${encodeURIComponent(accessToken)}`, undefined, "GET");
     },
   };
 

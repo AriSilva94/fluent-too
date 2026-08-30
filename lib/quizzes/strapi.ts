@@ -14,10 +14,18 @@ type ClientOptions = {
 type QuizFilters = {
   targetLanguage?: TargetLanguage;
   level?: QuizLevel;
+  levels?: QuizLevel[];
+  fields?: string[];
 };
+
+const LIST_FIELDS = ["title", "slug", "description", "level", "type", "targetLanguage"];
 
 type StrapiCollectionResponse = {
   data?: unknown[];
+};
+
+type StrapiMedia = {
+  url?: unknown;
 };
 
 type StrapiQuizRecord = {
@@ -43,6 +51,12 @@ export function createStrapiQuizClient(options: ClientOptions = {}) {
       const params = createBaseParams();
       if (filters.targetLanguage) params.set("filters[targetLanguage][$eq]", filters.targetLanguage);
       if (filters.level) params.set("filters[level][$eq]", filters.level);
+      if (filters.levels?.length) {
+        filters.levels.forEach((level, index) => params.set(`filters[level][$in][${index}]`, level));
+      }
+      if (filters.fields?.length) {
+        filters.fields.forEach((field, index) => params.set(`fields[${index}]`, field));
+      }
 
       return fetchQuizzes(`/api/quizzes?${params.toString()}`);
     },
@@ -75,7 +89,7 @@ export function createStrapiQuizClient(options: ClientOptions = {}) {
 
 export async function getQuizzes(locale?: Locale) {
   const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
-  return createStrapiQuizClient().getQuizzes({ targetLanguage });
+  return createStrapiQuizClient().getQuizzes({ targetLanguage, fields: LIST_FIELDS });
 }
 
 export async function getQuizById(id: string, locale?: Locale) {
@@ -85,12 +99,19 @@ export async function getQuizById(id: string, locale?: Locale) {
 
 export async function getQuizzesByLevel(level: QuizLevel, locale?: Locale) {
   const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
-  return createStrapiQuizClient().getQuizzes({ targetLanguage, level });
+  return createStrapiQuizClient().getQuizzes({ targetLanguage, level, fields: LIST_FIELDS });
 }
 
 export async function getQuizzesByLevels(levels: QuizLevel[], locale?: Locale) {
-  const groups = await Promise.all(levels.map((level) => getQuizzesByLevel(level, locale)));
-  return groups.flat();
+  const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
+  return createStrapiQuizClient().getQuizzes({ targetLanguage, levels, fields: LIST_FIELDS });
+}
+
+export async function getQuizzesGroupedByLevels(levelGroups: QuizLevel[][], locale?: Locale) {
+  const allLevels = Array.from(new Set(levelGroups.flat()));
+  const quizzes = await getQuizzesByLevels(allLevels, locale);
+
+  return levelGroups.map((levels) => quizzes.filter((quiz) => levels.includes(quiz.level)));
 }
 
 function createBaseParams() {
@@ -112,9 +133,11 @@ function mapQuiz(input: unknown): Quiz | null {
   const level = readLevel(source.level);
   const type = readType(source.type);
   const targetLanguage = readTargetLanguage(source.targetLanguage);
-  const questions = Array.isArray(source.questions) ? source.questions : null;
+  const questions = Array.isArray(source.questions) ? source.questions : [];
 
-  if (!slug || !title || !description || !level || !type || !targetLanguage || !questions) return null;
+  if (!slug || !title || !description || !level || !type || !targetLanguage) return null;
+
+  const image = readImageUrl(source.image);
 
   return {
     id: slug,
@@ -124,8 +147,18 @@ function mapQuiz(input: unknown): Quiz | null {
     type,
     targetLanguage,
     questions,
-    ...(readString(source.image) ? { image: readString(source.image) } : {}),
+    ...(image ? { image } : {}),
   } as Quiz;
+}
+
+function readImageUrl(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const media = value as StrapiMedia;
+  const url = readString(media.url);
+  if (!url) return null;
+  if (/^https?:\/\//.test(url)) return url;
+  const base = process.env.NEXT_PUBLIC_ASSET_BASE_URL || process.env.STRAPI_PUBLIC_URL || "";
+  return base ? `${base.replace(/\/$/, "")}${url}` : url;
 }
 
 function getTargetLanguageByLocale(locale: Locale): TargetLanguage {

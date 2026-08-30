@@ -2,30 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
-import { blogData } from "@/lib/blogData";
+import { getBlogPostBySlug } from "@/lib/blog/strapi";
 import type { Metadata } from "next";
 import { buildPageMetadata, getLocalizedUrl, getSiteName } from "@/lib/seo";
 
-function normalizeSlug(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
-
-function findPostBySlug(locale: Locale, slug: string) {
-  const normalizedSlug = normalizeSlug(slug);
-  return blogData[locale].find((post) => normalizeSlug(post.slug) === normalizedSlug);
-}
-
-export async function generateStaticParams() {
-  return Object.entries(blogData).flatMap(([locale, posts]) =>
-    posts.map((post) => ({
-      locale,
-      slug: post.slug,
-    })),
-  );
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -35,7 +16,7 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   if (!isValidLocale(locale)) return {};
 
-  const post = findPostBySlug(locale, slug);
+  const post = await getBlogPostBySlug(slug, locale);
   if (!post) return {};
 
   return buildPageMetadata({
@@ -57,7 +38,7 @@ export default async function BlogPostPage({
   if (!isValidLocale(locale)) notFound();
 
   const dict = await getDictionary(locale as Locale);
-  const post = findPostBySlug(locale as Locale, slug);
+  const post = await getBlogPostBySlug(slug, locale as Locale);
 
   if (!post) {
     notFound();

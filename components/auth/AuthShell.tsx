@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { assetUrl } from "@/lib/cdnAssets";
 
 type AuthShellProps = {
   children: ReactNode;
@@ -17,7 +18,7 @@ export default function AuthShell({ children, homeHref = "/pt-br/", visualTitle,
       <div className="grid min-h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-6.5rem)] lg:grid-cols-[minmax(0,1fr)_minmax(440px,0.82fr)]">
         <section className="relative hidden overflow-hidden bg-brand-blue lg:block">
           <Image
-            src="/assets/img/FOTO-BANNER-TOPO.png"
+            src={assetUrl("assets/images/FOTO-BANNER-TOPO.webp")}
             alt=""
             fill
             sizes="54vw"
@@ -29,7 +30,7 @@ export default function AuthShell({ children, homeHref = "/pt-br/", visualTitle,
           <div className="absolute left-10 top-8">
             <Link href={homeHref} className="inline-flex">
               <Image
-                src="/assets/img/LOGOTIPO-TOPO.png"
+                src={assetUrl("assets/images/LOGOTIPO-TOPO.webp")}
                 alt="Fluent Too"
                 width={190}
                 height={70}

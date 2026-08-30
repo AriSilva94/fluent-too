@@ -10,7 +10,6 @@ export const localeLabels: Record<Locale, string> = {
   "fr-fr": "FR",
 };
 
-/** Maps URL slug → Accept-Language prefix for matching */
 export const localeToLangTag: Record<Locale, string> = {
   "pt-br": "pt",
   "en-us": "en",

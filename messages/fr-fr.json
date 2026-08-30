@@ -87,7 +87,9 @@
     "saveSignInTitle": "Vous voulez suivre vos progrès ?",
     "saveSignInSubtitle": "Créez un compte pour sauvegarder votre historique d'étude et suivre vos résultats.",
     "createAccount": "Créer un compte",
-    "signIn": "Se connecter"
+    "signIn": "Se connecter",
+    "saveProfileRequired": "Choisissez votre profil pour commencer à enregistrer vos résultats.",
+    "saveProfileRequiredCta": "Choisir mon profil"
   },
   "login": {
     "title": "Connexion",
@@ -128,6 +130,18 @@
     "changePasswordSubmit": "Changer le mot de passe",
     "changePasswordSuccess": "Mot de passe modifié avec succès.",
     "logout": "Se déconnecter",
+    "profileTitle": "Comment voulez-vous vous inscrire ?",
+    "profileStudent": "Je suis étudiant",
+    "profileStudentHint": "Je veux apprendre des langues avec des cours et des quiz.",
+    "profileTeacher": "Je suis professeur",
+    "profileTeacherHint": "Je veux enseigner sur la plateforme.",
+    "teacherBioLabel": "Bio",
+    "teacherExperienceLabel": "Expérience",
+    "teacherLanguagesLabel": "Langues que vous enseignez",
+    "teacherCredentialLabel": "Lien de justificatif (optionnel)",
+    "teacherAttachmentLabel": "Pièce jointe (optionnel)",
+    "teacherAttachmentHint": "PDF, PNG ou JPEG, jusqu'à 5 Mo.",
+    "teacherSubmit": "Envoyer la candidature",
     "errors": {
       "INVALID_EMAIL": "Indiquez un e-mail valide.",
       "WEAK_PASSWORD": "Utilisez un mot de passe entre 8 et 72 caractères.",
@@ -135,6 +149,7 @@
       "REQUIRED": "Champ obligatoire.",
       "INVALID_CREDENTIALS": "E-mail ou mot de passe invalide.",
       "EMAIL_NOT_CONFIRMED": "Confirmez votre e-mail avant de vous connecter.",
+      "EMAIL_ALREADY_REGISTERED": "Cet e-mail possède déjà un compte avec mot de passe. Connectez-vous avec e-mail et mot de passe plutôt qu'avec Google.",
       "RATE_LIMITED": "Trop de tentatives. Réessayez dans quelques instants.",
       "SERVICE_UNAVAILABLE": "Service momentanément indisponible.",
       "UNAUTHORIZED": "Session expirée. Connectez-vous à nouveau.",
@@ -142,8 +157,22 @@
       "GOOGLE_AUTH_FAILED": "Connexion avec Google impossible.",
       "INVALID_ORIGIN": "Origine de requête non autorisée.",
       "PAYLOAD_TOO_LARGE": "Les données envoyées dépassent la limite.",
-      "UNKNOWN_ERROR": "Impossible de terminer l'opération."
+      "UNKNOWN_ERROR": "Impossible de terminer l'opération.",
+      "TEACHER_APPLICATION_EXISTS": "Vous avez déjà une candidature de professeur en cours d'examen.",
+      "FILE_TOO_LARGE": "Le fichier envoyé dépasse la limite de 5 Mo.",
+      "INVALID_FILE_TYPE": "Type de fichier non autorisé. Envoyez un PDF, PNG ou JPEG.",
+      "PROFILE_ALREADY_SET": "Votre profil a déjà été défini.",
+      "ROLE_UNAVAILABLE": "Ce profil est indisponible pour le moment. Réessayez plus tard.",
+      "INVALID_URL": "Indiquez un lien valide commençant par http:// ou https://."
     }
+  },
+  "onboarding": {
+    "title": "Comment voulez-vous utiliser Fluent Too ?",
+    "subtitle": "Choisissez votre profil pour continuer. Ce choix est définitif et ne pourra pas être modifié.",
+    "studentCta": "Je suis étudiant",
+    "teacherCta": "Je suis professeur",
+    "studentConfirmText": "Une fois confirmé, votre compte restera un compte étudiant. Vous ne pourrez plus postuler comme professeur.",
+    "studentConfirmCta": "Confirmer comme étudiant"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -155,11 +184,35 @@
     "totalAttempts": "Quiz terminés",
     "averageScore": "Moyenne générale",
     "bestScore": "Meilleur résultat",
-    "continueStudying": "Continuer à étudier"
+    "continueStudying": "Continuer à étudier",
+    "teacherPendingTitle": "Candidature d'enseignant en cours d'examen",
+    "teacherPendingText": "Nous avons bien reçu votre candidature pour devenir enseignant et notre équipe l'examine actuellement. Vous serez averti dès qu'une décision sera prise.",
+    "teacherRejectedTitle": "Candidature d'enseignant non approuvée",
+    "teacherRejectedText": "Votre candidature pour devenir enseignant n'a pas été approuvée cette fois-ci.",
+    "teacherRejectedCta": "Continuer en tant qu'élève"
   },
   "admin": {
     "title": "Panneau d'administration",
-    "subtitle": "Gérez le contenu, les utilisateurs et les paramètres."
+    "subtitle": "Gérez le contenu, les utilisateurs et les paramètres.",
+    "teachersTitle": "Candidatures d'enseignants",
+    "teachersEmpty": "Aucune candidature trouvée.",
+    "teachersLoadError": "Impossible de charger les candidatures. Réessayez dans un instant.",
+    "teachersFilterPending": "En attente",
+    "teachersFilterApproved": "Approuvées",
+    "teachersFilterRejected": "Rejetées",
+    "teachersApprove": "Approuver",
+    "teachersReject": "Rejeter",
+    "teachersRejectNoteLabel": "Motif du rejet",
+    "teachersRejectNoteRequired": "Indiquez un motif avant de rejeter.",
+    "teachersAlreadyReviewed": "Cette candidature a déjà été examinée par un autre administrateur.",
+    "teachersReviewError": "Impossible de terminer l'action. Veuillez réessayer.",
+    "teachersApproveConfirmTitle": "Approuver la candidature ?",
+    "teachersApproveConfirmText": "Cet utilisateur recevra l'accès professeur.",
+    "teachersApproveConfirmCta": "Approuver le professeur",
+    "teachersRejectConfirmTitle": "Rejeter la candidature ?",
+    "teachersRejectConfirmText": "Indiquez le motif pour le candidat.",
+    "teachersRejectConfirmCta": "Rejeter la candidature",
+    "cancel": "Annuler"
   },
   "notFound": {
     "badge": "Erreur de parcours",

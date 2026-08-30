@@ -1,14 +1,14 @@
 import Container from "@/components/ui/Container";
 import type { Dictionary } from "@/lib/getDictionary";
+import { assetUrl } from "@/lib/cdnAssets";
 
 export default function Hero({ dict }: { dict: Dictionary }) {
   return (
     <section
       id="inicio"
       className="relative bg-cover bg-[center_top] bg-no-repeat pb-28 pt-20 md:bg-center md:pb-36 md:pt-24"
-      style={{ backgroundImage: "url('/assets/img/FOTO-BANNER-TOPO.png')" }}
+      style={{ backgroundImage: `url('${assetUrl("assets/images/FOTO-BANNER-TOPO.webp")}')` }}
     >
-      {/* Mobile Gradient Overlay for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-transparent md:hidden" />
 
       <Container className="relative text-left">

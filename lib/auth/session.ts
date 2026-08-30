@@ -1,4 +1,5 @@
 import type { AuthResponse, AuthTokens, AuthUser } from "./contracts";
+import { decodeJwtExpiry } from "./jwt";
 
 type SessionTokens = {
   accessToken?: string;
@@ -29,4 +30,27 @@ export async function resolveSession(tokens: SessionTokens, client: SessionClien
   if (!next.ok) return { status: "anonymous", clear: true };
 
   return { status: "refreshed", user: next.data, tokens: refreshed.data.tokens };
+}
+
+export type OptimisticSessionResult =
+  | { status: "authenticated" }
+  | { status: "refreshed"; tokens: AuthTokens }
+  | { status: "anonymous"; clear?: boolean };
+
+export async function resolveSessionOptimistic(
+  tokens: SessionTokens,
+  client: Pick<SessionClient, "refresh">,
+  now: number = Date.now()
+): Promise<OptimisticSessionResult> {
+  if (!tokens.accessToken || !tokens.refreshToken) {
+    return { status: "anonymous", clear: Boolean(tokens.accessToken || tokens.refreshToken) };
+  }
+
+  const skewMs = 30_000;
+  const exp = decodeJwtExpiry(tokens.accessToken);
+  if (exp !== null && exp * 1000 > now + skewMs) return { status: "authenticated" };
+
+  const refreshed = await client.refresh(tokens.refreshToken);
+  if (!refreshed.ok) return { status: "anonymous", clear: true };
+  return { status: "refreshed", tokens: refreshed.data.tokens };
 }

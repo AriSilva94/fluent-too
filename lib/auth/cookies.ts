@@ -5,6 +5,8 @@ export const AUTH_COOKIE_NAMES = {
   refresh: "fluent_too_refresh",
 } as const;
 
+export const OAUTH_STATE_COOKIE = "fluent_too_oauth_nonce";
+
 export type AuthCookieOptions = {
   httpOnly: true;
   sameSite: "lax";
@@ -48,4 +50,12 @@ export function buildClearCookieInstructions() {
     { name: AUTH_COOKIE_NAMES.access, value: "", options: buildAuthCookieOptions(0, false) },
     { name: AUTH_COOKIE_NAMES.refresh, value: "", options: buildAuthCookieOptions(0, false) },
   ];
+}
+
+export function buildOAuthStateCookie(nonce: string, secure = process.env.AUTH_COOKIE_SECURE !== "false"): CookieInstruction {
+  return { name: OAUTH_STATE_COOKIE, value: nonce, options: buildAuthCookieOptions(600, secure) };
+}
+
+export function buildClearOAuthStateCookie(): CookieInstruction {
+  return { name: OAUTH_STATE_COOKIE, value: "", options: buildAuthCookieOptions(0, false) };
 }

@@ -1,1 +1,1 @@
-export { getQuizById, getQuizzes, getQuizzesByLevel, getQuizzesByLevels } from "./strapi";
+export { getQuizById, getQuizzes, getQuizzesByLevel, getQuizzesByLevels, getQuizzesGroupedByLevels } from "./strapi";

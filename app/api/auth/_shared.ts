@@ -2,7 +2,27 @@ import { NextResponse } from "next/server";
 import { AUTH_COOKIE_NAMES, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { getSiteUrl } from "@/lib/auth/request";
+import { checkRateLimit } from "@/lib/rate-limit/redis";
 import type { CookieInstruction } from "@/lib/auth/cookies";
+
+export type RateLimitConfig = { name: string; limit: number; windowSeconds: number };
+
+export function getClientIp(request: Request): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0]!.trim();
+  return request.headers.get("x-real-ip") ?? "unknown";
+}
+
+export async function enforceRateLimit(request: Request, config: RateLimitConfig): Promise<NextResponse | null> {
+  const key = `rate-limit:${config.name}:${getClientIp(request)}`;
+  const result = await checkRateLimit(key, config.limit, config.windowSeconds);
+  if (result.allowed) return null;
+
+  return NextResponse.json(
+    { ok: false, error: "RATE_LIMITED" },
+    { status: 429, headers: { "Retry-After": String(result.retryAfterSeconds) } }
+  );
+}
 
 export function routeOptions(request: Request) {
   return {

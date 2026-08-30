@@ -1,9 +1,12 @@
+export type AppRole = "super_admin" | "app_admin" | "teacher" | "teacher_pending" | "student" | "unassigned";
+
 export type AuthUser = {
   id: number;
   email: string;
   username?: string;
   confirmed?: boolean;
   blocked?: boolean;
+  role?: { id: number; name: string; type: AppRole } | null;
 };
 
 export type AuthTokens = {
@@ -18,6 +21,7 @@ export type AuthErrorCode =
   | "REQUIRED"
   | "INVALID_CREDENTIALS"
   | "EMAIL_NOT_CONFIRMED"
+  | "EMAIL_ALREADY_REGISTERED"
   | "RATE_LIMITED"
   | "SERVICE_UNAVAILABLE"
   | "UNAUTHORIZED"
@@ -25,7 +29,15 @@ export type AuthErrorCode =
   | "GOOGLE_AUTH_FAILED"
   | "INVALID_ORIGIN"
   | "PAYLOAD_TOO_LARGE"
-  | "UNKNOWN_ERROR";
+  | "UNKNOWN_ERROR"
+  | "TEACHER_APPLICATION_EXISTS"
+  | "FILE_TOO_LARGE"
+  | "INVALID_FILE_TYPE"
+  | "REVIEW_NOTE_REQUIRED"
+  | "ALREADY_REVIEWED"
+  | "PROFILE_ALREADY_SET"
+  | "ROLE_UNAVAILABLE"
+  | "INVALID_URL";
 
 export type AuthResponse<T> =
   | { ok: true; data: T }
@@ -33,7 +45,7 @@ export type AuthResponse<T> =
 
 export type FieldErrorCode = Extract<
   AuthErrorCode,
-  "INVALID_EMAIL" | "WEAK_PASSWORD" | "PASSWORDS_DO_NOT_MATCH" | "REQUIRED"
+  "INVALID_EMAIL" | "WEAK_PASSWORD" | "PASSWORDS_DO_NOT_MATCH" | "REQUIRED" | "INVALID_URL"
 >;
 
 export type ValidationResult<T> =
@@ -75,4 +87,11 @@ export type AuthSuccess = {
 export type RegistrationSuccess = {
   user: AuthUser;
   tokens?: AuthTokens;
+};
+
+export type TeacherApplicationPayload = {
+  bio: string;
+  experience: string;
+  languages: string[];
+  credentialUrl?: string;
 };

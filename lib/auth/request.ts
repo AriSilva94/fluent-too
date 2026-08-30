@@ -1,5 +1,5 @@
 export function isTrustedOrigin(origin: string | null, siteUrl: string) {
-  if (!origin) return true;
+  if (!origin) return false;
   try {
     return new URL(origin).origin === new URL(siteUrl).origin;
   } catch {
