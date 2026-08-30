@@ -9,6 +9,11 @@ import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { resolveSession } from "@/lib/auth/session";
 import { createQuizAttemptsClient } from "@/lib/quiz-attempts/client";
+import { createProfileClient } from "@/lib/profile/client";
+import { hasProfile, isPendingTeacher } from "@/lib/auth/roles";
+import DashboardAdminActions from "./DashboardAdminActions";
+import TeacherApplicationStatus from "./TeacherApplicationStatus";
+import { resolveTeacherApplicationView } from "./teacher-application-view";
 
 const dashboardDescriptions: Record<Locale, string> = {
   "pt-br": "Painel do aluno na Fluent Too com progresso, atividades e dados privados.",
@@ -53,12 +58,21 @@ export default async function DashboardPage({
   );
 
   if (session.status === "anonymous") redirect(`/${locale}/login?returnTo=/${locale}/dashboard`);
+  if (!hasProfile(session.user.role?.type)) redirect(`/${locale}/onboarding`);
   const user = session.user;
   const accessToken = session.status === "refreshed" ? session.tokens.accessToken : cookieStore.get(AUTH_COOKIE_NAMES.access)?.value;
   const attempts = accessToken ? await createQuizAttemptsClient().list(accessToken) : { ok: false as const, data: [] };
   const completedAttempts = attempts.data.length;
   const averageScore = completedAttempts > 0 ? Math.round(attempts.data.reduce((total, attempt) => total + attempt.score, 0) / completedAttempts) : 0;
   const bestScore = completedAttempts > 0 ? Math.max(...attempts.data.map((attempt) => attempt.score)) : 0;
+
+  // Só quem está `teacher_pending` paga o custo dessa chamada extra: qualquer outra
+  // role segue direto para o dashboard normal sem buscar a candidatura.
+  const teacherApplicationView = isPendingTeacher(user.role?.type)
+    ? resolveTeacherApplicationView(
+        accessToken ? await createProfileClient().myApplication(accessToken) : { ok: false, error: "UNKNOWN_ERROR" }
+      )
+    : null;
   const metricCards = [
     { label: dict.dashboard.totalAttempts, value: completedAttempts.toString(), tone: "blue" },
     { label: dict.dashboard.averageScore, value: `${averageScore}%`, tone: "orange" },
@@ -68,6 +82,9 @@ export default async function DashboardPage({
   return (
     <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+        {teacherApplicationView && (
+          <TeacherApplicationStatus dict={dict} view={teacherApplicationView.view} reviewNote={teacherApplicationView.reviewNote} />
+        )}
         <section className="overflow-hidden rounded-2xl bg-brand-blue shadow-[0_24px_80px_rgba(65,132,249,0.22)]">
           <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end lg:p-10">
             <div>
@@ -82,6 +99,16 @@ export default async function DashboardPage({
             </Link>
           </div>
         </section>
+
+        <DashboardAdminActions
+          locale={locale as Locale}
+          role={user.role?.type}
+          labels={{
+            title: dict.admin.title,
+            subtitle: dict.admin.subtitle,
+            teachersTitle: dict.admin.teachersTitle,
+          }}
+        />
 
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           {metricCards.map((metric) => (

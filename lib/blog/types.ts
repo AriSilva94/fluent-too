@@ -6,7 +6,8 @@ export type BlogPost = {
   date: string;
   author: string;
   readingTime: number;
-  content: string;
+  // Ausente nas listagens (a busca só pede `content` pra abrir o post individual).
+  content?: string;
   targetLanguage: "pt" | "en" | "fr";
   coverImage?: string;
 };

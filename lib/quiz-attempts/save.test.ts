@@ -69,4 +69,22 @@ describe("quiz attempt save", () => {
       saveQuizAttemptResult({ quiz, result, answers: { q1: "Monday" }, attemptKey: "attempt-1", fetcher })
     ).resolves.toBe("anonymous");
   });
+
+  it("retorna profileRequired para 403 PROFILE_REQUIRED, e nao um failed generico", async () => {
+    const fetcher = vi.fn(
+      async () => new Response(JSON.stringify({ ok: false, error: "PROFILE_REQUIRED" }), { status: 403 })
+    );
+
+    await expect(
+      saveQuizAttemptResult({ quiz, result, answers: { q1: "Monday" }, attemptKey: "attempt-1", fetcher })
+    ).resolves.toBe("profileRequired");
+  });
+
+  it("mantem failed para um 403 de outra causa", async () => {
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ ok: false }), { status: 403 }));
+
+    await expect(
+      saveQuizAttemptResult({ quiz, result, answers: { q1: "Monday" }, attemptKey: "attempt-1", fetcher })
+    ).resolves.toBe("failed");
+  });
 });

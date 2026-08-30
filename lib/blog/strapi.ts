@@ -14,7 +14,12 @@ type ClientOptions = {
 type BlogPostFilters = {
   targetLanguage?: TargetLanguage;
   slug?: string;
+  // Strapi `fields`: usado na listagem pra não trazer `content` (só o post aberto
+  // precisa do corpo inteiro; card de listagem mostra só `excerpt`).
+  fields?: string[];
 };
+
+const LIST_FIELDS = ["title", "slug", "category", "excerpt", "date", "author", "readingTime", "targetLanguage"];
 
 type StrapiCollectionResponse = {
   data?: unknown[];
@@ -49,6 +54,7 @@ export function createStrapiBlogClient(options: ClientOptions = {}) {
       const params = createBaseParams();
       if (filters.targetLanguage) params.set("filters[targetLanguage][$eq]", filters.targetLanguage);
       if (filters.slug) params.set("filters[slug][$eq]", filters.slug);
+      if (filters.fields?.length) filters.fields.forEach((field, index) => params.set(`fields[${index}]`, field));
 
       return fetchBlogPosts(`/api/blog-posts?${params.toString()}`);
     },
@@ -73,7 +79,7 @@ export function createStrapiBlogClient(options: ClientOptions = {}) {
 
 export async function getBlogPosts(locale?: Locale) {
   const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
-  const posts = await createStrapiBlogClient().getBlogPosts({ targetLanguage });
+  const posts = await createStrapiBlogClient().getBlogPosts({ targetLanguage, fields: LIST_FIELDS });
   return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
@@ -100,13 +106,15 @@ function mapBlogPost(input: unknown): BlogPost | null {
   const title = readString(source.title);
   const category = readString(source.category);
   const excerpt = readString(source.excerpt);
+  // Nas listagens (`fields` sem `content`) o Strapi nem devolve a chave: fica ausente.
+  // Só a página do post aberto (sem restrição de `fields`) pede o corpo inteiro.
   const content = readString(source.content);
   const date = readString(source.date);
   const author = readString(source.author);
   const readingTime = readNumber(source.readingTime);
   const targetLanguage = readTargetLanguage(source.targetLanguage);
 
-  if (!slug || !title || !category || !excerpt || !content || !date || !author || !targetLanguage) return null;
+  if (!slug || !title || !category || !excerpt || !date || !author || !targetLanguage) return null;
 
   const coverImage = readImageUrl(source.coverImage);
 
@@ -115,11 +123,11 @@ function mapBlogPost(input: unknown): BlogPost | null {
     title,
     category,
     excerpt,
-    content,
     date,
     author,
     readingTime: readingTime ?? 0,
     targetLanguage,
+    ...(content ? { content } : {}),
     ...(coverImage ? { coverImage } : {}),
   };
 }

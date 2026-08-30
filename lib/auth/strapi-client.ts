@@ -51,9 +51,15 @@ export function createStrapiClient(options: ClientOptions = {}) {
     return { ok: true, data: body as T };
   }
 
-  async function auth(path: string, body: unknown, method: "GET" | "POST" = "POST"): Promise<AuthResponse<AuthSuccess>> {
+  async function auth(
+    path: string,
+    body: unknown,
+    method: "GET" | "POST" = "POST",
+    headers?: Record<string, string>
+  ): Promise<AuthResponse<AuthSuccess>> {
     const response = await request<StrapiAuthBody>(path, {
       method,
+      headers,
       ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
     });
     if (!response.ok) return response;
@@ -99,11 +105,16 @@ export function createStrapiClient(options: ClientOptions = {}) {
       return request<{ ok: true }>("/api/auth/send-email-confirmation", { method: "POST", body: JSON.stringify(payload) });
     },
     changePassword(accessToken: string, payload: ChangePasswordPayload) {
-      return auth("/api/auth/change-password", {
-        currentPassword: payload.currentPassword,
-        password: payload.password,
-        passwordConfirmation: payload.passwordConfirmation,
-      });
+      return auth(
+        "/api/auth/change-password",
+        {
+          currentPassword: payload.currentPassword,
+          password: payload.password,
+          passwordConfirmation: payload.passwordConfirmation,
+        },
+        "POST",
+        { Authorization: `Bearer ${accessToken}` }
+      );
     },
     googleCallback(accessToken: string) {
       return auth(`/api/auth/google/callback?access_token=${encodeURIComponent(accessToken)}`, undefined, "GET");
