@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { locales, defaultLocale, isValidLocale, localeToLangTag } from "@/lib/i18n";
 import { AUTH_COOKIE_NAMES, buildClearCookieInstructions, buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
-import { resolveSession } from "@/lib/auth/session";
+import { resolveSessionOptimistic } from "@/lib/auth/session";
 import { decideAuthNavigation } from "@/lib/auth/proxy";
+import { buildContentSecurityPolicy, generateNonce } from "@/lib/security/csp";
 
 const LOCALE_COOKIE = "NEXT_LOCALE";
 
@@ -52,7 +53,7 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  const session = await resolveSession(
+  const session = await resolveSessionOptimistic(
     {
       accessToken: request.cookies.get(AUTH_COOKIE_NAMES.access)?.value,
       refreshToken: request.cookies.get(AUTH_COOKIE_NAMES.refresh)?.value,
@@ -65,14 +66,25 @@ export async function proxy(request: NextRequest) {
     process.env.STRAPI_PUBLIC_URL ?? "http://localhost:1337"
   );
 
+  // O nonce precisa existir nos dois lados: no header de requisição (pra Next aplicar
+  // aos próprios scripts que ele injeta na página) e no header de resposta (é o que o
+  // navegador de fato lê pra decidir o que a CSP permite executar).
+  const nonce = generateNonce();
+  const csp = buildContentSecurityPolicy(nonce, process.env.STRAPI_PUBLIC_URL ?? "http://localhost:1337");
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+
   const response =
-    decision.type === "redirect" ? NextResponse.redirect(new URL(decision.location, request.url)) : NextResponse.next();
+    decision.type === "redirect"
+      ? NextResponse.redirect(new URL(decision.location, request.url))
+      : NextResponse.next({ request: { headers: requestHeaders } });
 
   response.cookies.set(LOCALE_COOKIE, firstSegment, {
     maxAge: 60 * 60 * 24 * 365,
     path: "/",
   });
   response.headers.set("x-locale", firstSegment);
+  response.headers.set("Content-Security-Policy", csp);
 
   if (session.status === "refreshed") {
     for (const cookie of buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.nextUrl))) {

@@ -20,7 +20,7 @@ describe("limite de corpo da candidatura de professor", () => {
   it("responde FILE_TOO_LARGE sem materializar o formData", async () => {
     const request = new Request("http://localhost/api/profile/teacher", {
       method: "POST",
-      headers: { "content-length": String(500 * 1024 * 1024) },
+      headers: { "content-length": String(500 * 1024 * 1024), origin: "http://localhost" },
     });
     Object.defineProperty(request, "formData", {
       value: () => {
@@ -37,7 +37,7 @@ describe("limite de corpo da candidatura de professor", () => {
   it("responde 401 sem token, mesmo com corpo dentro do limite", async () => {
     const request = new Request("http://localhost/api/profile/teacher", {
       method: "POST",
-      headers: { "content-length": "10" },
+      headers: { "content-length": "10", origin: "http://localhost" },
     });
 
     const response = await POST(request);
