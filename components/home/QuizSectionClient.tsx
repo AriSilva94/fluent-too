@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -175,6 +176,15 @@ export default function QuizSectionClient({ locale, dict, quizzesByLevel, studyL
               </QuizGrid>
             </AnimatePresence>
           </motion.div>
+
+          <div className="mt-8 flex justify-center">
+            <Link
+              href={`/${locale}/quizzes`}
+              className="inline-flex min-h-11 items-center rounded-lg bg-brand-orange px-6 text-sm font-black text-white transition-colors hover:bg-brand-orange/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2"
+            >
+              {dict.home.quiz.viewAll}
+            </Link>
+          </div>
         </div>
       </Container>
     </section>

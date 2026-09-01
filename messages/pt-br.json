@@ -34,7 +34,8 @@
       "title": "Recursos",
       "tabsLabel": "Níveis de proficiência",
       "panelLabel": "Quiz nível {level}",
-      "subtitle": "Teste seus conhecimentos com nossos quizzes interativos."
+      "subtitle": "Teste seus conhecimentos com nossos quizzes interativos.",
+      "viewAll": "Ver todos os quizzes →"
     }
   },
   "footer": {

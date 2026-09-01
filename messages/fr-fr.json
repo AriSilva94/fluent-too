@@ -34,7 +34,8 @@
       "title": "Ressources",
       "tabsLabel": "Niveaux de compétence",
       "panelLabel": "Quiz niveau {level}",
-      "subtitle": "Testez vos connaissances avec nos quiz interactifs."
+      "subtitle": "Testez vos connaissances avec nos quiz interactifs.",
+      "viewAll": "Voir tous les quiz →"
     }
   },
   "footer": {

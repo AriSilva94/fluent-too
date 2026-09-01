@@ -46,7 +46,7 @@ export default async function BlogListPage({
     <div className="mx-auto max-w-6xl px-4 py-16">
       <h1 className="text-3xl font-bold text-gray-900 mb-4">{dict.blog.title}</h1>
 
-      <div className="mb-8">
+      <div className="mb-8 flex justify-center">
         <StudyLanguageFilter value={studyLanguage} labels={buildStudyLanguageLabels(dict.studyLanguage)} />
       </div>
 

@@ -43,6 +43,7 @@ export type Dictionary = {
       tabsLabel: string;
       panelLabel: string;
       subtitle: string;
+      viewAll: string;
     };
   };
   footer: {

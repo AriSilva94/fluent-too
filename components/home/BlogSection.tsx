@@ -57,6 +57,15 @@ export default async function BlogSection({ locale, dict }: { locale: Locale; di
             </Link>
           ))}
         </div>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            href={`/${locale}/blog`}
+            className="inline-flex min-h-11 items-center rounded-lg bg-brand-orange px-6 text-sm font-black text-white transition-colors hover:bg-brand-orange/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2"
+          >
+            {dict.home.blog.viewAll}
+          </Link>
+        </div>
       </Container>
     </section>
   );

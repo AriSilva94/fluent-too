@@ -34,7 +34,8 @@
       "title": "Resources",
       "tabsLabel": "Proficiency levels",
       "panelLabel": "Quiz level {level}",
-      "subtitle": "Test your knowledge with our interactive quizzes."
+      "subtitle": "Test your knowledge with our interactive quizzes.",
+      "viewAll": "See all quizzes →"
     }
   },
   "footer": {
