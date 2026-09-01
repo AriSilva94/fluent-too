@@ -1,4 +1,5 @@
-import type { Locale } from "@/lib/i18n";
+import { isMemberOf } from "@/lib/enums";
+import { TARGET_LANGUAGE } from "@/lib/quizzes/types";
 import type { BlogPost } from "./types";
 
 type TargetLanguage = BlogPost["targetLanguage"];
@@ -75,15 +76,13 @@ export function createStrapiBlogClient(options: ClientOptions = {}) {
   }
 }
 
-export async function getBlogPosts(locale?: Locale) {
-  const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
+export async function getBlogPosts(targetLanguage?: TargetLanguage) {
   const posts = await createStrapiBlogClient().getBlogPosts({ targetLanguage, fields: LIST_FIELDS });
   return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function getBlogPostBySlug(slug: string, locale?: Locale) {
-  const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
-  const posts = await createStrapiBlogClient().getBlogPosts({ targetLanguage, slug });
+export async function getBlogPostBySlug(slug: string) {
+  const posts = await createStrapiBlogClient().getBlogPosts({ slug });
   return posts[0] ?? null;
 }
 
@@ -138,17 +137,6 @@ function readImageUrl(value: unknown): string | null {
   return base ? `${base.replace(/\/$/, "")}${url}` : url;
 }
 
-function getTargetLanguageByLocale(locale: Locale): TargetLanguage {
-  switch (locale) {
-    case "pt-br":
-      return "pt";
-    case "en-us":
-      return "en";
-    case "fr-fr":
-      return "fr";
-  }
-}
-
 function readString(value: unknown) {
   return typeof value === "string" && value.trim() ? value : null;
 }
@@ -158,7 +146,7 @@ function readNumber(value: unknown) {
 }
 
 function readTargetLanguage(value: unknown): TargetLanguage | null {
-  return value === "pt" || value === "en" || value === "fr" ? value : null;
+  return isMemberOf(TARGET_LANGUAGE, value) ? value : null;
 }
 
 function trimTrailingSlash(value: string) {

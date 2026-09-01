@@ -5,10 +5,11 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
 import { getBlogPosts } from "@/lib/blog/strapi";
+import { readStudyTargetLanguage } from "@/lib/study-language-server";
 import { assetUrl } from "@/lib/cdnAssets";
 
 export default async function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
-  const posts = (await getBlogPosts(locale)).slice(0, 6);
+  const posts = (await getBlogPosts(await readStudyTargetLanguage())).slice(0, 6);
 
   return (
     <section id="blog" className="bg-white pb-8 pt-0 md:pb-14 md:pt-1">

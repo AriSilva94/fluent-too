@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { APPLICATION_STATUS } from "@/lib/teacher-applications/client";
 import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { TeacherApplicationView } from "./teacher-application-view";
@@ -38,7 +39,7 @@ export default function TeacherApplicationStatus({
     }
   }
 
-  if (view === "rejected") {
+  if (view === APPLICATION_STATUS.rejected) {
     return (
       <section className="mb-6 rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(255,103,0,0.12)]">
         <h2 className="text-xl font-black text-brand-orange">{dict.dashboard.teacherRejectedTitle}</h2>

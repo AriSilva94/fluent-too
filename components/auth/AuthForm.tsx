@@ -4,6 +4,12 @@ import { useState, type FormEvent } from "react";
 import { useAuthFormHeader } from "./AuthFormHeader";
 import AuthShell from "./AuthShell";
 
+export const AUTH_SURFACE = { auth: "auth", embedded: "embedded" } as const;
+
+export type AuthSurface = (typeof AUTH_SURFACE)[keyof typeof AUTH_SURFACE];
+
+export const FIELD_TYPE = { hidden: "hidden" } as const;
+
 export type AuthField = {
   name: string;
   label: string;
@@ -30,7 +36,7 @@ type AuthFormProps = {
   visualTitle: string;
   visualText: string;
   homeHref?: string;
-  surface?: "auth" | "embedded";
+  surface?: AuthSurface;
   initialError?: string;
 };
 
@@ -47,7 +53,7 @@ export default function AuthForm({
   visualTitle,
   visualText,
   homeHref,
-  surface = "auth",
+  surface = AUTH_SURFACE.auth,
   initialError,
 }: AuthFormProps) {
   const [pending, setPending] = useState(false);
@@ -79,7 +85,7 @@ export default function AuthForm({
   }
 
   const formContent = (
-    <div className={surface === "auth" ? "rounded-2xl bg-white p-6 shadow-[0_24px_80px_rgba(65,132,249,0.16)] sm:p-8" : "w-full max-w-xl rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)] sm:p-8"}>
+    <div className={surface === AUTH_SURFACE.auth ? "rounded-2xl bg-white p-6 shadow-[0_24px_80px_rgba(65,132,249,0.16)] sm:p-8" : "w-full max-w-xl rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)] sm:p-8"}>
       {header ? <div className="mb-6">{header}</div> : null}
       <div>
         <h1 className="text-3xl font-black leading-tight text-brand-blue sm:text-4xl">{title}</h1>
@@ -95,7 +101,7 @@ export default function AuthForm({
 
         {fields.map((field) => {
           const fieldError = fieldErrors[field.name];
-          if (field.type === "hidden") {
+          if (field.type === FIELD_TYPE.hidden) {
             return (
               <input
                 key={field.name}
@@ -167,7 +173,7 @@ export default function AuthForm({
     </div>
   );
 
-  if (surface === "embedded") {
+  if (surface === AUTH_SURFACE.embedded) {
     return <div className="flex justify-center px-4 py-8">{formContent}</div>;
   }
 

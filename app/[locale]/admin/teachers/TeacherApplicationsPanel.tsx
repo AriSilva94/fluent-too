@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/lib/getDictionary";
 import Breadcrumbs from "@/components/navigation/Breadcrumbs";
 import { isHttpUrl } from "@/lib/auth/teacher-registration";
+import { APPLICATION_STATUS, REVIEW_ACTION, REVIEW_ERROR, type ReviewAction, type TeacherApplicationStatus } from "@/lib/teacher-applications/client";
+import { valuesOf } from "@/lib/enums";
 
-type ApplicationStatus = "pending" | "approved" | "rejected";
+type ApplicationStatus = TeacherApplicationStatus;
 
 type ApplicationUser = {
   id: number;
@@ -35,8 +37,8 @@ type TeacherApplication = {
   reviewNote?: string | null;
 };
 
-const STATUS_FILTERS: ApplicationStatus[] = ["pending", "approved", "rejected"];
-type ReviewDialogState = { applicationId: number; action: "approve" | "reject" } | null;
+const STATUS_FILTERS: ApplicationStatus[] = valuesOf(APPLICATION_STATUS);
+type ReviewDialogState = { applicationId: number; action: ReviewAction } | null;
 
 export default function TeacherApplicationsPanel({
   dict,
@@ -92,7 +94,7 @@ export default function TeacherApplicationsPanel({
     await loadApplications(nextStatus);
   }
 
-  async function decide(id: number, action: "approve" | "reject", reviewNote?: string) {
+  async function decide(id: number, action: ReviewAction, reviewNote?: string) {
     setPendingAction(id);
     setErrors((current) => ({ ...current, [id]: "" }));
 
@@ -107,9 +109,9 @@ export default function TeacherApplicationsPanel({
 
     if (!body.ok) {
       const message =
-        body.error === "ALREADY_REVIEWED"
+        body.error === REVIEW_ERROR.alreadyReviewed
           ? dict.admin.teachersAlreadyReviewed
-          : body.error === "REVIEW_NOTE_REQUIRED"
+          : body.error === REVIEW_ERROR.reviewNoteRequired
             ? dict.admin.teachersRejectNoteRequired
             : dict.admin.teachersReviewError;
       setErrors((current) => ({ ...current, [id]: message }));
@@ -121,7 +123,7 @@ export default function TeacherApplicationsPanel({
     await loadApplications(status);
   }
 
-  function openReviewDialog(applicationId: number, action: "approve" | "reject") {
+  function openReviewDialog(applicationId: number, action: ReviewAction) {
     setReviewDialog({ applicationId, action });
     setRejectNote("");
     setDialogError("");
@@ -137,28 +139,28 @@ export default function TeacherApplicationsPanel({
   function confirmReviewDialog() {
     if (!reviewDialog) return;
 
-    if (reviewDialog.action === "reject") {
+    if (reviewDialog.action === REVIEW_ACTION.reject) {
       const note = rejectNote.trim();
       if (!note) {
         setDialogError(dict.admin.teachersRejectNoteRequired);
         return;
       }
-      void decide(reviewDialog.applicationId, "reject", note);
+      void decide(reviewDialog.applicationId, REVIEW_ACTION.reject, note);
       return;
     }
 
-    void decide(reviewDialog.applicationId, "approve");
+    void decide(reviewDialog.applicationId, REVIEW_ACTION.approve);
   }
 
   function startReject(id: number) {
-    openReviewDialog(id, "reject");
+    openReviewDialog(id, REVIEW_ACTION.reject);
     setErrors((current) => ({ ...current, [id]: "" }));
   }
 
   const selectedApplication = reviewDialog
     ? applications.find((application) => application.id === reviewDialog.applicationId)
     : null;
-  const isRejectDialog = reviewDialog?.action === "reject";
+  const isRejectDialog = reviewDialog?.action === REVIEW_ACTION.reject;
 
   return (
     <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
@@ -249,7 +251,7 @@ export default function TeacherApplicationsPanel({
                   </a>
                 ) : null}
 
-                {application.status === "rejected" && application.reviewNote ? (
+                {application.status === APPLICATION_STATUS.rejected && application.reviewNote ? (
                   <p className="mt-3 text-sm font-semibold text-red-700">{application.reviewNote}</p>
                 ) : null}
 
@@ -259,11 +261,11 @@ export default function TeacherApplicationsPanel({
                   </p>
                 ) : null}
 
-                {application.status === "pending" ? (
+                {application.status === APPLICATION_STATUS.pending ? (
                   <div className="mt-5 flex flex-wrap items-start gap-3">
                     <button
                       type="button"
-                      onClick={() => openReviewDialog(application.id, "approve")}
+                      onClick={() => openReviewDialog(application.id, REVIEW_ACTION.approve)}
                       disabled={pendingAction === application.id}
                       className="min-h-11 rounded-lg bg-brand-blue px-5 text-sm font-black text-white transition-colors hover:bg-brand-blue/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >

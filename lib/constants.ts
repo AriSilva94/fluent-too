@@ -31,3 +31,5 @@ export const LEVEL_VISUALS: Record<
     surface: "bg-[#f8fafc]",
   },
 };
+
+export const KEY = { escape: "Escape", arrowLeft: "ArrowLeft", arrowRight: "ArrowRight" } as const;

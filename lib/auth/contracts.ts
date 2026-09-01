@@ -1,4 +1,13 @@
-export type AppRole = "super_admin" | "app_admin" | "teacher" | "teacher_pending" | "student" | "unassigned";
+export const APP_ROLES = {
+  superAdmin: "super_admin",
+  appAdmin: "app_admin",
+  teacher: "teacher",
+  teacherPending: "teacher_pending",
+  student: "student",
+  unassigned: "unassigned",
+} as const;
+
+export type AppRole = (typeof APP_ROLES)[keyof typeof APP_ROLES];
 
 export type AuthUser = {
   id: number;
@@ -7,6 +16,7 @@ export type AuthUser = {
   confirmed?: boolean;
   blocked?: boolean;
   role?: { id: number; name: string; type: AppRole } | null;
+  teachingLanguages?: string[];
 };
 
 export type AuthTokens = {

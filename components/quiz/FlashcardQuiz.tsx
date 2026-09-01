@@ -1,6 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { EXIT_TRANSITION, SPRING_CONTENT } from '@/lib/motion';
 import type { Dictionary } from '@/lib/getDictionary';
 import type { Locale } from '@/lib/i18n';
 import { FlashcardQuiz, QuizResult } from '@/lib/quizzes/types';
@@ -74,15 +76,19 @@ export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
           .replace('{total}', quiz.questions.length.toString())}
       </div>
 
-      <div
+      <motion.div
         key={currentQuestion.id}
-        className="perspective-[1000px] w-full h-64 cursor-pointer mb-8 group animate-in fade-in zoom-in-95 duration-300"
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={SPRING_CONTENT}
+        className="perspective-[1000px] w-full h-64 cursor-pointer mb-8 group"
         onClick={() => setIsFlipped(!isFlipped)}
       >
-        <div
-          className={`relative w-full h-full transition-transform duration-500 transform-3d shadow-lg rounded-xl border border-neutral-200 ${
-            isFlipped ? 'rotate-y-180' : ''
-          }`}
+        <motion.div
+          animate={{ rotateY: isFlipped ? 180 : 0 }}
+          transition={SPRING_CONTENT}
+          style={{ transformStyle: 'preserve-3d' }}
+          className="relative w-full h-full shadow-lg rounded-xl border border-neutral-200"
         >
           <div className="absolute w-full h-full backface-hidden bg-white rounded-xl flex items-center justify-center p-8 text-center">
             <div>
@@ -98,11 +104,18 @@ export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
               <h3 className="text-2xl font-medium text-neutral-800">{currentQuestion.back}</h3>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {isFlipped && (
-        <div className="flex gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <AnimatePresence>
+        {isFlipped && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 8, transition: EXIT_TRANSITION }}
+          transition={SPRING_CONTENT}
+          className="flex gap-4 justify-center"
+        >
           <Button
             variant="outline"
             className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 w-32"
@@ -123,8 +136,9 @@ export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
           >
             {dict.quizzes.knewIt}
           </Button>
-        </div>
-      )}
+        </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

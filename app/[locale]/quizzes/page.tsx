@@ -8,6 +8,9 @@ import { getQuizzes, getQuizzesByLevel } from '@/lib/quizzes/data';
 import type { QuizLevel } from '@/lib/quizzes/types';
 import { LevelTabs, QuizCard } from '@/components/quiz/Shared';
 import { buildPageMetadata } from '@/lib/seo';
+import StudyLanguageFilter from '@/components/StudyLanguageFilter';
+import { readStudyLanguage } from '@/lib/study-language-server';
+import { buildStudyLanguageLabels, toTargetLanguage } from '@/lib/study-language';
 
 interface Props {
   params: Promise<{ locale: string }>;
@@ -36,9 +39,12 @@ export default async function QuizListPage({ params, searchParams }: Props) {
   const dict = await getDictionary(locale as Locale);
   const currentLevel = isQuizLevel(level) ? level : undefined;
   
-  const quizzes = currentLevel 
-    ? await getQuizzesByLevel(currentLevel, locale as Locale) 
-    : await getQuizzes(locale as Locale);
+  const studyLanguage = await readStudyLanguage();
+  const targetLanguage = toTargetLanguage(studyLanguage);
+
+  const quizzes = currentLevel
+    ? await getQuizzesByLevel(currentLevel, targetLanguage)
+    : await getQuizzes(targetLanguage);
 
   const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
@@ -51,6 +57,10 @@ export default async function QuizListPage({ params, searchParams }: Props) {
       />
 
       <div className="mt-8">
+        <div className="mb-6 flex justify-center">
+          <StudyLanguageFilter value={studyLanguage} labels={buildStudyLanguageLabels(dict.studyLanguage)} />
+        </div>
+
         <LevelTabs levels={levels} currentLevel={currentLevel} dict={dict} />
         
         {quizzes.length > 0 ? (

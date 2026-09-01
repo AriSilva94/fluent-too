@@ -4,7 +4,7 @@ import {
   type CookieInstruction,
 } from "./cookies";
 import { isTrustedOrigin, readLimitedJson } from "./request";
-import { resolveSession } from "./session";
+import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "./session";
 import {
   validateChangePassword,
   validateForgotPassword,
@@ -120,19 +120,23 @@ export async function handleSession(
     refresh: options.client.refresh,
   });
 
-  if (session.status === "authenticated") return { status: 200, body: { ok: true, user: session.user } };
-  if (session.status === "refreshed") {
+  if (wasSessionRefreshed(session)) {
     return {
       status: 200,
       body: { ok: true, user: session.user },
       cookies: buildCookieInstructions(session.tokens, options.secureCookies),
     };
   }
-  return {
-    status: 200,
-    body: { ok: false, user: null },
-    cookies: session.clear ? buildClearCookieInstructions() : undefined,
-  };
+
+  if (isAnonymousSession(session)) {
+    return {
+      status: 200,
+      body: { ok: false, user: null },
+      cookies: session.clear ? buildClearCookieInstructions() : undefined,
+    };
+  }
+
+  return { status: 200, body: { ok: true, user: session.user } };
 }
 
 export async function handleLogout(
@@ -176,8 +180,13 @@ function registrationResponseToHandler(
   };
 }
 
+export const AUTH_ERROR = {
+  invalidCredentials: "INVALID_CREDENTIALS",
+  emailNotConfirmed: "EMAIL_NOT_CONFIRMED",
+} as const;
+
 function mapClientStatus(error: string, status: number) {
-  if (error === "INVALID_CREDENTIALS") return 401;
-  if (error === "EMAIL_NOT_CONFIRMED") return 403;
+  if (error === AUTH_ERROR.invalidCredentials) return 401;
+  if (error === AUTH_ERROR.emailNotConfirmed) return 403;
   return status;
 }

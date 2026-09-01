@@ -13,15 +13,22 @@ import type { Dictionary } from "@/lib/getDictionary";
 import { assetUrl } from "@/lib/cdnAssets";
 import { buildHomeAnchorHref, shouldHandleHomeAnchorScroll } from "./headerNavigation";
 
+export const HOME_ANCHOR = {
+  home: "#inicio",
+  resources: "#recursos",
+  blog: "#blog",
+  contact: "#contato",
+} as const;
+
 export default function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   const navLinks = [
-    { hash: "#inicio", href: buildHomeAnchorHref(locale, "#inicio"), label: dict.nav.home },
-    { hash: "#recursos", href: buildHomeAnchorHref(locale, "#recursos"), label: dict.nav.resources },
-    { hash: "#blog", href: buildHomeAnchorHref(locale, "#blog"), label: dict.nav.blog },
-    { hash: "#contato", href: buildHomeAnchorHref(locale, "#contato"), label: dict.nav.contact },
+    { hash: HOME_ANCHOR.home, href: buildHomeAnchorHref(locale, HOME_ANCHOR.home), label: dict.nav.home },
+    { hash: HOME_ANCHOR.resources, href: buildHomeAnchorHref(locale, HOME_ANCHOR.resources), label: dict.nav.resources },
+    { hash: HOME_ANCHOR.blog, href: buildHomeAnchorHref(locale, HOME_ANCHOR.blog), label: dict.nav.blog },
+    { hash: HOME_ANCHOR.contact, href: buildHomeAnchorHref(locale, HOME_ANCHOR.contact), label: dict.nav.contact },
   ];
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
@@ -29,7 +36,7 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
     e.preventDefault();
     const id = hash.replace("#", "");
 
-    if (id === "inicio") {
+    if (hash === HOME_ANCHOR.home) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }

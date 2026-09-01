@@ -1,0 +1,246 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Breadcrumbs from "@/components/navigation/Breadcrumbs";
+import QuizEditorForm, { LANGUAGE_LABELS } from "@/components/quiz/QuizEditorForm";
+import type { Dictionary } from "@/lib/getDictionary";
+import { TARGET_LANGUAGES, type TargetLanguage } from "@/lib/quizzes/manage";
+import { MODERATION_ACTION, type ManagedQuiz } from "@/lib/quizzes/manage-client";
+import { QUIZ_TYPE, type QuizType } from "@/lib/quizzes/types";
+
+export default function AdminQuizzesPanel({
+  dict,
+  initialQuizzes,
+  initialFailed,
+  adminHref,
+}: {
+  dict: Dictionary;
+  initialQuizzes: ManagedQuiz[];
+  initialFailed: boolean;
+  adminHref: string;
+}) {
+  const router = useRouter();
+  const [quizzes, setQuizzes] = useState(initialQuizzes);
+  const [listFailed, setListFailed] = useState(initialFailed);
+  const [language, setLanguage] = useState<TargetLanguage | "">("");
+  const [editing, setEditing] = useState<ManagedQuiz | null>(null);
+  const [pending, setPending] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<ManagedQuiz | null>(null);
+
+  const typeLabels: Record<QuizType, string> = {
+    [QUIZ_TYPE.multipleChoice]: dict.teacher.typeMultipleChoice,
+    [QUIZ_TYPE.fillGap]: dict.teacher.typeFillGap,
+    [QUIZ_TYPE.flashcard]: dict.teacher.typeFlashcard,
+  };
+
+  async function loadQuizzes(nextLanguage: TargetLanguage | "") {
+    const query = nextLanguage ? `?targetLanguage=${nextLanguage}` : "";
+    const response = await fetch(`/api/admin/quizzes${query}`);
+    const body = await response.json().catch(() => ({ ok: false }));
+
+    if (!response.ok || !body.ok) {
+      setListFailed(true);
+      return;
+    }
+
+    setListFailed(false);
+    setQuizzes(Array.isArray(body.data) ? body.data : []);
+  }
+
+  async function selectLanguage(next: TargetLanguage | "") {
+    setLanguage(next);
+    await loadQuizzes(next);
+  }
+
+  async function moderate(quiz: ManagedQuiz, publish: boolean) {
+    setPending(quiz.documentId);
+    setError("");
+    setSuccess("");
+
+    const response = await fetch(`/api/admin/quizzes/${quiz.documentId}/${publish ? MODERATION_ACTION.publish : MODERATION_ACTION.unpublish}`, {
+      method: "POST",
+    });
+    const body = await response.json().catch(() => ({ ok: false, error: "UNKNOWN_ERROR" }));
+    setPending(null);
+
+    if (!body.ok) {
+      setError(dict.admin.moderationError);
+      return;
+    }
+
+    await loadQuizzes(language);
+    router.refresh();
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+
+    setPending(deleteTarget.documentId);
+    const response = await fetch(`/api/quizzes/${deleteTarget.documentId}`, { method: "DELETE" });
+    const body = await response.json().catch(() => ({ ok: false, error: "UNKNOWN_ERROR" }));
+    setPending(null);
+    setDeleteTarget(null);
+
+    if (!body.ok) {
+      setError(dict.teacher.errors[body.error] ?? dict.teacher.errors.UNKNOWN_ERROR);
+      return;
+    }
+
+    await loadQuizzes(language);
+    router.refresh();
+  }
+
+  async function handleSaved() {
+    setEditing(null);
+    setSuccess(dict.teacher.saved);
+    await loadQuizzes(language);
+    router.refresh();
+  }
+
+  return (
+    <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+        <Breadcrumbs items={[{ label: dict.admin.title, href: adminHref }, { label: dict.admin.quizzesTitle }]} />
+
+        <section className="overflow-hidden rounded-2xl bg-brand-blue shadow-[0_24px_80px_rgba(65,132,249,0.22)]">
+          <div className="p-6 sm:p-8 lg:p-10">
+            <h1 className="text-4xl font-black leading-none text-white sm:text-5xl">{dict.admin.quizzesTitle}</h1>
+            <p className="mt-4 max-w-2xl text-lg font-semibold leading-8 text-white/90">{dict.admin.quizzesSubtitle}</p>
+          </div>
+        </section>
+
+        {success && (
+          <p role="status" className="mt-6 rounded-2xl bg-emerald-50 px-6 py-5 text-base font-semibold text-emerald-800 ring-1 ring-emerald-200">
+            {success}
+          </p>
+        )}
+
+        {error && (
+          <p role="alert" className="mt-6 rounded-2xl bg-red-50 px-6 py-5 text-base font-semibold text-red-700 ring-1 ring-red-200">
+            {error}
+          </p>
+        )}
+
+        {editing ? (
+          <QuizEditorForm
+            dict={dict}
+            languages={[...TARGET_LANGUAGES]}
+            quiz={editing}
+            onCancel={() => setEditing(null)}
+            onSaved={handleSaved}
+          />
+        ) : (
+          <>
+            <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label={dict.admin.filterAllLanguages}>
+              <button
+                type="button"
+                onClick={() => void selectLanguage("")}
+                aria-pressed={language === ""}
+                className={filterClass(language === "")}
+              >
+                {dict.admin.filterAllLanguages}
+              </button>
+              {TARGET_LANGUAGES.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => void selectLanguage(option)}
+                  aria-pressed={language === option}
+                  className={filterClass(language === option)}
+                >
+                  {LANGUAGE_LABELS[option]}
+                </button>
+              ))}
+            </div>
+
+            <section className="mt-6 space-y-4">
+              {listFailed ? (
+                <p role="alert" className="rounded-2xl bg-red-50 px-6 py-8 text-base font-semibold text-red-700 ring-1 ring-red-200">
+                  {dict.admin.quizzesLoadError}
+                </p>
+              ) : quizzes.length === 0 ? (
+                <p className="rounded-2xl bg-white px-6 py-8 text-base font-semibold text-gray-600 shadow-[0_18px_54px_rgba(65,132,249,0.12)]">
+                  {dict.admin.quizzesEmpty}
+                </p>
+              ) : (
+                quizzes.map((quiz) => (
+                  <article key={quiz.documentId} className="rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)]">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <h2 className="text-xl font-black text-gray-950">{quiz.title}</h2>
+                        <p className="mt-2 text-sm font-semibold text-gray-500">
+                          {LANGUAGE_LABELS[quiz.targetLanguage as TargetLanguage] ?? quiz.targetLanguage} · {quiz.level} ·{" "}
+                          {typeLabels[quiz.type as QuizType] ?? quiz.type}
+                        </p>
+                      </div>
+                      <span
+                        className={`rounded-lg px-3 py-1 text-xs font-black ${
+                          quiz.publishedAt ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"
+                        }`}
+                      >
+                        {quiz.publishedAt ? dict.teacher.statusPublished : dict.teacher.statusDraft}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <button type="button" onClick={() => setEditing(quiz)} className={secondaryButtonClass}>
+                        {dict.admin.edit}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={pending === quiz.documentId}
+                        onClick={() => void moderate(quiz, !quiz.publishedAt)}
+                        className={secondaryButtonClass}
+                      >
+                        {quiz.publishedAt ? dict.admin.unpublish : dict.admin.publish}
+                      </button>
+                      <button type="button" onClick={() => setDeleteTarget(quiz)} className={dangerButtonClass}>
+                        {dict.admin.delete}
+                      </button>
+                    </div>
+                  </article>
+                ))
+              )}
+            </section>
+          </>
+        )}
+
+        {deleteTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 p-4">
+            <div role="dialog" aria-modal="true" aria-labelledby="delete-admin-quiz-title" className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+              <h2 id="delete-admin-quiz-title" className="text-2xl font-black text-gray-950">
+                {dict.teacher.deleteConfirmTitle}
+              </h2>
+              <p className="mt-3 text-base font-semibold text-gray-600">{dict.teacher.deleteConfirmText}</p>
+              <p className="mt-2 text-base font-black text-brand-blue">{deleteTarget.title}</p>
+
+              <div className="mt-6 flex flex-wrap justify-end gap-3">
+                <button type="button" onClick={() => setDeleteTarget(null)} className={secondaryButtonClass}>
+                  {dict.teacher.cancel}
+                </button>
+                <button type="button" onClick={() => void confirmDelete()} className={dangerButtonClass}>
+                  {dict.teacher.deleteConfirmCta}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function filterClass(active: boolean) {
+  return `min-h-11 rounded-lg px-5 text-sm font-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${
+    active ? "bg-brand-orange text-white" : "bg-white text-brand-blue shadow-[0_10px_30px_rgba(65,132,249,0.12)]"
+  }`;
+}
+
+const secondaryButtonClass =
+  "inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-black text-brand-blue ring-1 ring-brand-blue/20 transition-colors hover:bg-brand-blue/5 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2";
+
+const dangerButtonClass =
+  "inline-flex min-h-11 items-center justify-center rounded-lg bg-red-50 px-5 text-sm font-black text-red-700 ring-1 ring-red-200 transition-colors hover:bg-red-100 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2";

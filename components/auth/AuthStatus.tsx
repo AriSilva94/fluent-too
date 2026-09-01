@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { KEY } from "@/lib/constants";
 
 type SessionUser = {
   email: string;
@@ -47,7 +48,7 @@ export default function AuthStatus({ locale, labels, navigate = (url) => window.
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) setMenuOpen(false);
     }
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === KEY.escape) setMenuOpen(false);
     }
 
     document.addEventListener("mousedown", handlePointerDown);

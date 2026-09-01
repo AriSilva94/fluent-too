@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = await params;
   if (!isValidLocale(locale)) return {};
 
-  const quiz = await getQuizById(id, locale);
+  const quiz = await getQuizById(id);
   if (!quiz) return {};
 
   return buildPageMetadata({
@@ -35,7 +35,7 @@ export default async function QuizDetailPage({ params }: Props) {
   if (!isValidLocale(locale)) notFound();
 
   const dict = await getDictionary(locale as Locale);
-  const quiz = await getQuizById(id, locale as Locale);
+  const quiz = await getQuizById(id);
 
   if (!quiz) {
     notFound();

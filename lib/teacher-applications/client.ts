@@ -6,7 +6,15 @@ type ClientOptions = {
   timeoutMs?: number;
 };
 
-type TeacherApplicationStatus = "pending" | "approved" | "rejected";
+export const APPLICATION_STATUS = { pending: "pending", approved: "approved", rejected: "rejected" } as const;
+
+export type TeacherApplicationStatus = (typeof APPLICATION_STATUS)[keyof typeof APPLICATION_STATUS];
+
+export const REVIEW_ACTION = { approve: "approve", reject: "reject" } as const;
+
+export type ReviewAction = (typeof REVIEW_ACTION)[keyof typeof REVIEW_ACTION];
+
+export const REVIEW_ERROR = { alreadyReviewed: "ALREADY_REVIEWED", reviewNoteRequired: "REVIEW_NOTE_REQUIRED" } as const;
 
 type ReviewResult = { ok: true } | { ok: false; error: string };
 

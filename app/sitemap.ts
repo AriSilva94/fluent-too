@@ -6,17 +6,6 @@ import { getLocalizedUrl } from "@/lib/seo";
 
 const publicPaths = ["", "/about", "/blog", "/quizzes"];
 
-function getLocaleFromTargetLanguage(targetLanguage: "pt" | "en" | "fr") {
-  switch (targetLanguage) {
-    case "pt":
-      return "pt-br";
-    case "en":
-      return "en-us";
-    case "fr":
-      return "fr-fr";
-  }
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = locales.flatMap((locale) =>
     publicPaths.map((pathname) => ({
@@ -26,9 +15,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   );
 
-  const blogPostsByLocale = await Promise.all(locales.map((locale) => getBlogPosts(locale)));
-  const blogRoutes = locales.flatMap((locale, index) =>
-    blogPostsByLocale[index].map((post) => ({
+  const blogPosts = await getBlogPosts();
+  const blogRoutes = locales.flatMap((locale) =>
+    blogPosts.map((post) => ({
       url: getLocalizedUrl(locale, `/blog/${post.slug}`),
       changeFrequency: "monthly" as const,
       priority: locale === defaultLocale ? 0.7 : 0.6,
@@ -36,15 +25,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const quizzes = await getQuizzes();
-  const quizRoutes = quizzes.map((quiz) => {
-    const locale = getLocaleFromTargetLanguage(quiz.targetLanguage);
-
-    return {
+  const quizRoutes = locales.flatMap((locale) =>
+    quizzes.map((quiz) => ({
       url: getLocalizedUrl(locale, `/quizzes/${quiz.id}`),
       changeFrequency: "monthly" as const,
       priority: locale === defaultLocale ? 0.7 : 0.6,
-    };
-  });
+    })),
+  );
 
   return [...staticRoutes, ...blogRoutes, ...quizRoutes];
 }

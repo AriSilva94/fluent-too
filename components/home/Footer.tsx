@@ -18,7 +18,6 @@ export default function Footer({ locale, dict }: { locale: Locale; dict: Diction
     <footer role="contentinfo" className="bg-brand-orange text-white py-6 relative">
       <Container className="flex flex-col md:flex-row items-center justify-between gap-6">
 
-        {/* Left: Copyright */}
         <p className="text-sm font-medium order-2 md:order-1">
           {dict.footer.copyright.replace("{year}", new Date().getFullYear().toString())}
         </p>

@@ -6,7 +6,7 @@ import { isValidLocale, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
 import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
-import { resolveSession } from "@/lib/auth/session";
+import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "@/lib/auth/session";
 import { canReviewTeachers, hasProfile } from "@/lib/auth/roles";
 import { createTeacherApplicationsClient } from "@/lib/teacher-applications/client";
 import TeacherApplicationsPanel from "./TeacherApplicationsPanel";
@@ -53,13 +53,13 @@ export default async function AdminTeachersPage({
     createStrapiClient()
   );
 
-  if (session.status !== "authenticated" && session.status !== "refreshed") {
+  if (isAnonymousSession(session)) {
     redirect(`/${locale}/login`);
   }
   if (!hasProfile(session.user.role?.type)) redirect(`/${locale}/onboarding`);
   if (!canReviewTeachers(session.user.role?.type)) notFound();
 
-  const accessToken = session.status === "refreshed" ? session.tokens.accessToken : cookieStore.get(AUTH_COOKIE_NAMES.access)?.value;
+  const accessToken = wasSessionRefreshed(session) ? session.tokens.accessToken : cookieStore.get(AUTH_COOKIE_NAMES.access)?.value;
   const result = accessToken
     ? await createTeacherApplicationsClient().list(accessToken, "pending")
     : ({ ok: false, error: "UNKNOWN_ERROR" } as const);

@@ -1,37 +1,36 @@
-type SessionState = "anonymous" | "authenticated";
+import { SESSION_STATUS } from "./session";
+
+type SessionState = typeof SESSION_STATUS.anonymous | typeof SESSION_STATUS.authenticated;
+
+export const NAVIGATION = { next: "next", redirect: "redirect" } as const;
 
 export type AuthNavigationDecision =
-  | { type: "next" }
-  | { type: "redirect"; location: string };
+  | { type: typeof NAVIGATION.next }
+  | { type: typeof NAVIGATION.redirect; location: string };
 
-const privatePaths = ["/dashboard"];
+const privatePaths = ["/dashboard", "/admin", "/teacher"];
 const guestPaths = ["/login", "/register", "/forgot-password", "/auth/reset-password"];
 
-export function decideAuthNavigation(
-  pathname: string,
-  session: SessionState,
-  strapiPublicUrl: string
-): AuthNavigationDecision {
+export function decideAuthNavigation(pathname: string, session: SessionState): AuthNavigationDecision {
   const { locale, rest } = splitLocalizedPath(pathname);
 
-  if (rest === "/admin") return { type: "redirect", location: `${trimTrailingSlash(strapiPublicUrl)}/admin` };
-  if (privatePaths.some((path) => rest === path || rest.startsWith(`${path}/`)) && session === "anonymous") {
+  if (matchesPath(privatePaths, rest) && session === SESSION_STATUS.anonymous) {
     return {
-      type: "redirect",
+      type: NAVIGATION.redirect,
       location: `/${locale}/login?returnTo=${encodeURIComponent(pathname)}`,
     };
   }
-  if (guestPaths.some((path) => rest === path || rest.startsWith(`${path}/`)) && session === "authenticated") {
-    return { type: "redirect", location: `/${locale}/dashboard` };
+  if (matchesPath(guestPaths, rest) && session === SESSION_STATUS.authenticated) {
+    return { type: NAVIGATION.redirect, location: `/${locale}/dashboard` };
   }
-  return { type: "next" };
+  return { type: NAVIGATION.next };
+}
+
+function matchesPath(paths: string[], rest: string) {
+  return paths.some((path) => rest === path || rest.startsWith(`${path}/`));
 }
 
 function splitLocalizedPath(pathname: string) {
   const [, locale = "pt-br", ...segments] = pathname.split("/");
   return { locale, rest: `/${segments.join("/")}`.replace(/\/$/, "") || "/" };
-}
-
-function trimTrailingSlash(value: string) {
-  return value.replace(/\/+$/, "");
 }

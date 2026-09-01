@@ -7,11 +7,13 @@ import { isValidLocale, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
 import { AUTH_COOKIE_NAMES } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
-import { resolveSession } from "@/lib/auth/session";
+import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "@/lib/auth/session";
 import { createQuizAttemptsClient } from "@/lib/quiz-attempts/client";
 import { createProfileClient } from "@/lib/profile/client";
 import { hasProfile, isPendingTeacher } from "@/lib/auth/roles";
 import DashboardAdminActions from "./DashboardAdminActions";
+import { METRIC_TONE } from "./metric-tone";
+import DashboardTeacherActions from "./DashboardTeacherActions";
 import TeacherApplicationStatus from "./TeacherApplicationStatus";
 import { resolveTeacherApplicationView } from "./teacher-application-view";
 
@@ -57,10 +59,10 @@ export default async function DashboardPage({
     createStrapiClient()
   );
 
-  if (session.status === "anonymous") redirect(`/${locale}/login?returnTo=/${locale}/dashboard`);
+  if (isAnonymousSession(session)) redirect(`/${locale}/login?returnTo=/${locale}/dashboard`);
   if (!hasProfile(session.user.role?.type)) redirect(`/${locale}/onboarding`);
   const user = session.user;
-  const accessToken = session.status === "refreshed" ? session.tokens.accessToken : cookieStore.get(AUTH_COOKIE_NAMES.access)?.value;
+  const accessToken = wasSessionRefreshed(session) ? session.tokens.accessToken : cookieStore.get(AUTH_COOKIE_NAMES.access)?.value;
   const attempts = accessToken ? await createQuizAttemptsClient().list(accessToken) : { ok: false as const, data: [] };
   const completedAttempts = attempts.data.length;
   const averageScore = completedAttempts > 0 ? Math.round(attempts.data.reduce((total, attempt) => total + attempt.score, 0) / completedAttempts) : 0;
@@ -72,9 +74,9 @@ export default async function DashboardPage({
       )
     : null;
   const metricCards = [
-    { label: dict.dashboard.totalAttempts, value: completedAttempts.toString(), tone: "blue" },
-    { label: dict.dashboard.averageScore, value: `${averageScore}%`, tone: "orange" },
-    { label: dict.dashboard.bestScore, value: `${bestScore}%`, tone: "blue" },
+    { label: dict.dashboard.totalAttempts, value: completedAttempts.toString(), tone: METRIC_TONE.blue },
+    { label: dict.dashboard.averageScore, value: `${averageScore}%`, tone: METRIC_TONE.orange },
+    { label: dict.dashboard.bestScore, value: `${bestScore}%`, tone: METRIC_TONE.blue },
   ];
 
   return (
@@ -98,6 +100,16 @@ export default async function DashboardPage({
           </div>
         </section>
 
+        <DashboardTeacherActions
+          locale={locale as Locale}
+          role={user.role?.type}
+          labels={{
+            title: dict.dashboard.teacherAreaTitle,
+            subtitle: dict.teacher.subtitle,
+            cta: dict.dashboard.teacherAreaCta,
+          }}
+        />
+
         <DashboardAdminActions
           locale={locale as Locale}
           role={user.role?.type}
@@ -111,7 +123,7 @@ export default async function DashboardPage({
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           {metricCards.map((metric) => (
             <div key={metric.label} className="rounded-2xl bg-white p-5 shadow-[0_18px_54px_rgba(65,132,249,0.12)]">
-              <p className={metric.tone === "orange" ? "text-sm font-black text-brand-orange" : "text-sm font-black text-brand-blue"}>
+              <p className={metric.tone === METRIC_TONE.orange ? "text-sm font-black text-brand-orange" : "text-sm font-black text-brand-blue"}>
                 {metric.label}
               </p>
               <p className="mt-3 text-4xl font-black leading-none text-gray-950">{metric.value}</p>

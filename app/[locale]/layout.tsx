@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { MotionConfig } from "motion/react";
 import LocaleChrome from "@/components/home/localeChrome";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, locales, type Locale } from "@/lib/i18n";
@@ -36,8 +37,10 @@ export default async function LocaleLayout({
   const dict = await getDictionary(locale as Locale);
 
   return (
-    <LocaleChrome locale={locale as Locale} dict={dict}>
-      {children}
-    </LocaleChrome>
+    <MotionConfig reducedMotion="user">
+      <LocaleChrome locale={locale as Locale} dict={dict}>
+        {children}
+      </LocaleChrome>
+    </MotionConfig>
   );
 }

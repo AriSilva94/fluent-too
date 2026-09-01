@@ -16,7 +16,7 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   if (!isValidLocale(locale)) return {};
 
-  const post = await getBlogPostBySlug(slug, locale);
+  const post = await getBlogPostBySlug(slug);
   if (!post) return {};
 
   return buildPageMetadata({
@@ -38,7 +38,7 @@ export default async function BlogPostPage({
   if (!isValidLocale(locale)) notFound();
 
   const dict = await getDictionary(locale as Locale);
-  const post = await getBlogPostBySlug(slug, locale as Locale);
+  const post = await getBlogPostBySlug(slug);
 
   if (!post) {
     notFound();

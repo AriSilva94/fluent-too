@@ -1,6 +1,18 @@
-export type QuizLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+export const QUIZ_LEVEL = { a1: 'A1', a2: 'A2', b1: 'B1', b2: 'B2', c1: 'C1', c2: 'C2' } as const;
 
-export type QuizType = 'multiple-choice' | 'flashcard' | 'fill-gap';
+export type QuizLevel = (typeof QUIZ_LEVEL)[keyof typeof QUIZ_LEVEL];
+
+export const QUIZ_TYPE = {
+  multipleChoice: 'multiple-choice',
+  flashcard: 'flashcard',
+  fillGap: 'fill-gap',
+} as const;
+
+export type QuizType = (typeof QUIZ_TYPE)[keyof typeof QUIZ_TYPE];
+
+export const TARGET_LANGUAGE = { pt: 'pt', en: 'en', fr: 'fr' } as const;
+
+export type TargetLanguage = (typeof TARGET_LANGUAGE)[keyof typeof TARGET_LANGUAGE];
 
 export interface BaseQuestion {
   id: string;
@@ -30,21 +42,21 @@ export interface QuizBase {
   level: QuizLevel;
   type: QuizType;
   image?: string;
-  targetLanguage: 'pt' | 'en' | 'fr';
+  targetLanguage: TargetLanguage;
 }
 
 export interface MultipleChoiceQuiz extends QuizBase {
-  type: 'multiple-choice';
+  type: typeof QUIZ_TYPE.multipleChoice;
   questions: MultipleChoiceQuestion[];
 }
 
 export interface FlashcardQuiz extends QuizBase {
-  type: 'flashcard';
+  type: typeof QUIZ_TYPE.flashcard;
   questions: FlashcardQuestion[];
 }
 
 export interface FillGapQuiz extends QuizBase {
-  type: 'fill-gap';
+  type: typeof QUIZ_TYPE.fillGap;
   questions: FillGapQuestion[];
 }
 

@@ -1,3 +1,5 @@
+import { LOCALE } from "@/lib/i18n";
+import { QUIZ_TYPE } from "@/lib/quizzes/types";
 import Link from "next/link";
 import { Quiz } from "@/lib/quizzes/types";
 import { LEVEL_VISUALS, LevelDisplay } from "@/lib/constants";
@@ -20,21 +22,21 @@ export default function HomeQuizCard({
 }: HomeQuizCardProps) {
     const visual = LEVEL_VISUALS[levelLabel];
     const quizTypeLabel =
-        quiz.type === "multiple-choice"
-            ? locale === "pt-br"
+        quiz.type === QUIZ_TYPE.multipleChoice
+            ? locale === LOCALE.ptBr
                 ? "Multipla escolha"
-                : locale === "fr-fr"
+                : locale === LOCALE.frFr
                   ? "Choix multiple"
                   : "Multiple choice"
-            : quiz.type === "fill-gap"
-              ? locale === "pt-br"
+            : quiz.type === QUIZ_TYPE.fillGap
+              ? locale === LOCALE.ptBr
                   ? "Preencher lacunas"
-                  : locale === "fr-fr"
+                  : locale === LOCALE.frFr
                     ? "Texte a trous"
                     : "Fill gap"
-              : locale === "pt-br"
+              : locale === LOCALE.ptBr
                   ? "Flashcards"
-                  : locale === "fr-fr"
+                  : locale === LOCALE.frFr
                     ? "Cartes memoire"
                     : "Flashcards";
 

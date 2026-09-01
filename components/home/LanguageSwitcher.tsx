@@ -4,20 +4,24 @@ import { usePathname, useRouter } from "next/navigation";
 import BR from "country-flag-icons/react/3x2/BR";
 import US from "country-flag-icons/react/3x2/US";
 import FR from "country-flag-icons/react/3x2/FR";
-import { locales, localeLabels, type Locale } from "@/lib/i18n";
+import { LOCALE, locales, localeLabels, type Locale } from "@/lib/i18n";
+
+export const SWITCHER_VARIANT = { default: "default", header: "header" } as const;
+
+export type SwitcherVariant = (typeof SWITCHER_VARIANT)[keyof typeof SWITCHER_VARIANT];
 
 const localeFlags: Record<Locale, React.ComponentType<React.HTMLAttributes<HTMLElement>>> = {
-  "pt-br": BR,
-  "en-us": US,
-  "fr-fr": FR,
+  [LOCALE.ptBr]: BR,
+  [LOCALE.enUs]: US,
+  [LOCALE.frFr]: FR,
 };
 
 export default function LanguageSwitcher({
   locale,
-  variant = "default",
+  variant = SWITCHER_VARIANT.default,
 }: {
   locale: Locale;
-  variant?: "default" | "header";
+  variant?: SwitcherVariant;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -38,7 +42,7 @@ export default function LanguageSwitcher({
     <div className="flex items-center gap-1.5">
       {locales.map((loc) => {
         const Flag = localeFlags[loc];
-        const isHeader = variant === "header";
+        const isHeader = variant === SWITCHER_VARIANT.header;
         const isActive = locale === loc;
 
         let buttonClass =

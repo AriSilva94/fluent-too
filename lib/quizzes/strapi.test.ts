@@ -118,7 +118,7 @@ describe("getQuizzes (listagem)", () => {
 
     try {
       const { getQuizzes } = await import("./strapi");
-      await getQuizzes("en-us");
+      await getQuizzes("en");
       const url = decodeURIComponent(String(fetcher.mock.calls.at(0)?.at(0)));
       expect(url).toContain("fields[0]=title");
       expect(url).not.toContain("questions");
@@ -136,7 +136,7 @@ describe("getQuizById (detalhe)", () => {
 
     try {
       const { getQuizById } = await import("./strapi");
-      await getQuizById("a1-en-basics-mc", "en-us");
+      await getQuizById("a1-en-basics-mc");
       const url = decodeURIComponent(String(fetcher.mock.calls.at(0)?.at(0)));
       expect(url).not.toContain("fields[0]");
     } finally {
@@ -171,7 +171,7 @@ describe("getQuizzesGroupedByLevels", () => {
     const originalFetch = global.fetch;
     global.fetch = fetcher as unknown as typeof fetch;
     try {
-      const result = await getQuizzesGroupedByLevels([["A1"], ["C1", "C2"]], "en-us");
+      const result = await getQuizzesGroupedByLevels([["A1"], ["C1", "C2"]], "en");
       expect(fetcher).toHaveBeenCalledTimes(1);
       expect(result[0].map((q) => q.id)).toEqual(["a1-quiz"]);
       expect(result[1].map((q) => q.id).sort()).toEqual(["c1-quiz", "c2-quiz"]);

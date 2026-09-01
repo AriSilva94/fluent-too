@@ -7,7 +7,9 @@ import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
 import TeacherApplicationForm from "./TeacherApplicationForm";
 
-type Profile = "student" | "teacher";
+export const PROFILE_CHOICE = { student: "student", teacher: "teacher" } as const;
+
+type Profile = (typeof PROFILE_CHOICE)[keyof typeof PROFILE_CHOICE];
 
 export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   const router = useRouter();
@@ -53,39 +55,39 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
         <div className="mt-6 grid grid-cols-2 gap-3">
           <button
             type="button"
-            onClick={() => selectProfile("student")}
+            onClick={() => selectProfile(PROFILE_CHOICE.student)}
             disabled={pending}
-            aria-pressed={profile === "student"}
+            aria-pressed={profile === PROFILE_CHOICE.student}
             className={`rounded-lg px-4 py-3 text-left text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${
-              profile === "student"
+              profile === PROFILE_CHOICE.student
                 ? "bg-brand-orange text-white shadow-[0_14px_34px_rgba(255,103,0,0.28)]"
                 : "bg-[#f5f8ff] text-brand-blue ring-1 ring-brand-blue/18"
             }`}
           >
             <span className="block font-black">{dict.onboarding.studentCta}</span>
-            <span className={`mt-1 block text-xs font-medium ${profile === "student" ? "text-white/90" : "text-neutral-600"}`}>
+            <span className={`mt-1 block text-xs font-medium ${profile === PROFILE_CHOICE.student ? "text-white/90" : "text-neutral-600"}`}>
               {dict.auth.profileStudentHint}
             </span>
           </button>
           <button
             type="button"
-            onClick={() => selectProfile("teacher")}
+            onClick={() => selectProfile(PROFILE_CHOICE.teacher)}
             disabled={pending}
-            aria-pressed={profile === "teacher"}
+            aria-pressed={profile === PROFILE_CHOICE.teacher}
             className={`rounded-lg px-4 py-3 text-left text-sm font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-70 ${
-              profile === "teacher"
+              profile === PROFILE_CHOICE.teacher
                 ? "bg-brand-orange text-white shadow-[0_14px_34px_rgba(255,103,0,0.28)]"
                 : "bg-[#f5f8ff] text-brand-blue ring-1 ring-brand-blue/18"
             }`}
           >
             <span className="block font-black">{dict.onboarding.teacherCta}</span>
-            <span className={`mt-1 block text-xs font-medium ${profile === "teacher" ? "text-white/90" : "text-neutral-600"}`}>
+            <span className={`mt-1 block text-xs font-medium ${profile === PROFILE_CHOICE.teacher ? "text-white/90" : "text-neutral-600"}`}>
               {dict.auth.profileTeacherHint}
             </span>
           </button>
         </div>
 
-        {profile === "student" ? (
+        {profile === PROFILE_CHOICE.student ? (
           <div className="mt-6">
             <div className="mb-6 h-px bg-brand-blue/10" />
             <p className="text-sm font-medium leading-6 text-neutral-600">{dict.onboarding.studentConfirmText}</p>
@@ -100,7 +102,7 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
           </div>
         ) : null}
 
-        {profile === "teacher" ? (
+        {profile === PROFILE_CHOICE.teacher ? (
           <div className="mt-6">
             <div className="mb-6 h-px bg-brand-blue/10" />
             <TeacherApplicationForm dict={dict} locale={locale} />

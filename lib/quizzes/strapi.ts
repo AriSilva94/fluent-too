@@ -1,7 +1,5 @@
-import type { Locale } from "@/lib/i18n";
-import type { Quiz, QuizLevel } from "./types";
-
-type TargetLanguage = Quiz["targetLanguage"];
+import { isMemberOf } from "@/lib/enums";
+import { QUIZ_LEVEL, QUIZ_TYPE, TARGET_LANGUAGE, type Quiz, type QuizLevel, type TargetLanguage } from "./types";
 
 type Fetcher = typeof fetch;
 
@@ -87,29 +85,25 @@ export function createStrapiQuizClient(options: ClientOptions = {}) {
   }
 }
 
-export async function getQuizzes(locale?: Locale) {
-  const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
+export async function getQuizzes(targetLanguage?: TargetLanguage) {
   return createStrapiQuizClient().getQuizzes({ targetLanguage, fields: LIST_FIELDS });
 }
 
-export async function getQuizById(id: string, locale?: Locale) {
-  const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
-  return createStrapiQuizClient().getQuizBySlug(id, targetLanguage);
+export async function getQuizById(id: string) {
+  return createStrapiQuizClient().getQuizBySlug(id);
 }
 
-export async function getQuizzesByLevel(level: QuizLevel, locale?: Locale) {
-  const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
+export async function getQuizzesByLevel(level: QuizLevel, targetLanguage?: TargetLanguage) {
   return createStrapiQuizClient().getQuizzes({ targetLanguage, level, fields: LIST_FIELDS });
 }
 
-export async function getQuizzesByLevels(levels: QuizLevel[], locale?: Locale) {
-  const targetLanguage = locale ? getTargetLanguageByLocale(locale) : undefined;
+export async function getQuizzesByLevels(levels: QuizLevel[], targetLanguage?: TargetLanguage) {
   return createStrapiQuizClient().getQuizzes({ targetLanguage, levels, fields: LIST_FIELDS });
 }
 
-export async function getQuizzesGroupedByLevels(levelGroups: QuizLevel[][], locale?: Locale) {
+export async function getQuizzesGroupedByLevels(levelGroups: QuizLevel[][], targetLanguage?: TargetLanguage) {
   const allLevels = Array.from(new Set(levelGroups.flat()));
-  const quizzes = await getQuizzesByLevels(allLevels, locale);
+  const quizzes = await getQuizzesByLevels(allLevels, targetLanguage);
 
   return levelGroups.map((levels) => quizzes.filter((quiz) => levels.includes(quiz.level)));
 }
@@ -161,33 +155,20 @@ function readImageUrl(value: unknown): string | null {
   return base ? `${base.replace(/\/$/, "")}${url}` : url;
 }
 
-function getTargetLanguageByLocale(locale: Locale): TargetLanguage {
-  switch (locale) {
-    case "pt-br":
-      return "pt";
-    case "en-us":
-      return "en";
-    case "fr-fr":
-      return "fr";
-  }
-}
-
 function readString(value: unknown) {
   return typeof value === "string" && value.trim() ? value : null;
 }
 
 function readLevel(value: unknown): QuizLevel | null {
-  return value === "A1" || value === "A2" || value === "B1" || value === "B2" || value === "C1" || value === "C2"
-    ? value
-    : null;
+  return isMemberOf(QUIZ_LEVEL, value) ? value : null;
 }
 
 function readType(value: unknown): Quiz["type"] | null {
-  return value === "multiple-choice" || value === "fill-gap" || value === "flashcard" ? value : null;
+  return isMemberOf(QUIZ_TYPE, value) ? value : null;
 }
 
 function readTargetLanguage(value: unknown): TargetLanguage | null {
-  return value === "pt" || value === "en" || value === "fr" ? value : null;
+  return isMemberOf(TARGET_LANGUAGE, value) ? value : null;
 }
 
 function trimTrailingSlash(value: string) {
