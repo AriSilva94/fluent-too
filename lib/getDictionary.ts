@@ -36,6 +36,7 @@ export type Dictionary = {
     };
     blog: {
       title: string;
+      subtitle: string;
       viewAll: string;
     };
     quiz: {

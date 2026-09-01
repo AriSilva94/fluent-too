@@ -28,7 +28,8 @@
     },
     "blog": {
       "title": "Blog",
-      "viewAll": "Ver todos os posts →"
+      "viewAll": "Ver todos os posts →",
+      "subtitle": "Artigos sobre métodos de estudo, cultura e rotina de quem aprende um novo idioma."
     },
     "quiz": {
       "title": "Recursos",

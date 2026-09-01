@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { getBlogPosts } from "@/lib/blog/strapi";
+import Container from "@/components/ui/Container";
+import SectionHeading from "@/components/ui/SectionHeading";
 import StudyLanguageFilter from "@/components/StudyLanguageFilter";
 import { readStudyLanguage } from "@/lib/study-language-server";
 import { buildStudyLanguageLabels, toTargetLanguage } from "@/lib/study-language";
@@ -43,14 +45,15 @@ export default async function BlogListPage({
   const posts = await getBlogPosts(toTargetLanguage(studyLanguage));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16">
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">{dict.blog.title}</h1>
+    <Container className="py-12">
+      <SectionHeading title={dict.blog.title} subtitle={dict.home.blog.subtitle} center as="h1" />
 
-      <div className="mb-8 flex justify-center">
-        <StudyLanguageFilter value={studyLanguage} labels={buildStudyLanguageLabels(dict.studyLanguage)} />
-      </div>
+      <div className="mt-8">
+        <div className="mb-6 flex justify-center">
+          <StudyLanguageFilter value={studyLanguage} labels={buildStudyLanguageLabels(dict.studyLanguage)} />
+        </div>
 
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
           <Link
             key={post.slug}
@@ -86,12 +89,13 @@ export default async function BlogListPage({
             </div>
           </Link>
         ))}
-        {posts.length === 0 && (
+          {posts.length === 0 && (
             <div className="col-span-full text-center py-12 text-gray-500">
-                <p>{dict.blog.noPosts}</p>
+              <p>{dict.blog.noPosts}</p>
             </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </Container>
   );
 }

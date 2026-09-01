@@ -28,7 +28,8 @@
     },
     "blog": {
       "title": "Blog",
-      "viewAll": "Voir tous les articles →"
+      "viewAll": "Voir tous les articles →",
+      "subtitle": "Des articles sur les méthodes d'étude, la culture et la routine de l'apprentissage d'une langue."
     },
     "quiz": {
       "title": "Ressources",
