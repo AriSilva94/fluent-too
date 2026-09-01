@@ -54,7 +54,7 @@ export default async function BlogListPage({
         {posts.map((post) => (
           <Link
             key={post.slug}
-            href={`/${locale}/blog/${post.slug}`}
+            href={`/${locale}/blog/${post.slug}?idioma=${post.targetLanguage}`}
             className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-lg h-full"
           >
              <div 

@@ -151,7 +151,7 @@ function readImageUrl(value: unknown): string | null {
   const url = readString(media.url);
   if (!url) return null;
   if (/^https?:\/\//.test(url)) return url;
-  const base = process.env.NEXT_PUBLIC_ASSET_BASE_URL || process.env.STRAPI_PUBLIC_URL || "";
+  const base = process.env.NEXT_PUBLIC_ASSET_BASE_URL || "";
   return base ? `${base.replace(/\/$/, "")}${url}` : url;
 }
 

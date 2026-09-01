@@ -81,8 +81,8 @@ export async function getBlogPosts(targetLanguage?: TargetLanguage) {
   return posts.sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
-export async function getBlogPostBySlug(slug: string) {
-  const posts = await createStrapiBlogClient().getBlogPosts({ slug });
+export async function getBlogPostBySlug(slug: string, targetLanguage?: TargetLanguage) {
+  const posts = await createStrapiBlogClient().getBlogPosts({ slug, targetLanguage });
   return posts[0] ?? null;
 }
 
@@ -133,7 +133,7 @@ function readImageUrl(value: unknown): string | null {
   const url = readString(media.url);
   if (!url) return null;
   if (/^https?:\/\//.test(url)) return url;
-  const base = process.env.NEXT_PUBLIC_ASSET_BASE_URL || process.env.STRAPI_PUBLIC_URL || "";
+  const base = process.env.NEXT_PUBLIC_ASSET_BASE_URL || "";
   return base ? `${base.replace(/\/$/, "")}${url}` : url;
 }
 

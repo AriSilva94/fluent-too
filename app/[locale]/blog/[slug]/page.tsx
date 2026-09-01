@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { getBlogPostBySlug } from "@/lib/blog/strapi";
+import { isMemberOf } from "@/lib/enums";
+import { TARGET_LANGUAGE } from "@/lib/quizzes/types";
 import type { Metadata } from "next";
 import { buildPageMetadata, getLocalizedUrl, getSiteName } from "@/lib/seo";
 
@@ -31,14 +33,17 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; slug: string }>;
+  searchParams: Promise<{ idioma?: string }>;
 }) {
   const { locale, slug } = await params;
   if (!isValidLocale(locale)) notFound();
 
+  const { idioma } = await searchParams;
   const dict = await getDictionary(locale as Locale);
-  const post = await getBlogPostBySlug(slug);
+  const post = await getBlogPostBySlug(slug, isMemberOf(TARGET_LANGUAGE, idioma) ? idioma : undefined);
 
   if (!post) {
     notFound();

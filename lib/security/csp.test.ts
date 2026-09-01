@@ -20,6 +20,11 @@ describe("buildContentSecurityPolicy", () => {
     expect(csp).toContain("connect-src 'self' https://api.example.com");
   });
 
+  it("libera o Strapi publico em img-src, que e de onde vem o upload", () => {
+    const csp = buildContentSecurityPolicy("abc123", "http://localhost:1337");
+    expect(csp).toContain("img-src 'self' data: https: http://localhost:1337");
+  });
+
   it("mantem unsafe-inline so no style-src-attr, com nonce no style-src-elem", () => {
     const csp = buildContentSecurityPolicy("abc123", "https://api.example.com");
     expect(csp).toContain("style-src-elem 'self' 'nonce-abc123' 'unsafe-inline'");

@@ -23,7 +23,7 @@ export default async function BlogSection({ locale, dict }: { locale: Locale; di
           {posts.map((post) => (
             <Link
               key={post.slug}
-              href={`/${locale}/blog/${post.slug}`}
+              href={`/${locale}/blog/${post.slug}?idioma=${post.targetLanguage}`}
               className="group flex flex-col overflow-hidden rounded-[22px] border-2 border-brand-orange bg-white transition-all hover:shadow-lg h-full"
             >
               <div className="relative h-52 w-full">

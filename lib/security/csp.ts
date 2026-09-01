@@ -10,7 +10,7 @@ export function buildContentSecurityPolicy(nonce: string, strapiPublicUrl: strin
     "style-src 'self' 'unsafe-inline'",
     `style-src-elem 'self' 'nonce-${nonce}' 'unsafe-inline'`,
     "style-src-attr 'unsafe-inline'",
-    "img-src 'self' data: https:",
+    `img-src 'self' data: https: ${strapiPublicUrl}`,
     `connect-src 'self' ${strapiPublicUrl}`,
     "font-src 'self' data:",
     "frame-ancestors 'none'",

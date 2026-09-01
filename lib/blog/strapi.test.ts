@@ -65,4 +65,18 @@ describe("getBlogPostBySlug (detalhe)", () => {
       global.fetch = originalFetch;
     }
   });
+
+  it("filtra pelo idioma quando informado, porque as traducoes dividem o slug", async () => {
+    const originalFetch = global.fetch;
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ data: [] })));
+    global.fetch = fetcher as unknown as typeof fetch;
+
+    try {
+      await getBlogPostBySlug("culture-and-language", "fr");
+      const url = decodeURIComponent(String(fetcher.mock.calls.at(0)?.at(0)));
+      expect(url).toContain("filters[targetLanguage][$eq]=fr");
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
 });
