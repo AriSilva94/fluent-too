@@ -5,6 +5,7 @@ import { isValidLocale, Locale } from '@/lib/i18n';
 import Container from '@/components/ui/Container';
 import { getQuizById } from '@/lib/quizzes/data';
 import QuizRenderer from '@/components/quiz/QuizRenderer';
+import QuizStage from '@/components/quiz/QuizStage';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { buildPageMetadata } from '@/lib/seo';
@@ -51,19 +52,9 @@ export default async function QuizDetailPage({ params }: Props) {
         </Link>
       </div>
 
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-8 text-center">
-          <span className="inline-block px-3 py-1 text-sm font-bold text-blue-600 bg-blue-50 rounded-full mb-4">
-            Level {quiz.level}
-          </span>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-4">{quiz.title}</h1>
-          <p className="text-neutral-600">{quiz.description}</p>
-        </div>
-
-        <div className="bg-neutral-50 p-6 md:p-8 rounded-2xl border border-neutral-200">
-           <QuizRenderer quiz={quiz} dict={dict} locale={locale as Locale} />
-        </div>
-      </div>
+      <QuizStage title={quiz.title} description={quiz.description} level={quiz.level} dict={dict}>
+        <QuizRenderer quiz={quiz} dict={dict} locale={locale as Locale} />
+      </QuizStage>
     </Container>
   );
 }

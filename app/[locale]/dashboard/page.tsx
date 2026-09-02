@@ -115,7 +115,10 @@ export default async function DashboardPage({
           role={user.role?.type}
           labels={{
             title: dict.admin.title,
-            subtitle: dict.admin.subtitle,
+            subtitle: dict.admin.hubSubtitle,
+            hubCta: dict.admin.hubCta,
+            quizzesTitle: dict.admin.quizzesTitle,
+            blogTitle: dict.admin.blogTitle,
             teachersTitle: dict.admin.teachersTitle,
           }}
         />

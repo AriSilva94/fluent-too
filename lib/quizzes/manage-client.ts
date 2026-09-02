@@ -17,6 +17,7 @@ export type ManagedQuiz = {
   level: string;
   type: string;
   isPublic: boolean;
+  estimatedMinutes?: number | null;
   questions?: unknown[];
   publishedAt?: string | null;
   updatedAt?: string;

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { getBlogPostBySlug } from "@/lib/blog/strapi";
+import { formatBlogDate } from "@/lib/blog/format-date";
 import { isMemberOf } from "@/lib/enums";
 import { TARGET_LANGUAGE } from "@/lib/quizzes/types";
 import type { Metadata } from "next";
@@ -99,7 +100,7 @@ export default async function BlogPostPage({
         </div>
         <div>
           <div className="font-medium text-gray-900">{post.author}</div>
-          <div>{post.date}</div>
+          <div>{formatBlogDate(post.date, locale as Locale)}</div>
         </div>
       </div>
 

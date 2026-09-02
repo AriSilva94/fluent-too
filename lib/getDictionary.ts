@@ -63,6 +63,17 @@ export type Dictionary = {
     readingTime: string;
   };
   levels: Record<string, string>;
+  table: {
+    range: string;
+    page: string;
+    previous: string;
+    next: string;
+    actions: string;
+    status: string;
+    viewLabel: string;
+    viewTable: string;
+    viewGrid: string;
+  };
   quizzes: {
     title: string;
     backToQuizzes: string;
@@ -86,6 +97,7 @@ export type Dictionary = {
     didntKnow: string;
     knewIt: string;
     noQuizzesFound: string;
+    levelBadge: string;
     saveSuccess: string;
     saveFailed: string;
     saveProfileRequired: string;
@@ -218,6 +230,17 @@ export type Dictionary = {
     deleteConfirmCta: string;
     saved: string;
     noLanguages: string;
+    previewTitle: string;
+    previewHint: string;
+    previewUntitled: string;
+    previewNoDescription: string;
+    previewQuestion: string;
+    previewOption: string;
+    previewSentence: string;
+    previewCardFront: string;
+    previewCardBack: string;
+    tabEdit: string;
+    tabPreview: string;
     errors: Record<string, string>;
   };
   admin: {
@@ -241,8 +264,26 @@ export type Dictionary = {
     teachersRejectConfirmTitle: string;
     teachersRejectConfirmText: string;
     teachersRejectConfirmCta: string;
+    teachersStatusPending: string;
+    teachersStatusApproved: string;
+    teachersStatusRejected: string;
+    teachersDecidedBy: string;
+    teachersReviewerUnknown: string;
+    teachersNoUser: string;
+    teachersLanguagesColumn: string;
+    teachersReviewedColumn: string;
+    teachersCredentialLabel: string;
+    teachersAttachmentLabel: string;
     cancel: string;
     hubSubtitle: string;
+    hubCta: string;
+    teachersSubtitle: string;
+    hubQuizzesSummary: string;
+    hubBlogSummary: string;
+    hubPendingLabel: string;
+    hubPendingCta: string;
+    hubNoPending: string;
+    hubOpen: string;
     quizzesTitle: string;
     quizzesSubtitle: string;
     quizzesEmpty: string;
@@ -251,6 +292,7 @@ export type Dictionary = {
     unpublish: string;
     moderationError: string;
     filterAllLanguages: string;
+    filterLanguageLegend: string;
     blogTitle: string;
     blogSubtitle: string;
     blogEmpty: string;

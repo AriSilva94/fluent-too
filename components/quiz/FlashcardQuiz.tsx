@@ -8,17 +8,19 @@ import type { Locale } from '@/lib/i18n';
 import { FlashcardQuiz, QuizResult } from '@/lib/quizzes/types';
 import Button from '@/components/ui/Button';
 import { gradeQuiz } from '@/lib/quizzes/grade';
-import { createQuizAttemptKey, saveQuizAttemptResult, type QuizAttemptSaveState } from '@/lib/quiz-attempts/save';
+import { createQuizAttemptKey, saveQuizAttemptResult, type PersistAttempt, type QuizAttemptSaveState } from '@/lib/quiz-attempts/save';
 import QuizAttemptResult from './QuizAttemptResult';
 
 interface Props {
   quiz: FlashcardQuiz;
   dict: Dictionary;
   locale: Locale;
+  persistAttempt?: PersistAttempt;
+  initialCardIndex?: number;
 }
 
-export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+export default function FlashcardQuizComponent({ quiz, dict, locale, persistAttempt = saveQuizAttemptResult, initialCardIndex = 0 }: Props) {
+  const [currentCardIndex, setCurrentCardIndex] = useState(clampCardIndex(initialCardIndex, quiz.questions.length));
   const [isFlipped, setIsFlipped] = useState(false);
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [result, setResult] = useState<QuizResult | null>(null);
@@ -38,7 +40,7 @@ export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
       const graded = gradeQuiz(quiz, newAnswers);
       setResult(graded);
       setSaveState('idle');
-      const nextSaveState = await saveQuizAttemptResult({ quiz, result: graded, answers: newAnswers, attemptKey: createQuizAttemptKey() });
+      const nextSaveState = await persistAttempt({ quiz, result: graded, answers: newAnswers, attemptKey: createQuizAttemptKey() });
       setSaveState(nextSaveState);
     } else {
       setIsFlipped(false);
@@ -141,4 +143,9 @@ export default function FlashcardQuizComponent({ quiz, dict, locale }: Props) {
       </AnimatePresence>
     </div>
   );
+}
+
+function clampCardIndex(index: number, total: number) {
+  if (!Number.isFinite(index) || index < 0) return 0;
+  return Math.min(Math.trunc(index), Math.max(0, total - 1));
 }

@@ -1,53 +1,43 @@
 "use client";
 
 import { useState } from "react";
+import { LayoutGrid, Table2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { Dictionary } from "@/lib/getDictionary";
+import type { Locale } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+import PagedPanel from "@/components/ui/PagedPanel";
+import ApplicationsTable from "./ApplicationsTable";
+import ApplicationCard, { type TeacherApplication } from "./ApplicationCard";
 import Breadcrumbs from "@/components/navigation/Breadcrumbs";
-import { isHttpUrl } from "@/lib/auth/teacher-registration";
 import { APPLICATION_STATUS, REVIEW_ACTION, REVIEW_ERROR, type ReviewAction, type TeacherApplicationStatus } from "@/lib/teacher-applications/client";
 import { valuesOf } from "@/lib/enums";
 
 type ApplicationStatus = TeacherApplicationStatus;
 
-type ApplicationUser = {
-  id: number;
-  username?: string | null;
-  email: string;
-  confirmed?: boolean;
-};
-
-type ApplicationAttachment = {
-  id: number;
-  url: string;
-  name?: string | null;
-};
-
-type TeacherApplication = {
-  id: number;
-  status: ApplicationStatus;
-  languages?: string[] | null;
-  bio?: string | null;
-  experience?: string | null;
-  credentialUrl?: string | null;
-  attachment?: ApplicationAttachment | null;
-  user?: ApplicationUser | null;
-  reviewedBy?: ApplicationUser | null;
-  reviewedAt?: string | null;
-  reviewNote?: string | null;
-};
-
 const STATUS_FILTERS: ApplicationStatus[] = valuesOf(APPLICATION_STATUS);
+
+const VIEW_MODE = { table: "table", grid: "grid" } as const;
+
+type ViewMode = (typeof VIEW_MODE)[keyof typeof VIEW_MODE];
+
+const VIEW_MODES: ViewMode[] = [VIEW_MODE.table, VIEW_MODE.grid];
+
+const GRID_PAGE_SIZE = 6;
+
+const FILTERS_CHROME = 68;
 type ReviewDialogState = { applicationId: number; action: ReviewAction } | null;
 
 export default function TeacherApplicationsPanel({
   dict,
+  locale,
   initialApplications,
   initialFailed = false,
   initialStatus,
   dashboardHref,
 }: {
   dict: Dictionary;
+  locale: Locale;
   initialApplications: unknown[];
   initialFailed?: boolean;
   initialStatus: ApplicationStatus;
@@ -55,6 +45,7 @@ export default function TeacherApplicationsPanel({
 }) {
   const router = useRouter();
   const [status, setStatus] = useState<ApplicationStatus>(initialStatus);
+  const [view, setView] = useState<ViewMode>(VIEW_MODE.table);
   const [applications, setApplications] = useState<TeacherApplication[]>(initialApplications as TeacherApplication[]);
   const [listFailed, setListFailed] = useState(initialFailed);
   const [loading, setLoading] = useState(false);
@@ -157,14 +148,39 @@ export default function TeacherApplicationsPanel({
     setErrors((current) => ({ ...current, [id]: "" }));
   }
 
+  function reviewActions(application: TeacherApplication) {
+    if (application.status !== APPLICATION_STATUS.pending) return null;
+
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => openReviewDialog(application.id, REVIEW_ACTION.approve)}
+          disabled={pendingAction === application.id}
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-blue px-5 text-sm font-black text-white transition-colors hover:bg-brand-blue/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-9 sm:px-4 sm:text-xs"
+        >
+          {dict.admin.teachersApprove}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => startReject(application.id)}
+          className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-black text-brand-orange ring-1 ring-brand-orange/40 transition-colors hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 sm:min-h-9 sm:px-4 sm:text-xs"
+        >
+          {dict.admin.teachersReject}
+        </button>
+      </>
+    );
+  }
+
   const selectedApplication = reviewDialog
     ? applications.find((application) => application.id === reviewDialog.applicationId)
     : null;
   const isRejectDialog = reviewDialog?.action === REVIEW_ACTION.reject;
 
   return (
-    <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+    <div className="flex flex-1 flex-col bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
+      <div className="mx-auto w-full max-w-6xl px-4 py-8">
         <Breadcrumbs
           items={[
             { label: dict.dashboard.title, href: dashboardHref },
@@ -173,28 +189,58 @@ export default function TeacherApplicationsPanel({
         />
 
         <section className="overflow-hidden rounded-2xl bg-brand-blue shadow-[0_24px_80px_rgba(65,132,249,0.22)]">
-          <div className="p-6 sm:p-8 lg:p-10">
-            <h1 className="text-4xl font-black leading-none text-white sm:text-5xl">{dict.admin.teachersTitle}</h1>
+          <div className="p-5 sm:p-6">
+            <h1 className="text-2xl font-black leading-tight text-white sm:text-3xl">{dict.admin.teachersTitle}</h1>
+            <p className="mt-2 max-w-2xl text-base font-semibold leading-6 text-white/90">{dict.admin.teachersSubtitle}</p>
           </div>
         </section>
 
-        <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label={dict.admin.teachersTitle}>
-          {STATUS_FILTERS.map((filter) => (
-            <button
-              key={filter}
-              type="button"
-              onClick={() => selectStatus(filter)}
-              aria-pressed={status === filter}
-              className={`min-h-11 rounded-lg px-5 text-sm font-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 ${
-                status === filter ? "bg-brand-orange text-white" : "bg-white text-brand-blue shadow-[0_10px_30px_rgba(65,132,249,0.12)]"
-              }`}
-            >
-              {statusLabels[filter]}
-            </button>
-          ))}
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2" role="group" aria-label={dict.admin.teachersTitle}>
+            {STATUS_FILTERS.map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => selectStatus(filter)}
+                aria-pressed={status === filter}
+                className={cn(
+                  "min-h-11 rounded-lg px-5 text-sm font-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2",
+                  status === filter
+                    ? "bg-brand-orange text-white"
+                    : "bg-white text-brand-blue shadow-[0_10px_30px_rgba(65,132,249,0.12)]"
+                )}
+              >
+                {statusLabels[filter]}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-1 rounded-lg bg-white p-1 shadow-[0_10px_30px_rgba(65,132,249,0.12)]" role="group" aria-label={dict.table.viewLabel}>
+            {VIEW_MODES.map((mode) => {
+              const Icon = mode === VIEW_MODE.table ? Table2 : LayoutGrid;
+              const label = mode === VIEW_MODE.table ? dict.table.viewTable : dict.table.viewGrid;
+
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => setView(mode)}
+                  aria-pressed={view === mode}
+                  title={label}
+                  className={cn(
+                    "inline-flex min-h-9 items-center gap-2 rounded-md px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue",
+                    view === mode ? "bg-brand-blue text-white" : "text-brand-blue hover:bg-brand-blue/5"
+                  )}
+                >
+                  <Icon aria-hidden className="h-4 w-4" />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <section className="mt-6 space-y-4">
+        <section className="mt-6">
           {!loading && listFailed ? (
             <p
               role="alert"
@@ -210,80 +256,35 @@ export default function TeacherApplicationsPanel({
             </p>
           ) : null}
 
-          {applications.map((application) => {
-            const errorId = `application-${application.id}-error`;
-            const error = errors[application.id];
-
-            return (
-              <article key={application.id} className="rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)]">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <p className="text-sm font-black text-brand-orange">{application.user?.email}</p>
-                    {application.languages && application.languages.length > 0 ? (
-                      <p className="mt-1 text-sm font-bold text-neutral-500">{application.languages.join(", ").toUpperCase()}</p>
-                    ) : null}
-                  </div>
-                  {application.credentialUrl && isHttpUrl(application.credentialUrl) ? (
-                    <a
-                      href={application.credentialUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm font-bold text-brand-blue hover:underline sm:text-right"
-                    >
-                      {application.credentialUrl}
-                    </a>
-                  ) : null}
+          {applications.length > 0 && view === VIEW_MODE.grid ? (
+            <PagedPanel rows={applications} labels={dict.table} pageSize={GRID_PAGE_SIZE} extraChrome={FILTERS_CHROME}>
+              {(pageRows) => (
+                <div className="grid gap-4 p-4 lg:grid-cols-2">
+                  {pageRows.map((application) => (
+                    <ApplicationCard
+                      key={application.id}
+                      application={application}
+                      dict={dict}
+                      locale={locale}
+                      error={errors[application.id]}
+                      className="shadow-none ring-1 ring-neutral-200"
+                      actions={reviewActions(application)}
+                    />
+                  ))}
                 </div>
+              )}
+            </PagedPanel>
+          ) : null}
 
-                {application.bio ? <p className="mt-4 text-base font-medium leading-7 text-neutral-600">{application.bio}</p> : null}
-                {application.experience ? (
-                  <p className="mt-2 text-base font-medium leading-7 text-neutral-600">{application.experience}</p>
-                ) : null}
-
-                {application.attachment?.url ? (
-                  <a
-                    href={application.attachment.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 inline-block text-sm font-bold text-brand-blue hover:underline"
-                  >
-                    {application.attachment.name ?? application.attachment.url}
-                  </a>
-                ) : null}
-
-                {application.status === APPLICATION_STATUS.rejected && application.reviewNote ? (
-                  <p className="mt-3 text-sm font-semibold text-red-700">{application.reviewNote}</p>
-                ) : null}
-
-                {error ? (
-                  <p id={errorId} role="alert" className="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 ring-1 ring-red-200">
-                    {error}
-                  </p>
-                ) : null}
-
-                {application.status === APPLICATION_STATUS.pending ? (
-                  <div className="mt-5 flex flex-wrap items-start gap-3">
-                    <button
-                      type="button"
-                      onClick={() => openReviewDialog(application.id, REVIEW_ACTION.approve)}
-                      disabled={pendingAction === application.id}
-                      className="min-h-11 rounded-lg bg-brand-blue px-5 text-sm font-black text-white transition-colors hover:bg-brand-blue/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {dict.admin.teachersApprove}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => startReject(application.id)}
-                      className="min-h-11 rounded-lg bg-white px-5 text-sm font-black text-brand-orange ring-1 ring-brand-orange/40 transition-colors hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2"
-                    >
-                      {dict.admin.teachersReject}
-                    </button>
-                  </div>
-                ) : null}
-              </article>
-            );
-          })}
+          {applications.length > 0 && view === VIEW_MODE.table ? (
+            <ApplicationsTable
+              applications={applications}
+              dict={dict}
+              locale={locale}
+              actions={reviewActions}
+              extraChrome={FILTERS_CHROME}
+            />
+          ) : null}
         </section>
 
         {reviewDialog && selectedApplication ? (

@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/navigation/Breadcrumbs";
-import QuizEditorForm, { LANGUAGE_LABELS } from "@/components/quiz/QuizEditorForm";
+import QuizEditorForm from "@/components/quiz/QuizEditorForm";
+import QuizTable from "@/components/quiz/QuizTable";
 import type { Dictionary } from "@/lib/getDictionary";
+import type { Locale } from "@/lib/i18n";
 import type { ManagedQuiz } from "@/lib/quizzes/manage-client";
 import type { TargetLanguage } from "@/lib/quizzes/manage";
 import { QUIZ_TYPE, type QuizType } from "@/lib/quizzes/types";
@@ -13,12 +15,14 @@ type EditorState = { quiz: ManagedQuiz | null } | null;
 
 export default function TeacherQuizzesPanel({
   dict,
+  locale,
   languages,
   initialQuizzes,
   initialFailed,
   dashboardHref,
 }: {
   dict: Dictionary;
+  locale: Locale;
   languages: TargetLanguage[];
   initialQuizzes: ManagedQuiz[];
   initialFailed: boolean;
@@ -86,15 +90,15 @@ export default function TeacherQuizzesPanel({
   }
 
   return (
-    <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+    <div className="flex flex-1 flex-col bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
+      <div className="mx-auto w-full max-w-6xl px-4 py-8">
         <Breadcrumbs items={[{ label: dict.dashboard.title, href: dashboardHref }, { label: dict.teacher.title }]} />
 
         <section className="overflow-hidden rounded-2xl bg-brand-blue shadow-[0_24px_80px_rgba(65,132,249,0.22)]">
-          <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end lg:p-10">
+          <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <h1 className="text-4xl font-black leading-none text-white sm:text-5xl">{dict.teacher.title}</h1>
-              <p className="mt-4 max-w-2xl text-lg font-semibold leading-8 text-white/90">{dict.teacher.subtitle}</p>
+              <h1 className="text-2xl font-black leading-tight text-white sm:text-3xl">{dict.teacher.title}</h1>
+              <p className="mt-2 max-w-2xl text-base font-semibold leading-6 text-white/90">{dict.teacher.subtitle}</p>
             </div>
             {hasLanguages && !editor && (
               <button
@@ -129,13 +133,14 @@ export default function TeacherQuizzesPanel({
         {editor ? (
           <QuizEditorForm
             dict={dict}
+            locale={locale}
             languages={languages}
             quiz={editor.quiz}
             onCancel={() => setEditor(null)}
             onSaved={handleSaved}
           />
         ) : (
-          <section className="mt-6 space-y-4">
+          <section className="mt-6">
             {listFailed ? (
               <p role="alert" className="rounded-2xl bg-red-50 px-6 py-8 text-base font-semibold text-red-700 ring-1 ring-red-200">
                 {dict.teacher.loadError}
@@ -145,35 +150,21 @@ export default function TeacherQuizzesPanel({
                 {dict.teacher.empty}
               </p>
             ) : (
-              quizzes.map((quiz) => (
-                <article key={quiz.documentId} className="rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)]">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-xl font-black text-gray-950">{quiz.title}</h2>
-                      <p className="mt-2 text-sm font-semibold text-gray-500">
-                        {LANGUAGE_LABELS[quiz.targetLanguage as TargetLanguage] ?? quiz.targetLanguage} · {quiz.level} ·{" "}
-                        {typeLabels[quiz.type as QuizType] ?? quiz.type}
-                      </p>
-                    </div>
-                    <span
-                      className={`rounded-lg px-3 py-1 text-xs font-black ${
-                        quiz.publishedAt ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"
-                      }`}
-                    >
-                      {quiz.publishedAt ? dict.teacher.statusPublished : dict.teacher.statusDraft}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-3">
+              <QuizTable
+                quizzes={quizzes}
+                dict={dict}
+                typeLabels={typeLabels}
+                actions={(quiz) => (
+                  <>
                     <button type="button" onClick={() => openEditor(quiz)} className={secondaryButtonClass}>
                       {dict.teacher.editQuiz}
                     </button>
                     <button type="button" onClick={() => setDeleteTarget(quiz)} className={dangerButtonClass}>
                       {dict.teacher.delete}
                     </button>
-                  </div>
-                </article>
-              ))
+                  </>
+                )}
+              />
             )}
           </section>
         )}

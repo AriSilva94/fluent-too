@@ -6,16 +6,17 @@ import type { Locale } from '@/lib/i18n';
 import { MultipleChoiceQuiz, QuizResult } from '@/lib/quizzes/types';
 import Button from '@/components/ui/Button';
 import { gradeQuiz } from '@/lib/quizzes/grade';
-import { createQuizAttemptKey, saveQuizAttemptResult, type QuizAttemptSaveState } from '@/lib/quiz-attempts/save';
+import { createQuizAttemptKey, saveQuizAttemptResult, type PersistAttempt, type QuizAttemptSaveState } from '@/lib/quiz-attempts/save';
 import QuizAttemptResult from './QuizAttemptResult';
 
 interface Props {
   quiz: MultipleChoiceQuiz;
   dict: Dictionary;
   locale: Locale;
+  persistAttempt?: PersistAttempt;
 }
 
-export default function MultipleChoiceQuizComponent({ quiz, dict, locale }: Props) {
+export default function MultipleChoiceQuizComponent({ quiz, dict, locale, persistAttempt = saveQuizAttemptResult }: Props) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [result, setResult] = useState<QuizResult | null>(null);
   const [saveState, setSaveState] = useState<QuizAttemptSaveState>('idle');
@@ -27,7 +28,7 @@ export default function MultipleChoiceQuizComponent({ quiz, dict, locale }: Prop
     const graded = gradeQuiz(quiz, answers);
     setResult(graded);
     setSaveState('idle');
-    const nextSaveState = await saveQuizAttemptResult({ quiz, result: graded, answers, attemptKey: createQuizAttemptKey() });
+    const nextSaveState = await persistAttempt({ quiz, result: graded, answers, attemptKey: createQuizAttemptKey() });
     setSaveState(nextSaveState);
   };
 
@@ -62,9 +63,9 @@ export default function MultipleChoiceQuizComponent({ quiz, dict, locale }: Prop
             {q.question}
           </h3>
           <div className="space-y-3">
-            {q.options.map((option) => (
+            {q.options.map((option, optionIndex) => (
               <label
-                key={option}
+                key={`${q.id}-${optionIndex}`}
                 className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors ${
                   answers[q.id] === option
                     ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'

@@ -63,6 +63,7 @@ export default async function TeacherQuizzesPage({ params }: { params: Promise<{
   return (
     <TeacherQuizzesPanel
       dict={dict}
+      locale={locale as Locale}
       languages={languages}
       initialQuizzes={result.ok ? result.data : []}
       initialFailed={!result.ok}

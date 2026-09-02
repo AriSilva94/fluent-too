@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { getBlogPosts } from "@/lib/blog/strapi";
+import { formatBlogDate } from "@/lib/blog/format-date";
 import Container from "@/components/ui/Container";
 import SectionHeading from "@/components/ui/SectionHeading";
 import StudyLanguageFilter from "@/components/StudyLanguageFilter";
@@ -71,7 +72,7 @@ export default async function BlogListPage({
                     <span className="rounded-full bg-brand-orange/10 px-2.5 py-1 font-semibold uppercase tracking-wide text-brand-orange">
                       {post.category}
                     </span>
-                    <span>{post.date}</span>
+                    <span>{formatBlogDate(post.date, locale as Locale)}</span>
                     <span>•</span>
                     <span>{post.author}</span>
                     <span>•</span>

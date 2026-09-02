@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import type { Dictionary } from "@/lib/getDictionary";
+import type { Locale } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+import Button from "@/components/ui/Button";
+import { Field, FieldGroup, fieldControlClass } from "@/components/ui/Field";
 import { QUIZ_LEVELS, QUIZ_TYPES, type TargetLanguage } from "@/lib/quizzes/manage";
 import type { ManagedQuiz } from "@/lib/quizzes/manage-client";
 import {
@@ -13,35 +17,34 @@ import {
   toQuestionPayload,
   type QuestionDraft,
 } from "@/lib/quizzes/editor";
+import type { QuizDraft } from "@/lib/quizzes/preview";
 import { QUIZ_LEVEL, QUIZ_TYPE, TARGET_LANGUAGE, type QuizLevel, type QuizType } from "@/lib/quizzes/types";
+import QuizPreviewPanel from "./QuizPreviewPanel";
 
 export const LANGUAGE_LABELS: Record<TargetLanguage, string> = { pt: "Português", en: "English", fr: "Français" };
 
-type FormState = {
-  title: string;
-  description: string;
-  targetLanguage: TargetLanguage;
-  level: QuizLevel;
-  type: QuizType;
-  estimatedMinutes: string;
-  isPublic: boolean;
-  questions: QuestionDraft[];
-};
+const PANE = { edit: "edit", preview: "preview" } as const;
+
+type Pane = (typeof PANE)[keyof typeof PANE];
 
 export default function QuizEditorForm({
   dict,
+  locale,
   languages,
   quiz,
   onCancel,
   onSaved,
 }: {
   dict: Dictionary;
+  locale: Locale;
   languages: TargetLanguage[];
   quiz: ManagedQuiz | null;
   onCancel: () => void;
   onSaved: () => void | Promise<void>;
 }) {
-  const [form, setForm] = useState<FormState>(() => createInitialState(quiz, languages));
+  const [form, setForm] = useState<QuizDraft>(() => createInitialState(quiz, languages));
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [pane, setPane] = useState<Pane>(PANE.edit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -51,7 +54,7 @@ export default function QuizEditorForm({
     [QUIZ_TYPE.flashcard]: dict.teacher.typeFlashcard,
   };
 
-  function updateForm(patch: Partial<FormState>) {
+  function updateForm(patch: Partial<QuizDraft>) {
     setForm((current) => ({ ...current, ...patch }));
   }
 
@@ -75,10 +78,28 @@ export default function QuizEditorForm({
     }));
   }
 
+  function removeQuestion(index: number) {
+    setForm((current) => ({
+      ...current,
+      questions: current.questions.filter((_, position) => position !== index),
+    }));
+    setActiveIndex((current) => (current === null ? null : Math.max(0, current > index ? current - 1 : current)));
+  }
+
+  function addQuestion() {
+    setForm((current) => ({
+      ...current,
+      questions: [...current.questions, createEmptyQuestion(newQuestionId(current.questions.length))],
+    }));
+    setActiveIndex(form.questions.length);
+  }
+
   async function save() {
     const incomplete = form.questions.findIndex((question) => !isQuestionDraftComplete(form.type, question));
     if (incomplete >= 0) {
       setError(`${dict.teacher.errors.INVALID_QUESTION} (${dict.teacher.questionNumber} ${incomplete + 1})`);
+      setActiveIndex(incomplete);
+      setPane(PANE.edit);
       return;
     }
 
@@ -114,281 +135,313 @@ export default function QuizEditorForm({
   }
 
   return (
-    <form
-      className="mt-6 space-y-6 rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)] sm:p-8"
-      onSubmit={(event) => {
-        event.preventDefault();
-        void save();
-      }}
-    >
-      {error && (
-        <p role="alert" className="rounded-2xl bg-red-50 px-6 py-5 text-base font-semibold text-red-700 ring-1 ring-red-200">
-          {error}
-        </p>
-      )}
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={dict.teacher.fieldTitle}>
-          <input
-            type="text"
-            required
-            maxLength={120}
-            value={form.title}
-            onChange={(event) => updateForm({ title: event.target.value })}
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label={dict.teacher.fieldLanguage}>
-          <select
-            value={form.targetLanguage}
-            onChange={(event) => updateForm({ targetLanguage: event.target.value as TargetLanguage })}
-            className={inputClass}
+    <div className="mt-6">
+      <div role="tablist" aria-label={dict.teacher.previewTitle} className="flex gap-2 lg:hidden">
+        {[PANE.edit, PANE.preview].map((value) => (
+          <button
+            key={value}
+            type="button"
+            role="tab"
+            aria-selected={pane === value}
+            onClick={() => setPane(value)}
+            className={cn(
+              "min-h-11 flex-1 rounded-lg px-4 text-sm font-bold transition-colors",
+              pane === value
+                ? "bg-neutral-900 text-white"
+                : "border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+            )}
           >
-            {languages.map((language) => (
-              <option key={language} value={language}>
-                {LANGUAGE_LABELS[language]}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label={dict.teacher.fieldLevel}>
-          <select
-            value={form.level}
-            onChange={(event) => updateForm({ level: event.target.value as QuizLevel })}
-            className={inputClass}
-          >
-            {QUIZ_LEVELS.map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label={dict.teacher.fieldType}>
-          <select
-            value={form.type}
-            onChange={(event) =>
-              updateForm({ type: event.target.value as QuizType, questions: [createEmptyQuestion(newQuestionId())] })
-            }
-            className={inputClass}
-          >
-            {QUIZ_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {typeLabels[type]}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label={dict.teacher.fieldMinutes}>
-          <input
-            type="number"
-            min={1}
-            value={form.estimatedMinutes}
-            onChange={(event) => updateForm({ estimatedMinutes: event.target.value })}
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label={dict.teacher.fieldDescription}>
-          <textarea
-            rows={3}
-            maxLength={1000}
-            value={form.description}
-            onChange={(event) => updateForm({ description: event.target.value })}
-            className={inputClass}
-          />
-        </Field>
+            {value === PANE.edit ? dict.teacher.tabEdit : dict.teacher.tabPreview}
+          </button>
+        ))}
       </div>
 
-      <label className="flex items-start gap-3 text-sm font-semibold text-gray-800">
-        <input
-          type="checkbox"
-          checked={form.isPublic}
-          onChange={(event) => updateForm({ isPublic: event.target.checked })}
-          className="mt-1 h-5 w-5 rounded border-gray-300 text-brand-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
-        />
-        <span>
-          {dict.teacher.fieldPublic}
-          <span className="mt-1 block text-sm font-medium text-gray-500">{dict.teacher.fieldPublicHint}</span>
-        </span>
-      </label>
+      <div className="mt-4 grid gap-8 lg:mt-0 lg:grid-cols-12">
+        <form
+          className={cn("space-y-6 lg:col-span-7 lg:block", pane === PANE.edit ? "block" : "hidden")}
+          onSubmit={(event) => {
+            event.preventDefault();
+            void save();
+          }}
+        >
+          {error && (
+            <p
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800"
+            >
+              {error}
+            </p>
+          )}
 
-      <fieldset className="space-y-4 border-t border-gray-100 pt-6">
-        <legend className="text-lg font-black text-brand-blue">{dict.teacher.questions}</legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label={dict.teacher.fieldTitle}>
+              <input
+                type="text"
+                required
+                maxLength={120}
+                value={form.title}
+                onChange={(event) => updateForm({ title: event.target.value })}
+                className={fieldControlClass}
+              />
+            </Field>
 
-        {form.questions.map((question, index) => (
-          <div key={question.id} className="rounded-2xl bg-gray-50 p-5 ring-1 ring-gray-100">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-black text-brand-blue">
-                {dict.teacher.questionNumber} {index + 1}
-              </p>
-              {form.questions.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    updateForm({ questions: form.questions.filter((_, position) => position !== index) })
-                  }
-                  className={linkButtonClass}
-                >
-                  {dict.teacher.removeQuestion}
-                </button>
-              )}
-            </div>
+            <Field label={dict.teacher.fieldLanguage}>
+              <select
+                value={form.targetLanguage}
+                onChange={(event) => updateForm({ targetLanguage: event.target.value as TargetLanguage })}
+                className={fieldControlClass}
+              >
+                {languages.map((language) => (
+                  <option key={language} value={language}>
+                    {LANGUAGE_LABELS[language]}
+                  </option>
+                ))}
+              </select>
+            </Field>
 
-            {form.type === QUIZ_TYPE.multipleChoice && (
-              <div className="mt-4 space-y-4">
-                <Field label={dict.teacher.questionText}>
-                  <input
-                    type="text"
-                    value={question.question}
-                    onChange={(event) => updateQuestion(index, { question: event.target.value })}
-                    className={inputClass}
-                  />
-                </Field>
+            <Field label={dict.teacher.fieldLevel}>
+              <select
+                value={form.level}
+                onChange={(event) => updateForm({ level: event.target.value as QuizLevel })}
+                className={fieldControlClass}
+              >
+                {QUIZ_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
+            </Field>
 
-                <FieldGroup id={`options-${question.id}`} label={dict.teacher.options}>
-                  {question.options.map((option, optionIndex) => (
-                    <div key={optionIndex} className="flex gap-2">
+            <Field label={dict.teacher.fieldType}>
+              <select
+                value={form.type}
+                onChange={(event) => {
+                  setActiveIndex(null);
+                  updateForm({
+                    type: event.target.value as QuizType,
+                    questions: [createEmptyQuestion(newQuestionId())],
+                  });
+                }}
+                className={fieldControlClass}
+              >
+                {QUIZ_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {typeLabels[type]}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field label={dict.teacher.fieldMinutes}>
+              <input
+                type="number"
+                min={1}
+                value={form.estimatedMinutes}
+                onChange={(event) => updateForm({ estimatedMinutes: event.target.value })}
+                className={fieldControlClass}
+              />
+            </Field>
+
+            <Field label={dict.teacher.fieldDescription}>
+              <textarea
+                rows={3}
+                maxLength={1000}
+                value={form.description}
+                onChange={(event) => updateForm({ description: event.target.value })}
+                className={fieldControlClass}
+              />
+            </Field>
+          </div>
+
+          <label className="flex items-start gap-3 text-sm font-semibold text-neutral-800">
+            <input
+              type="checkbox"
+              checked={form.isPublic}
+              onChange={(event) => updateForm({ isPublic: event.target.checked })}
+              className="mt-0.5 h-5 w-5 rounded border-neutral-300 text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            />
+            <span>
+              {dict.teacher.fieldPublic}
+              <span className="mt-1 block text-sm font-normal text-neutral-500">{dict.teacher.fieldPublicHint}</span>
+            </span>
+          </label>
+
+          <fieldset className="space-y-4 border-t border-neutral-200 pt-6">
+            <legend className="text-lg font-bold text-neutral-900">{dict.teacher.questions}</legend>
+
+            {form.questions.map((question, index) => (
+              <div
+                key={question.id}
+                onFocusCapture={() => setActiveIndex(index)}
+                className={cn(
+                  "rounded-lg border bg-white p-5 transition-colors",
+                  activeIndex === index ? "border-blue-500 ring-1 ring-blue-500" : "border-neutral-200"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-bold text-neutral-900">
+                    {dict.teacher.questionNumber} {index + 1}
+                  </p>
+                  {form.questions.length > 1 && (
+                    <button type="button" onClick={() => removeQuestion(index)} className={linkButtonClass}>
+                      {dict.teacher.removeQuestion}
+                    </button>
+                  )}
+                </div>
+
+                {form.type === QUIZ_TYPE.multipleChoice && (
+                  <div className="mt-4 space-y-4">
+                    <Field label={dict.teacher.questionText}>
                       <input
                         type="text"
-                        aria-label={`${dict.teacher.options} ${optionIndex + 1}`}
-                        value={option}
-                        onChange={(event) => {
-                          const options = question.options.map((current, position) =>
-                            position === optionIndex ? event.target.value : current
-                          );
-                          updateQuestion(index, { options });
-                        }}
-                        className={inputClass}
+                        value={question.question}
+                        onChange={(event) => updateQuestion(index, { question: event.target.value })}
+                        className={fieldControlClass}
                       />
-                      {question.options.length > 2 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            updateQuestion(index, {
-                              options: question.options.filter((_, position) => position !== optionIndex),
-                            })
-                          }
-                          className={linkButtonClass}
-                        >
-                          {dict.teacher.removeOption}
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => updateQuestion(index, { options: [...question.options, ""] })}
-                    className={linkButtonClass}
-                  >
-                    {dict.teacher.addOption}
-                  </button>
-                </FieldGroup>
+                    </Field>
 
-                <Field label={dict.teacher.correctAnswer}>
-                  <select
-                    value={question.correctAnswer}
-                    onChange={(event) => updateQuestion(index, { correctAnswer: event.target.value })}
-                    className={inputClass}
-                  >
-                    <option value="">—</option>
-                    {question.options
-                      .map((option) => option.trim())
-                      .filter(Boolean)
-                      .map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
+                    <FieldGroup id={`options-${question.id}`} label={dict.teacher.options}>
+                      {question.options.map((option, optionIndex) => (
+                        <div key={optionIndex} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            aria-label={`${dict.teacher.options} ${optionIndex + 1}`}
+                            value={option}
+                            onChange={(event) => {
+                              const options = question.options.map((current, position) =>
+                                position === optionIndex ? event.target.value : current
+                              );
+                              updateQuestion(index, { options });
+                            }}
+                            className={fieldControlClass}
+                          />
+                          {question.options.length > 2 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateQuestion(index, {
+                                  options: question.options.filter((_, position) => position !== optionIndex),
+                                })
+                              }
+                              className={linkButtonClass}
+                            >
+                              {dict.teacher.removeOption}
+                            </button>
+                          )}
+                        </div>
                       ))}
-                  </select>
-                </Field>
-              </div>
-            )}
+                      <button
+                        type="button"
+                        onClick={() => updateQuestion(index, { options: [...question.options, ""] })}
+                        className={linkButtonClass}
+                      >
+                        {dict.teacher.addOption}
+                      </button>
+                    </FieldGroup>
 
-            {form.type === QUIZ_TYPE.fillGap && (
-              <div className="mt-4 space-y-4">
-                <Field label={dict.teacher.gapParts} hint={dict.teacher.gapPartsHint}>
-                  <input
-                    type="text"
-                    value={question.sentence}
-                    onChange={(event) => updateSentence(index, event.target.value)}
-                    className={inputClass}
-                  />
-                </Field>
+                    <Field label={dict.teacher.correctAnswer}>
+                      <select
+                        value={question.correctAnswer}
+                        onChange={(event) => updateQuestion(index, { correctAnswer: event.target.value })}
+                        className={fieldControlClass}
+                      >
+                        <option value="">—</option>
+                        {question.options
+                          .map((option) => option.trim())
+                          .filter(Boolean)
+                          .map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                      </select>
+                    </Field>
+                  </div>
+                )}
 
-                {question.correctAnswers.length > 0 && (
-                  <FieldGroup id={`gaps-${question.id}`} label={dict.teacher.gapAnswers}>
-                    {question.correctAnswers.map((answer, answerIndex) => (
+                {form.type === QUIZ_TYPE.fillGap && (
+                  <div className="mt-4 space-y-4">
+                    <Field label={dict.teacher.gapParts} hint={dict.teacher.gapPartsHint}>
                       <input
-                        key={answerIndex}
                         type="text"
-                        aria-label={`${dict.teacher.gapAnswers} ${answerIndex + 1}`}
-                        value={answer}
-                        onChange={(event) => {
-                          const correctAnswers = question.correctAnswers.map((current, position) =>
-                            position === answerIndex ? event.target.value : current
-                          );
-                          updateQuestion(index, { correctAnswers });
-                        }}
-                        className={inputClass}
+                        value={question.sentence}
+                        onChange={(event) => updateSentence(index, event.target.value)}
+                        className={fieldControlClass}
                       />
-                    ))}
-                  </FieldGroup>
+                    </Field>
+
+                    {question.correctAnswers.length > 0 && (
+                      <FieldGroup id={`gaps-${question.id}`} label={dict.teacher.gapAnswers}>
+                        {question.correctAnswers.map((answer, answerIndex) => (
+                          <input
+                            key={answerIndex}
+                            type="text"
+                            aria-label={`${dict.teacher.gapAnswers} ${answerIndex + 1}`}
+                            value={answer}
+                            onChange={(event) => {
+                              const correctAnswers = question.correctAnswers.map((current, position) =>
+                                position === answerIndex ? event.target.value : current
+                              );
+                              updateQuestion(index, { correctAnswers });
+                            }}
+                            className={fieldControlClass}
+                          />
+                        ))}
+                      </FieldGroup>
+                    )}
+                  </div>
+                )}
+
+                {form.type === QUIZ_TYPE.flashcard && (
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <Field label={dict.teacher.cardFront}>
+                      <input
+                        type="text"
+                        value={question.front}
+                        onChange={(event) => updateQuestion(index, { front: event.target.value })}
+                        className={fieldControlClass}
+                      />
+                    </Field>
+                    <Field label={dict.teacher.cardBack}>
+                      <input
+                        type="text"
+                        value={question.back}
+                        onChange={(event) => updateQuestion(index, { back: event.target.value })}
+                        className={fieldControlClass}
+                      />
+                    </Field>
+                  </div>
                 )}
               </div>
-            )}
+            ))}
 
-            {form.type === QUIZ_TYPE.flashcard && (
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Field label={dict.teacher.cardFront}>
-                  <input
-                    type="text"
-                    value={question.front}
-                    onChange={(event) => updateQuestion(index, { front: event.target.value })}
-                    className={inputClass}
-                  />
-                </Field>
-                <Field label={dict.teacher.cardBack}>
-                  <input
-                    type="text"
-                    value={question.back}
-                    onChange={(event) => updateQuestion(index, { back: event.target.value })}
-                    className={inputClass}
-                  />
-                </Field>
-              </div>
-            )}
+            <button type="button" onClick={addQuestion} className={addQuestionClass}>
+              {dict.teacher.addQuestion}
+            </button>
+          </fieldset>
+
+          <div className="flex flex-wrap gap-3 border-t border-neutral-200 pt-6">
+            <Button type="submit" disabled={saving}>
+              {saving ? dict.teacher.saving : dict.teacher.save}
+            </Button>
+            <Button type="button" variant="outline" onClick={onCancel} disabled={saving}>
+              {dict.teacher.cancel}
+            </Button>
           </div>
-        ))}
+        </form>
 
-        <button
-          type="button"
-          onClick={() =>
-            updateForm({ questions: [...form.questions, createEmptyQuestion(newQuestionId(form.questions.length))] })
-          }
-          className={secondaryButtonClass}
-        >
-          {dict.teacher.addQuestion}
-        </button>
-      </fieldset>
-
-      <div className="flex flex-wrap gap-3 border-t border-gray-100 pt-6">
-        <button type="submit" disabled={saving} className={primaryButtonClass}>
-          {saving ? dict.teacher.saving : dict.teacher.save}
-        </button>
-        <button type="button" onClick={onCancel} disabled={saving} className={secondaryButtonClass}>
-          {dict.teacher.cancel}
-        </button>
+        <aside className={cn("lg:col-span-5 lg:block", pane === PANE.preview ? "block" : "hidden")}>
+          <div className="lg:sticky lg:top-8">
+            <QuizPreviewPanel draft={form} dict={dict} locale={locale} focusIndex={activeIndex ?? 0} />
+          </div>
+        </aside>
       </div>
-    </form>
+    </div>
   );
 }
 
-function createInitialState(quiz: ManagedQuiz | null, languages: TargetLanguage[]): FormState {
+function createInitialState(quiz: ManagedQuiz | null, languages: TargetLanguage[]): QuizDraft {
   const fallbackLanguage = languages[0] ?? TARGET_LANGUAGE.pt;
 
   if (!quiz) {
@@ -415,7 +468,7 @@ function createInitialState(quiz: ManagedQuiz | null, languages: TargetLanguage[
       : fallbackLanguage) as TargetLanguage,
     level: (QUIZ_LEVELS.includes(quiz.level as QuizLevel) ? quiz.level : QUIZ_LEVEL.a1) as QuizLevel,
     type,
-    estimatedMinutes: "",
+    estimatedMinutes: quiz.estimatedMinutes ? String(quiz.estimatedMinutes) : "",
     isPublic: quiz.isPublic !== false,
     questions: saved.length
       ? saved.map((question, index) => toQuestionDraft(type, question, newQuestionId(index)))
@@ -423,40 +476,11 @@ function createInitialState(quiz: ManagedQuiz | null, languages: TargetLanguage[
   };
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="text-sm font-black text-brand-blue">{label}</span>
-      {hint && <span className="mt-1 block text-sm font-medium text-gray-500">{hint}</span>}
-      <span className="mt-2 block">{children}</span>
-    </label>
-  );
-}
-
-function FieldGroup({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <p id={id} className="text-sm font-black text-brand-blue">
-        {label}
-      </p>
-      <div role="group" aria-labelledby={id} className="mt-2 space-y-2">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-const inputClass =
-  "w-full rounded-lg border border-gray-200 bg-white px-4 py-3 text-base font-semibold text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue";
-
-const primaryButtonClass =
-  "inline-flex min-h-12 items-center justify-center rounded-lg bg-brand-orange px-6 text-base font-black text-white transition-colors hover:bg-brand-orange/90 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2";
-
-const secondaryButtonClass =
-  "inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-black text-brand-blue ring-1 ring-brand-blue/20 transition-colors hover:bg-brand-blue/5 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2";
-
 const linkButtonClass =
-  "text-sm font-black text-brand-blue underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue";
+  "shrink-0 text-sm font-bold text-blue-700 underline decoration-2 underline-offset-4 hover:text-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500";
+
+const addQuestionClass =
+  "inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white px-5 text-sm font-bold text-neutral-700 transition-colors hover:border-blue-500 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500";
 
 function newQuestionId(seed = 0) {
   return `q-${Date.now().toString(36)}-${seed}-${Math.random().toString(36).slice(2, 7)}`;

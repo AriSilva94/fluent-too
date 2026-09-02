@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/navigation/Breadcrumbs";
 import { LANGUAGE_LABELS } from "@/components/quiz/QuizEditorForm";
+import DataTable, { rowActionClass, rowDangerActionClass, type DataColumn } from "@/components/ui/DataTable";
+import StatusBadge from "@/components/ui/StatusBadge";
+import LanguageFlag from "@/components/ui/LanguageFlag";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { ManagedBlogPost } from "@/lib/blog/manage-client";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/lib/quizzes/manage";
@@ -42,7 +45,9 @@ export default function AdminBlogPanel({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [deleteTarget, setDeleteTarget] = useState<ManagedBlogPost | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ManagedBlogPost | null>(
+    null,
+  );
 
   function startNew() {
     setError("");
@@ -74,7 +79,9 @@ export default function AdminBlogPanel({
       date: normalizeDate(post.date),
       author: post.author ?? defaultAuthor,
       readingTime: post.readingTime ? String(post.readingTime) : "",
-      targetLanguage: (TARGET_LANGUAGES.includes(post.targetLanguage as TargetLanguage)
+      targetLanguage: (TARGET_LANGUAGES.includes(
+        post.targetLanguage as TargetLanguage,
+      )
         ? post.targetLanguage
         : TARGET_LANGUAGE.pt) as TargetLanguage,
     });
@@ -116,17 +123,26 @@ export default function AdminBlogPanel({
       readingTime: form.readingTime ? Number(form.readingTime) : undefined,
     };
 
-    const response = await fetch(form.documentId ? `/api/admin/blog/${form.documentId}` : "/api/admin/blog", {
-      method: form.documentId ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const body = await response.json().catch(() => ({ ok: false, error: "UNKNOWN_ERROR" }));
+    const response = await fetch(
+      form.documentId
+        ? `/api/admin/blog/${form.documentId}`
+        : "/api/admin/blog",
+      {
+        method: form.documentId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      },
+    );
+    const body = await response
+      .json()
+      .catch(() => ({ ok: false, error: "UNKNOWN_ERROR" }));
 
     setSaving(false);
 
     if (!body.ok) {
-      setError(dict.teacher.errors[body.error] ?? dict.teacher.errors.UNKNOWN_ERROR);
+      setError(
+        dict.teacher.errors[body.error] ?? dict.teacher.errors.UNKNOWN_ERROR,
+      );
       return;
     }
 
@@ -140,13 +156,19 @@ export default function AdminBlogPanel({
     if (!deleteTarget) return;
 
     setSaving(true);
-    const response = await fetch(`/api/admin/blog/${deleteTarget.documentId}`, { method: "DELETE" });
-    const body = await response.json().catch(() => ({ ok: false, error: "UNKNOWN_ERROR" }));
+    const response = await fetch(`/api/admin/blog/${deleteTarget.documentId}`, {
+      method: "DELETE",
+    });
+    const body = await response
+      .json()
+      .catch(() => ({ ok: false, error: "UNKNOWN_ERROR" }));
     setSaving(false);
     setDeleteTarget(null);
 
     if (!body.ok) {
-      setError(dict.teacher.errors[body.error] ?? dict.teacher.errors.UNKNOWN_ERROR);
+      setError(
+        dict.teacher.errors[body.error] ?? dict.teacher.errors.UNKNOWN_ERROR,
+      );
       return;
     }
 
@@ -155,15 +177,24 @@ export default function AdminBlogPanel({
   }
 
   return (
-    <div className="bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
-        <Breadcrumbs items={[{ label: dict.admin.title, href: adminHref }, { label: dict.admin.blogTitle }]} />
+    <div className="flex flex-1 flex-col bg-[linear-gradient(180deg,#fff7f1_0%,#ffffff_42%,#eef5ff_100%)]">
+      <div className="mx-auto w-full max-w-6xl px-4 py-8">
+        <Breadcrumbs
+          items={[
+            { label: dict.admin.title, href: adminHref },
+            { label: dict.admin.blogTitle },
+          ]}
+        />
 
         <section className="overflow-hidden rounded-2xl bg-brand-blue shadow-[0_24px_80px_rgba(65,132,249,0.22)]">
-          <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end lg:p-10">
+          <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <h1 className="text-4xl font-black leading-none text-white sm:text-5xl">{dict.admin.blogTitle}</h1>
-              <p className="mt-4 max-w-2xl text-lg font-semibold leading-8 text-white/90">{dict.admin.blogSubtitle}</p>
+              <h1 className="text-2xl font-black leading-tight text-white sm:text-3xl">
+                {dict.admin.blogTitle}
+              </h1>
+              <p className="mt-2 max-w-2xl text-base font-semibold leading-6 text-white/90">
+                {dict.admin.blogSubtitle}
+              </p>
             </div>
             {!form && (
               <button
@@ -178,13 +209,19 @@ export default function AdminBlogPanel({
         </section>
 
         {success && (
-          <p role="status" className="mt-6 rounded-2xl bg-emerald-50 px-6 py-5 text-base font-semibold text-emerald-800 ring-1 ring-emerald-200">
+          <p
+            role="status"
+            className="mt-6 rounded-2xl bg-emerald-50 px-6 py-5 text-base font-semibold text-emerald-800 ring-1 ring-emerald-200"
+          >
             {success}
           </p>
         )}
 
         {error && (
-          <p role="alert" className="mt-6 rounded-2xl bg-red-50 px-6 py-5 text-base font-semibold text-red-700 ring-1 ring-red-200">
+          <p
+            role="alert"
+            className="mt-6 rounded-2xl bg-red-50 px-6 py-5 text-base font-semibold text-red-700 ring-1 ring-red-200"
+          >
             {error}
           </p>
         )}
@@ -204,7 +241,9 @@ export default function AdminBlogPanel({
                   required
                   maxLength={200}
                   value={form.title}
-                  onChange={(event) => updateForm({ title: event.target.value })}
+                  onChange={(event) =>
+                    updateForm({ title: event.target.value })
+                  }
                   className={inputClass}
                 />
               </Field>
@@ -223,7 +262,9 @@ export default function AdminBlogPanel({
                   type="text"
                   required
                   value={form.category}
-                  onChange={(event) => updateForm({ category: event.target.value })}
+                  onChange={(event) =>
+                    updateForm({ category: event.target.value })
+                  }
                   className={inputClass}
                 />
               </Field>
@@ -231,7 +272,11 @@ export default function AdminBlogPanel({
               <Field label={dict.admin.blogFieldLanguage}>
                 <select
                   value={form.targetLanguage}
-                  onChange={(event) => updateForm({ targetLanguage: event.target.value as TargetLanguage })}
+                  onChange={(event) =>
+                    updateForm({
+                      targetLanguage: event.target.value as TargetLanguage,
+                    })
+                  }
                   className={inputClass}
                 >
                   {TARGET_LANGUAGES.map((language) => (
@@ -257,7 +302,9 @@ export default function AdminBlogPanel({
                   type="text"
                   required
                   value={form.author}
-                  onChange={(event) => updateForm({ author: event.target.value })}
+                  onChange={(event) =>
+                    updateForm({ author: event.target.value })
+                  }
                   className={inputClass}
                 />
               </Field>
@@ -267,7 +314,9 @@ export default function AdminBlogPanel({
                   type="number"
                   min={1}
                   value={form.readingTime}
-                  onChange={(event) => updateForm({ readingTime: event.target.value })}
+                  onChange={(event) =>
+                    updateForm({ readingTime: event.target.value })
+                  }
                   className={inputClass}
                 />
               </Field>
@@ -279,7 +328,9 @@ export default function AdminBlogPanel({
                 required
                 maxLength={500}
                 value={form.excerpt}
-                onChange={(event) => updateForm({ excerpt: event.target.value })}
+                onChange={(event) =>
+                  updateForm({ excerpt: event.target.value })
+                }
                 className={inputClass}
               />
             </Field>
@@ -289,24 +340,38 @@ export default function AdminBlogPanel({
                 rows={14}
                 required
                 value={form.content}
-                onChange={(event) => updateForm({ content: event.target.value })}
+                onChange={(event) =>
+                  updateForm({ content: event.target.value })
+                }
                 className={inputClass}
               />
             </Field>
 
             <div className="flex flex-wrap gap-3 border-t border-gray-100 pt-6">
-              <button type="submit" disabled={saving} className={primaryButtonClass}>
+              <button
+                type="submit"
+                disabled={saving}
+                className={primaryButtonClass}
+              >
                 {saving ? dict.admin.saving : dict.admin.save}
               </button>
-              <button type="button" onClick={() => setForm(null)} disabled={saving} className={secondaryButtonClass}>
+              <button
+                type="button"
+                onClick={() => setForm(null)}
+                disabled={saving}
+                className={secondaryButtonClass}
+              >
                 {dict.admin.cancel}
               </button>
             </div>
           </form>
         ) : (
-          <section className="mt-6 space-y-4">
+          <section className="mt-6">
             {listFailed ? (
-              <p role="alert" className="rounded-2xl bg-red-50 px-6 py-8 text-base font-semibold text-red-700 ring-1 ring-red-200">
+              <p
+                role="alert"
+                className="rounded-2xl bg-red-50 px-6 py-8 text-base font-semibold text-red-700 ring-1 ring-red-200"
+              >
                 {dict.admin.blogLoadError}
               </p>
             ) : posts.length === 0 ? (
@@ -314,53 +379,69 @@ export default function AdminBlogPanel({
                 {dict.admin.blogEmpty}
               </p>
             ) : (
-              posts.map((post) => (
-                <article key={post.documentId} className="rounded-2xl bg-white p-6 shadow-[0_18px_54px_rgba(65,132,249,0.12)]">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-xl font-black text-gray-950">{post.title}</h2>
-                      <p className="mt-2 text-sm font-semibold text-gray-500">
-                        {post.category} · {normalizeDate(post.date)} ·{" "}
-                        {LANGUAGE_LABELS[post.targetLanguage as TargetLanguage] ?? post.targetLanguage}
-                      </p>
-                    </div>
-                    <span
-                      className={`rounded-lg px-3 py-1 text-xs font-black ${
-                        post.publishedAt ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"
-                      }`}
-                    >
-                      {post.publishedAt ? dict.teacher.statusPublished : dict.teacher.statusDraft}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" onClick={() => startEdit(post)} className={secondaryButtonClass}>
+              <DataTable
+                rows={posts}
+                columns={postColumns(dict)}
+                rowKey={(post) => post.documentId}
+                primaryHeader={dict.admin.blogFieldTitle}
+                primary={(post) => post.title}
+                meta={(post) =>
+                  [post.category, normalizeDate(post.date), languageLabel(post.targetLanguage)]
+                    .filter(Boolean)
+                    .join(" · ")
+                }
+                labels={dict.table}
+                actions={(post) => (
+                  <>
+                    <button type="button" onClick={() => startEdit(post)} className={rowActionClass}>
                       {dict.admin.edit}
                     </button>
-                    <button type="button" onClick={() => setDeleteTarget(post)} className={dangerButtonClass}>
+                    <button type="button" onClick={() => setDeleteTarget(post)} className={rowDangerActionClass}>
                       {dict.admin.delete}
                     </button>
-                  </div>
-                </article>
-              ))
+                  </>
+                )}
+              />
             )}
           </section>
         )}
 
         {deleteTarget && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 p-4">
-            <div role="dialog" aria-modal="true" aria-labelledby="delete-post-title" className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-              <h2 id="delete-post-title" className="text-2xl font-black text-gray-950">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-post-title"
+              className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+            >
+              <h2
+                id="delete-post-title"
+                className="text-2xl font-black text-gray-950"
+              >
                 {dict.admin.blogDeleteConfirmTitle}
               </h2>
-              <p className="mt-3 text-base font-semibold text-gray-600">{dict.admin.blogDeleteConfirmText}</p>
-              <p className="mt-2 text-base font-black text-brand-blue">{deleteTarget.title}</p>
+              <p className="mt-3 text-base font-semibold text-gray-600">
+                {dict.admin.blogDeleteConfirmText}
+              </p>
+              <p className="mt-2 text-base font-black text-brand-blue">
+                {deleteTarget.title}
+              </p>
 
               <div className="mt-6 flex flex-wrap justify-end gap-3">
-                <button type="button" onClick={() => setDeleteTarget(null)} disabled={saving} className={secondaryButtonClass}>
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={saving}
+                  className={secondaryButtonClass}
+                >
                   {dict.admin.cancel}
                 </button>
-                <button type="button" onClick={() => void confirmDelete()} disabled={saving} className={dangerButtonClass}>
+                <button
+                  type="button"
+                  onClick={() => void confirmDelete()}
+                  disabled={saving}
+                  className={dangerButtonClass}
+                >
                   {dict.admin.blogDeleteConfirmCta}
                 </button>
               </div>
@@ -377,7 +458,13 @@ function normalizeDate(value: string | undefined) {
   return /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0, 10) : value;
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="text-sm font-black text-brand-blue">{label}</span>
@@ -397,3 +484,45 @@ const secondaryButtonClass =
 
 const dangerButtonClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg bg-red-50 px-5 text-sm font-black text-red-700 ring-1 ring-red-200 transition-colors hover:bg-red-100 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2";
+
+function languageLabel(value: string | undefined) {
+  return LANGUAGE_LABELS[value as TargetLanguage] ?? value ?? "";
+}
+
+function postColumns(dict: Dictionary): DataColumn<ManagedBlogPost>[] {
+  return [
+    {
+      key: "category",
+      header: dict.admin.blogFieldCategory,
+      cell: (post) => post.category ?? "",
+      headerClassName: "hidden md:table-cell",
+      cellClassName: "hidden md:table-cell",
+    },
+    {
+      key: "language",
+      header: dict.admin.blogFieldLanguage,
+      cell: (post) => <LanguageFlag language={post.targetLanguage} label={languageLabel(post.targetLanguage)} />,
+      headerClassName: "hidden md:table-cell",
+      cellClassName: "hidden md:table-cell",
+    },
+    {
+      key: "date",
+      header: dict.admin.blogFieldDate,
+      cell: (post) => normalizeDate(post.date),
+      headerClassName: "hidden lg:table-cell",
+      cellClassName: "hidden lg:table-cell",
+    },
+    {
+      key: "status",
+      header: dict.table.status,
+      headerClassName: "hidden sm:table-cell",
+      cell: (post) => (
+        <StatusBadge
+          published={Boolean(post.publishedAt)}
+          publishedLabel={dict.teacher.statusPublished}
+          draftLabel={dict.teacher.statusDraft}
+        />
+      ),
+    },
+  ];
+}

@@ -59,6 +59,7 @@ export default async function AdminQuizzesPage({ params }: { params: Promise<{ l
   return (
     <AdminQuizzesPanel
       dict={dict}
+      locale={locale as Locale}
       initialQuizzes={result.ok ? result.data : []}
       initialFailed={!result.ok}
       adminHref={`/${locale}/admin`}

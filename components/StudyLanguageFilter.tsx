@@ -27,10 +27,14 @@ export default function StudyLanguageFilter({
   value,
   labels,
   onChange,
+  persist = true,
+  hideLegend = false,
 }: {
   value: StudyLanguage;
   labels: StudyLanguageLabels;
   onChange?: (language: StudyLanguage) => void;
+  persist?: boolean;
+  hideLegend?: boolean;
 }) {
   const router = useRouter();
   const [selected, setSelected] = useState<StudyLanguage>(value);
@@ -41,7 +45,7 @@ export default function StudyLanguageFilter({
     if (next === selected) return;
 
     setSelected(next);
-    persistStudyLanguage(next);
+    if (persist) persistStudyLanguage(next);
 
     if (onChange) {
       onChange(next);
@@ -53,7 +57,7 @@ export default function StudyLanguageFilter({
 
   return (
     <div className="inline-flex flex-col items-center gap-2">
-      <span id={labelId} className="text-sm font-bold text-brand-blue-ink">
+      <span id={labelId} className={hideLegend ? "sr-only" : "text-sm font-bold text-brand-blue-ink"}>
         {labels.legend}
       </span>
 

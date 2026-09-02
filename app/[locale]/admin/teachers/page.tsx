@@ -67,6 +67,7 @@ export default async function AdminTeachersPage({
   return (
     <TeacherApplicationsPanel
       dict={dict}
+      locale={locale as Locale}
       initialApplications={result.ok ? result.data : []}
       initialFailed={!result.ok}
       initialStatus="pending"

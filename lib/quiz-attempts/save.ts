@@ -15,12 +15,14 @@ export type QuizAttemptSaveState = (typeof SAVE_STATE)[keyof typeof SAVE_STATE];
 
 export const SAVE_ERROR = { profileRequired: "PROFILE_REQUIRED" } as const;
 
-type BuildPayloadOptions = {
+export type BuildPayloadOptions = {
   quiz: Quiz;
   result: QuizResult;
   answers: unknown;
   attemptKey: string;
 };
+
+export type PersistAttempt = (options: BuildPayloadOptions) => Promise<QuizAttemptSaveState>;
 
 type SaveOptions = BuildPayloadOptions & {
   fetcher?: Fetcher;

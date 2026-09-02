@@ -30,6 +30,7 @@ function renderPanel(overrides: Partial<Parameters<typeof TeacherQuizzesPanel>[0
   return render(
     <TeacherQuizzesPanel
       dict={dict}
+      locale="pt-br"
       languages={["en"]}
       initialQuizzes={[quiz]}
       initialFailed={false}
@@ -53,9 +54,30 @@ describe("TeacherQuizzesPanel", () => {
   it("lista os quizzes do professor com idioma, nível e situação", () => {
     renderPanel();
 
-    expect(screen.getByRole("heading", { name: "Saudações básicas" })).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: /Saudações básicas/ })).toBeInTheDocument();
     expect(screen.getByText(/English · A1 · Múltipla escolha/)).toBeInTheDocument();
     expect(screen.getByText("Publicado")).toBeInTheDocument();
+  });
+
+  it("pagina a lista e mostra o intervalo visível", async () => {
+    const user = userEvent.setup();
+    const muitos = Array.from({ length: 12 }, (_, index) => ({
+      ...quiz,
+      documentId: "doc-" + index,
+      title: "Aula " + String(index + 1).padStart(2, "0"),
+    }));
+
+    renderPanel({ initialQuizzes: muitos });
+
+    expect(screen.getByText("1–10 de 12")).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: /Aula 01/ })).toBeInTheDocument();
+    expect(screen.queryByRole("cell", { name: /Aula 11/ })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Próxima página" }));
+
+    expect(screen.getByText("11–12 de 12")).toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: /Aula 11/ })).toBeInTheDocument();
+    expect(screen.queryByRole("cell", { name: /Aula 01/ })).not.toBeInTheDocument();
   });
 
   it("oferece apenas os idiomas aprovados no formulário", async () => {
