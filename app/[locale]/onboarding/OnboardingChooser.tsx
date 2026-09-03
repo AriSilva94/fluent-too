@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AuthShell from "@/components/auth/AuthShell";
+import { buildAuthVisual } from "@/lib/auth/visual";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
 import TeacherApplicationForm from "./TeacherApplicationForm";
@@ -39,8 +40,8 @@ export default function OnboardingChooser({ dict, locale }: { dict: Dictionary; 
   }
 
   return (
-    <AuthShell homeHref={`/${locale}/`} visualTitle={dict.auth.visualTitle} visualText={dict.auth.visualText}>
-      <div className="rounded-2xl bg-white p-6 shadow-[0_24px_80px_rgba(65,132,249,0.16)] sm:p-8">
+    <AuthShell visual={buildAuthVisual(dict, locale)}>
+      <div>
         <div>
           <h1 className="text-3xl font-black leading-tight text-brand-blue sm:text-4xl">{dict.onboarding.title}</h1>
           <p className="mt-3 text-base font-medium leading-7 text-neutral-600">{dict.onboarding.subtitle}</p>

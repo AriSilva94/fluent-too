@@ -49,6 +49,7 @@ export type Dictionary = {
   };
   footer: {
     copyright: string;
+    backToTop: string;
   };
   about: {
     title: string;
@@ -117,8 +118,15 @@ export type Dictionary = {
   };
   auth: {
     google: string;
-    visualTitle: string;
     visualText: string;
+    visualHeadline: string;
+    visualPoint1: string;
+    visualPoint2: string;
+    visualPoint3: string;
+    showPassword: string;
+    hidePassword: string;
+    noAccount: string;
+    consent: string;
     registerTitle: string;
     registerSubtitle: string;
     registerSubmit: string;
@@ -186,6 +194,28 @@ export type Dictionary = {
     teacherRejectedCta: string;
     teacherAreaTitle: string;
     teacherAreaCta: string;
+    greeting: string;
+    studentSubtitle: string;
+    resumeTitle: string;
+    resumeCta: string;
+    resumeMeta: string;
+    progressTitle: string;
+    progressAttempts: string;
+    progressAverage: string;
+    progressLevel: string;
+    recommendedTitle: string;
+    recommendedEmpty: string;
+    recommendedCta: string;
+    masteredLabel: string;
+    startTitle: string;
+    startText: string;
+    startCta: string;
+    teacherReachTitle: string;
+    teacherReachAttempts: string;
+    teacherReachLearners: string;
+    teacherReachAverage: string;
+    teacherReachTop: string;
+    teacherReachEmpty: string;
   };
   teacher: {
     title: string;
@@ -337,6 +367,36 @@ export type Dictionary = {
       title: string;
       description: string;
     };
+  };
+  languages: Record<string, string>;
+  account: {
+    menuLabel: string;
+    security: string;
+    roleStudent: string;
+    roleTeacher: string;
+    roleTeacherPending: string;
+    roleAdmin: string;
+    roleSuperAdmin: string;
+    roleUnassigned: string;
+  };
+  notifications: {
+    label: string;
+    empty: string;
+    emptyHint: string;
+    loadError: string;
+    retry: string;
+    markAll: string;
+    justNow: string;
+    unread: string;
+    unreadOne: string;
+    kinds: Record<string, string>;
+    details: Record<string, string>;
+  };
+  legal: {
+    updatedAt: string;
+    termsShort: string;
+    privacyShort: string;
+    backHome: string;
   };
   studyLanguage: {
     legend: string;

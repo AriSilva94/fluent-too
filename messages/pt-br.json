@@ -40,7 +40,8 @@
     }
   },
   "footer": {
-    "copyright": "© {year} Fluent Too. Todos os direitos reservados."
+    "copyright": "© {year} Fluent Too. Todos os direitos reservados.",
+    "backToTop": "Voltar ao topo"
   },
   "about": {
     "title": "Sobre"
@@ -115,8 +116,15 @@
   },
   "auth": {
     "google": "Continuar com Google",
-    "visualTitle": "Fluent Too",
     "visualText": "Aprenda idiomas com prática guiada, quizzes por nível e histórico de evolução.",
+    "visualHeadline": "Sua próxima aula começa aqui",
+    "visualPoint1": "Quizzes por nível, do A1 ao C2",
+    "visualPoint2": "Múltipla escolha, lacunas e flashcards",
+    "visualPoint3": "Progresso salvo a cada resposta",
+    "showPassword": "Mostrar senha",
+    "hidePassword": "Ocultar senha",
+    "noAccount": "Ainda não tem conta?",
+    "consent": "Ao criar sua conta, você concorda com os {terms} e a {privacy}.",
     "registerTitle": "Criar conta",
     "registerSubtitle": "Cadastre-se para acessar sua área de estudos.",
     "registerSubmit": "Criar conta",
@@ -205,7 +213,29 @@
     "teacherRejectedText": "Sua candidatura para se tornar professor não foi aprovada desta vez.",
     "teacherRejectedCta": "Continuar como estudante",
     "teacherAreaTitle": "Área do professor",
-    "teacherAreaCta": "Gerenciar meus quizzes"
+    "teacherAreaCta": "Gerenciar meus quizzes",
+    "greeting": "Olá, {name}",
+    "studentSubtitle": "Seu estudo, reunido em um lugar só.",
+    "resumeTitle": "Continue de onde parou",
+    "resumeCta": "Retomar",
+    "resumeMeta": "Última nota {score}%",
+    "progressTitle": "Progresso por idioma",
+    "progressAttempts": "respondidos: {count}",
+    "progressAverage": "média {score}%",
+    "progressLevel": "até {level}",
+    "recommendedTitle": "Para praticar agora",
+    "recommendedEmpty": "Nenhum quiz novo no momento.",
+    "recommendedCta": "Ver todos os quizzes",
+    "masteredLabel": "Quizzes dominados",
+    "startTitle": "Comece pelo primeiro quiz",
+    "startText": "Escolha um idioma e responda um quiz curto. Seu progresso aparece aqui.",
+    "startCta": "Escolher um quiz",
+    "teacherReachTitle": "Alcance dos seus quizzes",
+    "teacherReachAttempts": "Respostas recebidas",
+    "teacherReachLearners": "Alunos alcançados",
+    "teacherReachAverage": "Média das notas",
+    "teacherReachTop": "Mais respondido: {title}",
+    "teacherReachEmpty": "Ninguém respondeu seus quizzes ainda."
   },
   "admin": {
     "title": "Painel administrativo",
@@ -383,5 +413,55 @@
   "studyLanguage": {
     "legend": "Quero estudar",
     "all": "Todos"
+  },
+  "languages": {
+    "pt": "Português",
+    "en": "Inglês",
+    "fr": "Francês"
+  },
+  "account": {
+    "menuLabel": "Sua conta",
+    "security": "Senha e segurança",
+    "roleStudent": "Aluno",
+    "roleTeacher": "Professor",
+    "roleTeacherPending": "Professor em análise",
+    "roleAdmin": "Administrador",
+    "roleSuperAdmin": "Administrador",
+    "roleUnassigned": "Sem perfil"
+  },
+  "notifications": {
+    "label": "Notificações",
+    "empty": "Nada novo por aqui",
+    "emptyHint": "Avisamos assim que algo acontecer.",
+    "loadError": "Não foi possível carregar as notificações.",
+    "retry": "Tentar de novo",
+    "markAll": "Marcar como lidas",
+    "justNow": "agora",
+    "unread": "{count} não lidas",
+    "unreadOne": "1 não lida",
+    "kinds": {
+      "teacher_application": "{name} quer ensinar na plataforma",
+      "new_student": "{name} entrou como aluno",
+      "new_teacher": "{name} agora é professor",
+      "quiz_attempt": "{name} respondeu {quizTitle}",
+      "application_decision_approved": "Sua candidatura foi aprovada",
+      "application_decision_rejected": "Sua candidatura não foi aprovada",
+      "new_quiz": "Novo quiz: {title}"
+    },
+    "details": {
+      "teacher_application": "Analisar candidatura",
+      "new_student": "Novo cadastro",
+      "new_teacher": "Aprovado na revisão",
+      "quiz_attempt": "Nota {score}%",
+      "application_decision_approved": "Você já pode criar quizzes",
+      "application_decision_rejected": "Veja o motivo no painel",
+      "new_quiz": "Nível {level}"
+    }
+  },
+  "legal": {
+    "updatedAt": "Atualizado em {date}",
+    "termsShort": "Termos",
+    "privacyShort": "Privacidade",
+    "backHome": "Voltar para o início"
   }
 }

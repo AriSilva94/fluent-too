@@ -24,5 +24,5 @@ export default async function SecurityPage({ params }: { params: Promise<{ local
   if (isAnonymousSession(session)) redirect(`/${locale}/login?returnTo=/${locale}/dashboard/security`);
   if (!hasProfile(session.user.role?.type)) redirect(`/${locale}/onboarding`);
 
-  return <ChangePasswordForm dict={dict} email={session.user.email} />;
+  return <ChangePasswordForm dict={dict} email={session.user.email} locale={locale as Locale} />;
 }

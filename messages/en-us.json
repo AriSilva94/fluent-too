@@ -40,7 +40,8 @@
     }
   },
   "footer": {
-    "copyright": "© {year} Fluent Too. All rights reserved."
+    "copyright": "© {year} Fluent Too. All rights reserved.",
+    "backToTop": "Back to top"
   },
   "about": {
     "title": "About"
@@ -115,8 +116,15 @@
   },
   "auth": {
     "google": "Continue with Google",
-    "visualTitle": "Fluent Too",
     "visualText": "Learn languages with guided practice, level-based quizzes, and study history.",
+    "visualHeadline": "Your next lesson starts here",
+    "visualPoint1": "Quizzes by level, from A1 to C2",
+    "visualPoint2": "Multiple choice, fill the gaps, and flashcards",
+    "visualPoint3": "Progress saved with every answer",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "noAccount": "Don't have an account?",
+    "consent": "By creating your account, you agree to the {terms} and the {privacy}.",
     "registerTitle": "Create account",
     "registerSubtitle": "Sign up to access your study area.",
     "registerSubmit": "Create account",
@@ -205,7 +213,29 @@
     "teacherRejectedText": "Your application to become a teacher was not approved this time.",
     "teacherRejectedCta": "Continue as a student",
     "teacherAreaTitle": "Teacher area",
-    "teacherAreaCta": "Manage my quizzes"
+    "teacherAreaCta": "Manage my quizzes",
+    "greeting": "Hi, {name}",
+    "studentSubtitle": "Your studies, all in one place.",
+    "resumeTitle": "Pick up where you left off",
+    "resumeCta": "Resume",
+    "resumeMeta": "Last score {score}%",
+    "progressTitle": "Progress by language",
+    "progressAttempts": "taken: {count}",
+    "progressAverage": "{score}% average",
+    "progressLevel": "up to {level}",
+    "recommendedTitle": "Practice next",
+    "recommendedEmpty": "No new quiz right now.",
+    "recommendedCta": "See all quizzes",
+    "masteredLabel": "Quizzes mastered",
+    "startTitle": "Start with your first quiz",
+    "startText": "Pick a language and take a short quiz. Your progress shows up here.",
+    "startCta": "Choose a quiz",
+    "teacherReachTitle": "Reach of your quizzes",
+    "teacherReachAttempts": "Answers received",
+    "teacherReachLearners": "Students reached",
+    "teacherReachAverage": "Average score",
+    "teacherReachTop": "Most answered: {title}",
+    "teacherReachEmpty": "Nobody has taken your quizzes yet."
   },
   "admin": {
     "title": "Admin Panel",
@@ -383,5 +413,55 @@
   "studyLanguage": {
     "legend": "I want to study",
     "all": "All"
+  },
+  "languages": {
+    "pt": "Portuguese",
+    "en": "English",
+    "fr": "French"
+  },
+  "account": {
+    "menuLabel": "Your account",
+    "security": "Password and security",
+    "roleStudent": "Student",
+    "roleTeacher": "Teacher",
+    "roleTeacherPending": "Teacher under review",
+    "roleAdmin": "Administrator",
+    "roleSuperAdmin": "Administrator",
+    "roleUnassigned": "No profile"
+  },
+  "notifications": {
+    "label": "Notifications",
+    "empty": "Nothing new here",
+    "emptyHint": "We'll let you know as soon as something happens.",
+    "loadError": "Could not load notifications.",
+    "retry": "Try again",
+    "markAll": "Mark as read",
+    "justNow": "just now",
+    "unread": "{count} unread",
+    "unreadOne": "1 unread",
+    "kinds": {
+      "teacher_application": "{name} wants to teach on the platform",
+      "new_student": "{name} joined as a student",
+      "new_teacher": "{name} is now a teacher",
+      "quiz_attempt": "{name} took {quizTitle}",
+      "application_decision_approved": "Your application was approved",
+      "application_decision_rejected": "Your application was not approved",
+      "new_quiz": "New quiz: {title}"
+    },
+    "details": {
+      "teacher_application": "Review application",
+      "new_student": "New sign-up",
+      "new_teacher": "Approved in review",
+      "quiz_attempt": "Scored {score}%",
+      "application_decision_approved": "You can create quizzes now",
+      "application_decision_rejected": "See the reason in your dashboard",
+      "new_quiz": "Level {level}"
+    }
+  },
+  "legal": {
+    "updatedAt": "Updated on {date}",
+    "termsShort": "Terms",
+    "privacyShort": "Privacy",
+    "backHome": "Back to home"
   }
 }

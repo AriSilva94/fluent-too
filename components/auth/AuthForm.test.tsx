@@ -23,10 +23,11 @@ describe("AuthForm", () => {
         ]}
         onSubmit={submit}
         messages={{ INVALID_CREDENTIALS: "Credenciais invalidas" }}
-        visualTitle="Fluent Too"
-        visualText="Aprenda idiomas com pratica guiada."
+        passwordLabels={{ show: "Mostrar senha", hide: "Ocultar senha" }}
+        visual={{ headline: "Sua proxima aula", text: "Aprenda idiomas com pratica guiada.", points: ["Quizzes por nivel"], legal: { termsHref: "/pt-br/terms", termsLabel: "Termos", privacyHref: "/pt-br/privacy", privacyLabel: "Privacidade", copyright: "© 2026 Fluent Too" } }}
         googleHref="/api/auth/google?returnTo=%2Fpt-br%2Fdashboard"
         googleLabel="Continuar com Google"
+        dividerLabel="ou continue com"
       />
     );
 
@@ -63,8 +64,8 @@ describe("AuthForm", () => {
         ]}
         onSubmit={submit}
         messages={{}}
-        visualTitle="Fluent Too"
-        visualText="Aprenda idiomas com pratica guiada."
+        passwordLabels={{ show: "Mostrar senha", hide: "Ocultar senha" }}
+        visual={{ headline: "Sua proxima aula", text: "Aprenda idiomas com pratica guiada.", points: ["Quizzes por nivel"], legal: { termsHref: "/pt-br/terms", termsLabel: "Termos", privacyHref: "/pt-br/privacy", privacyLabel: "Privacidade", copyright: "© 2026 Fluent Too" } }}
       />
     );
 
@@ -78,5 +79,33 @@ describe("AuthForm", () => {
     await user.click(screen.getByRole("button", { name: "Salvar senha" }));
 
     expect(submit).toHaveBeenCalledWith({ password: "Password@123" });
+  });
+
+  it("alterna a visibilidade da senha pelo botao do olho", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <AuthForm
+        title="Entrar"
+        subtitle="Acesse sua conta"
+        submitLabel="Entrar"
+        fields={[{ name: "password", label: "Senha", type: "password", autoComplete: "current-password" }]}
+        onSubmit={async () => ({ ok: true as const })}
+        messages={{}}
+        passwordLabels={{ show: "Mostrar senha", hide: "Ocultar senha" }}
+        visual={{ headline: "Sua proxima aula", text: "Pratica guiada.", points: [], legal: { termsHref: "/pt-br/terms", termsLabel: "Termos", privacyHref: "/pt-br/privacy", privacyLabel: "Privacidade", copyright: "© 2026 Fluent Too" } }}
+      />
+    );
+
+    const password = screen.getByLabelText("Senha");
+    await user.type(password, "Password@123");
+    expect(password).toHaveAttribute("type", "password");
+
+    await user.click(screen.getByRole("button", { name: "Mostrar senha" }));
+    expect(screen.getByLabelText("Senha")).toHaveAttribute("type", "text");
+    expect(screen.getByLabelText("Senha")).toHaveValue("Password@123");
+
+    await user.click(screen.getByRole("button", { name: "Ocultar senha" }));
+    expect(screen.getByLabelText("Senha")).toHaveAttribute("type", "password");
   });
 });

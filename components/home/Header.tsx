@@ -6,6 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Container from "@/components/ui/Container";
 import AuthStatus from "@/components/auth/AuthStatus";
+import HeaderNotifications from "@/components/notifications/HeaderNotifications";
 import LanguageSwitcher from "@/components/home/LanguageSwitcher";
 import MobileMenu from "@/components/home/MobileMenu";
 import type { Locale } from "@/lib/i18n";
@@ -80,14 +81,12 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
           <div className="ml-4 border-l pl-4 border-white/30">
             <LanguageSwitcher locale={locale} variant="header" />
           </div>
-          <AuthStatus
-            locale={locale}
-            labels={{ login: dict.login.submit, dashboard: dict.dashboard.title, logout: dict.auth.logout }}
-          />
+          <AuthStatus locale={locale} dict={dict} />
         </nav>
 
-        <div className="flex items-center gap-4 lg:hidden">
+        <div className="flex items-center gap-3 lg:hidden">
           <LanguageSwitcher locale={locale} variant="header" />
+          <HeaderNotifications locale={locale} labels={dict.notifications} />
           <button
             type="button"
             className="z-50 flex h-10 w-10 items-center justify-center text-white focus:outline-none"
@@ -127,10 +126,7 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
         navLinks={navLinks}
         scrollToSection={scrollToSection}
         authSlot={
-          <AuthStatus
-            locale={locale}
-            labels={{ login: dict.login.submit, dashboard: dict.dashboard.title, logout: dict.auth.logout }}
-          />
+          <AuthStatus locale={locale} dict={dict} showBell={false} />
         }
       />
     </header>

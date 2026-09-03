@@ -4,7 +4,7 @@ import { defaultLocale, locales } from "@/lib/i18n";
 import { getQuizzes } from "@/lib/quizzes/data";
 import { getLocalizedUrl } from "@/lib/seo";
 
-const publicPaths = ["", "/about", "/blog", "/quizzes"];
+const publicPaths = ["", "/about", "/blog", "/quizzes", "/terms", "/privacy"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = locales.flatMap((locale) =>

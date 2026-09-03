@@ -6,6 +6,12 @@ const labels = {
   title: "Área do professor",
   subtitle: "Crie e edite aulas nos idiomas aprovados no seu cadastro.",
   cta: "Gerenciar meus quizzes",
+  reachTitle: "Alcance dos seus quizzes",
+  reachAttempts: "Respostas recebidas",
+  reachLearners: "Alunos alcançados",
+  reachAverage: "Média das notas",
+  reachTop: "Mais respondido: {title}",
+  reachEmpty: "Ninguém respondeu seus quizzes ainda.",
 };
 
 describe("DashboardTeacherActions", () => {
@@ -36,5 +42,29 @@ describe("DashboardTeacherActions", () => {
     render(<DashboardTeacherActions locale="pt-br" role="teacher_pending" labels={labels} />);
 
     expect(screen.queryByRole("link", { name: "Gerenciar meus quizzes" })).not.toBeInTheDocument();
+  });
+
+  it("mostra o alcance quando existem respostas", () => {
+    render(
+      <DashboardTeacherActions
+        locale="pt-br"
+        role="teacher"
+        labels={labels}
+        reach={{ attempts: 12, learners: 5, averageScore: 74, topQuiz: { slug: "verbos", title: "Verbos", attempts: 7 } }}
+      />
+    );
+
+    expect(screen.getByText("12")).toBeInTheDocument();
+    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText("74%")).toBeInTheDocument();
+    expect(screen.getByText("Mais respondido: Verbos")).toBeInTheDocument();
+  });
+
+  it("explica o vazio quando ninguém respondeu", () => {
+    render(
+      <DashboardTeacherActions locale="pt-br" role="teacher" labels={labels} reach={{ attempts: 0, learners: 0, averageScore: 0, topQuiz: null }} />
+    );
+
+    expect(screen.getByText(labels.reachEmpty)).toBeInTheDocument();
   });
 });

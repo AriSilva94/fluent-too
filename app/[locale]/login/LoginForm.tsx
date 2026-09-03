@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import AuthForm from "@/components/auth/AuthForm";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
+import { buildAuthVisual } from "@/lib/auth/visual";
 
 export default function LoginForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   const searchParams = useSearchParams();
@@ -18,15 +19,28 @@ export default function LoginForm({ dict, locale }: { dict: Dictionary; locale: 
       submitLabel={dict.login.submit}
       fields={[
         { name: "email", label: dict.login.emailLabel, type: "email", autoComplete: "email" },
-        { name: "password", label: dict.login.passwordLabel, type: "password", autoComplete: "current-password" },
+        {
+          name: "password",
+          label: dict.login.passwordLabel,
+          type: "password",
+          autoComplete: "current-password",
+          action: (
+            <Link
+              href={`/${locale}/forgot-password`}
+              className="text-xs font-bold text-brand-blue-ink transition-colors hover:text-brand-orange"
+            >
+              {dict.auth.forgotPassword}
+            </Link>
+          ),
+        },
       ]}
       messages={dict.auth.errors}
+      passwordLabels={{ show: dict.auth.showPassword, hide: dict.auth.hidePassword }}
       initialError={initialError}
-      visualTitle={dict.auth.visualTitle}
-      visualText={dict.auth.visualText}
-      homeHref={`/${locale}/`}
+      visual={buildAuthVisual(dict, locale)}
       googleHref={`/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`}
       googleLabel={dict.auth.google}
+      dividerLabel={dict.login.orContinueWith}
       onSubmit={async (values) => {
         const response = await fetch("/api/auth/login", {
           method: "POST",
@@ -38,14 +52,12 @@ export default function LoginForm({ dict, locale }: { dict: Dictionary; locale: 
         return { ok: true, redirectTo: returnTo };
       }}
       footer={
-        <div className="space-y-2">
-          <Link href={`/${locale}/forgot-password`} className="block text-brand-orange hover:underline">
-            {dict.auth.forgotPassword}
-          </Link>
-          <Link href={`/${locale}/register`} className="block text-brand-orange hover:underline">
+        <span>
+          {dict.auth.noAccount}{" "}
+          <Link href={`/${locale}/register`} className="font-black text-brand-orange transition-colors hover:text-brand-orange/80">
             {dict.auth.registerLink}
           </Link>
-        </div>
+        </span>
       }
     />
   );

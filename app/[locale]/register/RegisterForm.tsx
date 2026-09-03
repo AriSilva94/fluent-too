@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import AuthForm from "@/components/auth/AuthForm";
+import ConsentNotice from "@/components/legal/ConsentNotice";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
+import { buildAuthVisual } from "@/lib/auth/visual";
 
 export default function RegisterForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   return (
@@ -22,11 +24,12 @@ export default function RegisterForm({ dict, locale }: { dict: Dictionary; local
         },
       ]}
       messages={dict.auth.errors}
-      visualTitle={dict.auth.visualTitle}
-      visualText={dict.auth.visualText}
-      homeHref={`/${locale}/`}
+      passwordLabels={{ show: dict.auth.showPassword, hide: dict.auth.hidePassword }}
+      visual={buildAuthVisual(dict, locale)}
+      consent={<ConsentNotice dict={dict} locale={locale} />}
       googleHref={`/api/auth/google?returnTo=${encodeURIComponent(`/${locale}/dashboard`)}`}
       googleLabel={dict.auth.google}
+      dividerLabel={dict.login.orContinueWith}
       onSubmit={async (values) => {
         const response = await fetch("/api/auth/register", {
           method: "POST",
