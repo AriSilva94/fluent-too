@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, KeyRound, LayoutDashboard, LogOut, ShieldCheck, SquarePen } from "lucide-react";
+import { ChevronDown, KeyRound, LayoutDashboard, LogIn, LogOut, ShieldCheck, SquarePen } from "lucide-react";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import { APP_ROLES, type AppRole } from "@/lib/auth/contracts";
 import { canCreateContent, canManageContent } from "@/lib/auth/roles";
@@ -13,11 +13,23 @@ import type { Locale } from "@/lib/i18n";
 import { KEY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
+export const AUTH_LAYOUT = { header: "header", sheet: "sheet" } as const;
+
+export type AuthLayout = (typeof AUTH_LAYOUT)[keyof typeof AUTH_LAYOUT];
+
 type AuthStatusProps = {
   locale: Locale;
   dict: Dictionary;
   showBell?: boolean;
+  layout?: AuthLayout;
   navigate?: (url: string) => void;
+};
+
+const signInStyles: Record<AuthLayout, string> = {
+  [AUTH_LAYOUT.header]:
+    "inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/10 px-4 py-1.5 text-sm font-bold text-white transition-colors duration-200 hover:border-white hover:bg-white hover:text-brand-orange",
+  [AUTH_LAYOUT.sheet]:
+    "flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3.5 text-base font-black uppercase tracking-[0.08em] text-brand-orange shadow-[0_10px_24px_rgba(15,23,42,0.18)] transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
 };
 
 const ROLE_LABEL_KEY: Record<AppRole, keyof Dictionary["account"]> = {
@@ -29,7 +41,13 @@ const ROLE_LABEL_KEY: Record<AppRole, keyof Dictionary["account"]> = {
   [APP_ROLES.unassigned]: "roleUnassigned",
 };
 
-export default function AuthStatus({ locale, dict, showBell = true, navigate = (url) => window.location.assign(url) }: AuthStatusProps) {
+export default function AuthStatus({
+  locale,
+  dict,
+  showBell = true,
+  layout = AUTH_LAYOUT.header,
+  navigate = (url) => window.location.assign(url),
+}: AuthStatusProps) {
   const [user, setUser] = useState<SessionUser | null | undefined>(getSession);
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -70,7 +88,14 @@ export default function AuthStatus({ locale, dict, showBell = true, navigate = (
 
   if (!user) {
     return (
-      <Link href={`/${locale}/login`} className="text-sm font-medium text-white transition-colors hover:text-white/80">
+      <Link
+        href={`/${locale}/login`}
+        className={cn(
+          signInStyles[layout],
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-orange"
+        )}
+      >
+        <LogIn aria-hidden className="h-4 w-4 flex-shrink-0" strokeWidth={2.5} />
         {dict.login.submit}
       </Link>
     );
@@ -88,27 +113,40 @@ export default function AuthStatus({ locale, dict, showBell = true, navigate = (
     { href: `/${locale}/dashboard/security`, label: dict.account.security, icon: KeyRound, show: true },
   ].filter((link) => link.show);
 
+  const isSheet = layout === AUTH_LAYOUT.sheet;
+
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn("flex items-center gap-2", isSheet && "w-full")}>
       {showBell ? <NotificationBell locale={locale} labels={dict.notifications} /> : null}
 
-      <div ref={wrapperRef} className="relative">
+      <div ref={wrapperRef} className={cn("relative", isSheet && "w-full")}>
         <button
           type="button"
           onClick={() => setMenuOpen((open) => !open)}
           aria-expanded={menuOpen}
           aria-haspopup="true"
           aria-label={displayName}
-          className="flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 py-1 pl-1 pr-2 text-white transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-orange"
+          className={cn(
+            "flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 py-1 pl-1 pr-2 text-white transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-orange",
+            isSheet && "w-full justify-between gap-3 py-1.5 pr-3"
+          )}
         >
-          <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-brand-blue text-xs font-bold text-white">
-            {initials}
+          <span className={cn("flex items-center gap-2.5", isSheet && "min-w-0")}>
+            <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-brand-blue text-xs font-bold text-white">
+              {initials}
+            </span>
+            {isSheet ? <span className="truncate text-sm font-bold">{displayName}</span> : null}
           </span>
           <ChevronDown aria-hidden className={cn("h-3.5 w-3.5 opacity-85 transition-transform", menuOpen && "rotate-180")} strokeWidth={2.5} />
         </button>
 
         {menuOpen ? (
-          <div className="absolute right-0 top-[calc(100%+10px)] z-20 w-[min(17rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.18)]">
+          <div
+            className={cn(
+              "absolute right-0 z-20 w-[min(17rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.18)]",
+              isSheet ? "bottom-[calc(100%+10px)] w-full" : "top-[calc(100%+10px)]"
+            )}
+          >
             <div className="flex items-center gap-3 border-b border-neutral-200 bg-[#f9fbff] px-4 py-3.5">
               <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
                 {initials}

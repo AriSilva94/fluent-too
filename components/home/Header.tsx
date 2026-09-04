@@ -5,10 +5,11 @@ import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Container from "@/components/ui/Container";
-import AuthStatus from "@/components/auth/AuthStatus";
+import AuthStatus, { AUTH_LAYOUT } from "@/components/auth/AuthStatus";
 import HeaderNotifications from "@/components/notifications/HeaderNotifications";
 import LanguageSwitcher from "@/components/home/LanguageSwitcher";
-import MobileMenu from "@/components/home/MobileMenu";
+import MobileMenu, { MOBILE_MENU_ID } from "@/components/home/MobileMenu";
+import MenuToggle from "@/components/home/MenuToggle";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
 import { assetUrl } from "@/lib/cdnAssets";
@@ -84,39 +85,15 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
           <AuthStatus locale={locale} dict={dict} />
         </nav>
 
-        <div className="flex items-center gap-3 lg:hidden">
-          <LanguageSwitcher locale={locale} variant="header" />
+        <div className="flex items-center gap-2 lg:hidden">
           <HeaderNotifications locale={locale} labels={dict.notifications} />
-          <button
-            type="button"
-            className="z-50 flex h-10 w-10 items-center justify-center text-white focus:outline-none"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? dict.nav.menuClose : dict.nav.menuOpen}
-          >
-            {menuOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="h-8 w-8"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="h-8 w-8"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
+          <MenuToggle
+            isOpen={menuOpen}
+            onToggle={() => setMenuOpen((open) => !open)}
+            labelOpen={dict.nav.menuOpen}
+            labelClose={dict.nav.menuClose}
+            controls={MOBILE_MENU_ID}
+          />
         </div>
       </Container>
 
@@ -125,9 +102,9 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
         onClose={() => setMenuOpen(false)}
         navLinks={navLinks}
         scrollToSection={scrollToSection}
-        authSlot={
-          <AuthStatus locale={locale} dict={dict} showBell={false} />
-        }
+        locale={locale}
+        labels={{ title: dict.nav.mainMenu, language: dict.nav.language }}
+        authSlot={<AuthStatus locale={locale} dict={dict} showBell={false} layout={AUTH_LAYOUT.sheet} />}
       />
     </header>
   );

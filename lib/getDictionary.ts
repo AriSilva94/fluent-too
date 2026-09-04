@@ -17,6 +17,7 @@ export type Dictionary = {
     menuOpen: string;
     menuClose: string;
     mainMenu: string;
+    language: string;
   };
   home: {
     hero: {
