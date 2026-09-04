@@ -12,6 +12,12 @@ describe("cookies", () => {
     });
   });
 
+  it("usa SameSite=Lax nos dois cookies para sobreviver a navegacao vinda de outro site", () => {
+    const [access, refresh] = buildCookieInstructions({ accessToken: "a", refreshToken: "r" }, true);
+    expect(access.options.sameSite).toBe("lax");
+    expect(refresh.options.sameSite).toBe("lax");
+  });
+
   it("gera instrucoes para gravar e limpar tokens", () => {
     expect(buildCookieInstructions({ accessToken: "a", refreshToken: "r" }, true)).toHaveLength(2);
     expect(buildClearCookieInstructions()).toEqual([

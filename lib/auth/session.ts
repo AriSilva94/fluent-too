@@ -25,11 +25,15 @@ export type SessionResult =
   | { status: typeof SESSION_STATUS.anonymous; clear?: boolean };
 
 export async function resolveSession(tokens: SessionTokens, client: SessionClient): Promise<SessionResult> {
-  if (!tokens.accessToken || !tokens.refreshToken) return { status: SESSION_STATUS.anonymous, clear: Boolean(tokens.accessToken || tokens.refreshToken) };
+  if (!tokens.accessToken && !tokens.refreshToken) return { status: SESSION_STATUS.anonymous, clear: false };
 
-  const current = await client.me(tokens.accessToken);
-  if (current.ok) return { status: SESSION_STATUS.authenticated, user: current.data };
-  if (current.status !== 401) return { status: SESSION_STATUS.anonymous };
+  if (tokens.accessToken) {
+    const current = await client.me(tokens.accessToken);
+    if (current.ok) return { status: SESSION_STATUS.authenticated, user: current.data };
+    if (current.status !== 401) return { status: SESSION_STATUS.anonymous };
+  }
+
+  if (!tokens.refreshToken) return { status: SESSION_STATUS.anonymous, clear: true };
 
   const refreshed = await client.refresh(tokens.refreshToken);
   if (!refreshed.ok) return { status: SESSION_STATUS.anonymous, clear: true };
@@ -50,13 +54,13 @@ export async function resolveSessionOptimistic(
   client: Pick<SessionClient, "refresh">,
   now: number = Date.now()
 ): Promise<OptimisticSessionResult> {
-  if (!tokens.accessToken || !tokens.refreshToken) {
-    return { status: SESSION_STATUS.anonymous, clear: Boolean(tokens.accessToken || tokens.refreshToken) };
-  }
+  if (!tokens.accessToken && !tokens.refreshToken) return { status: SESSION_STATUS.anonymous, clear: false };
 
   const skewMs = 30_000;
-  const exp = decodeJwtExpiry(tokens.accessToken);
+  const exp = tokens.accessToken ? decodeJwtExpiry(tokens.accessToken) : null;
   if (exp !== null && exp * 1000 > now + skewMs) return { status: SESSION_STATUS.authenticated };
+
+  if (!tokens.refreshToken) return { status: SESSION_STATUS.anonymous, clear: true };
 
   const refreshed = await client.refresh(tokens.refreshToken);
   if (!refreshed.ok) return { status: SESSION_STATUS.anonymous, clear: true };

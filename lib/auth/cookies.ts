@@ -34,7 +34,7 @@ export function buildAuthCookieOptions(maxAge: number, secure = process.env.AUTH
 export function buildCookieInstructions(tokens: AuthTokens, secure = process.env.AUTH_COOKIE_SECURE !== "false") {
   return [
     { name: AUTH_COOKIE_NAMES.access, value: tokens.accessToken, options: buildAuthCookieOptions(600, secure, "lax") },
-    { name: AUTH_COOKIE_NAMES.refresh, value: tokens.refreshToken, options: buildAuthCookieOptions(2592000, secure, "strict") },
+    { name: AUTH_COOKIE_NAMES.refresh, value: tokens.refreshToken, options: buildAuthCookieOptions(2592000, secure, "lax") },
   ];
 }
 
@@ -48,7 +48,7 @@ export function resolveAuthCookieSecure(url?: string | URL) {
 export function buildClearCookieInstructions() {
   return [
     { name: AUTH_COOKIE_NAMES.access, value: "", options: buildAuthCookieOptions(0, false, "lax") },
-    { name: AUTH_COOKIE_NAMES.refresh, value: "", options: buildAuthCookieOptions(0, false, "strict") },
+    { name: AUTH_COOKIE_NAMES.refresh, value: "", options: buildAuthCookieOptions(0, false, "lax") },
   ];
 }
 
