@@ -7,6 +7,10 @@ export const AUTH_COOKIE_NAMES = {
 
 export const OAUTH_STATE_COOKIE = "fluent_too_oauth_nonce";
 
+export const ACCESS_TOKEN_LIFESPAN_SECONDS = 600;
+export const IDLE_REFRESH_TOKEN_LIFESPAN_SECONDS = 1209600;
+export const OAUTH_STATE_LIFESPAN_SECONDS = 600;
+
 export type AuthCookieOptions = {
   httpOnly: true;
   sameSite: "lax" | "strict";
@@ -33,8 +37,8 @@ export function buildAuthCookieOptions(maxAge: number, secure = process.env.AUTH
 
 export function buildCookieInstructions(tokens: AuthTokens, secure = process.env.AUTH_COOKIE_SECURE !== "false") {
   return [
-    { name: AUTH_COOKIE_NAMES.access, value: tokens.accessToken, options: buildAuthCookieOptions(600, secure, "lax") },
-    { name: AUTH_COOKIE_NAMES.refresh, value: tokens.refreshToken, options: buildAuthCookieOptions(2592000, secure, "lax") },
+    { name: AUTH_COOKIE_NAMES.access, value: tokens.accessToken, options: buildAuthCookieOptions(ACCESS_TOKEN_LIFESPAN_SECONDS, secure, "lax") },
+    { name: AUTH_COOKIE_NAMES.refresh, value: tokens.refreshToken, options: buildAuthCookieOptions(IDLE_REFRESH_TOKEN_LIFESPAN_SECONDS, secure, "lax") },
   ];
 }
 
@@ -53,7 +57,7 @@ export function buildClearCookieInstructions() {
 }
 
 export function buildOAuthStateCookie(nonce: string, secure = process.env.AUTH_COOKIE_SECURE !== "false"): CookieInstruction {
-  return { name: OAUTH_STATE_COOKIE, value: nonce, options: buildAuthCookieOptions(600, secure, "lax") };
+  return { name: OAUTH_STATE_COOKIE, value: nonce, options: buildAuthCookieOptions(OAUTH_STATE_LIFESPAN_SECONDS, secure, "lax") };
 }
 
 export function buildClearOAuthStateCookie(): CookieInstruction {
