@@ -302,6 +302,11 @@
     "blogFieldAuthor": "Author",
     "blogFieldReadingTime": "Reading time (minutes)",
     "blogFieldLanguage": "Language",
+    "blogFieldCoverImage": "Cover image",
+    "blogCoverImageHint": "PNG, JPG, WEBP, GIF or AVIF, up to 8MB.",
+    "blogCoverImageChange": "Change image",
+    "blogCoverImageRemove": "Remove image",
+    "blogCoverImageUploading": "Uploading image...",
     "blogDeleteConfirmTitle": "Delete article",
     "blogDeleteConfirmText": "The article goes offline and cannot be recovered from here.",
     "blogDeleteConfirmCta": "Delete permanently",
@@ -408,7 +413,10 @@
       "EXCERPT_REQUIRED": "Enter the excerpt.",
       "CONTENT_REQUIRED": "Write the article content.",
       "AUTHOR_REQUIRED": "Enter the author.",
-      "INVALID_DATE": "Enter a valid date."
+      "INVALID_DATE": "Enter a valid date.",
+      "FILE_REQUIRED": "Select an image.",
+      "INVALID_FILE_TYPE": "Unsupported image format.",
+      "FILE_TOO_LARGE": "The image exceeds the 8MB limit."
     }
   },
   "studyLanguage": {

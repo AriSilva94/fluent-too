@@ -338,6 +338,11 @@ export type Dictionary = {
     blogFieldAuthor: string;
     blogFieldReadingTime: string;
     blogFieldLanguage: string;
+    blogFieldCoverImage: string;
+    blogCoverImageHint: string;
+    blogCoverImageChange: string;
+    blogCoverImageRemove: string;
+    blogCoverImageUploading: string;
     blogDeleteConfirmTitle: string;
     blogDeleteConfirmText: string;
     blogDeleteConfirmCta: string;

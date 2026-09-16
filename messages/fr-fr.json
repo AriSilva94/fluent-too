@@ -302,6 +302,11 @@
     "blogFieldAuthor": "Auteur",
     "blogFieldReadingTime": "Temps de lecture (minutes)",
     "blogFieldLanguage": "Langue",
+    "blogFieldCoverImage": "Image de couverture",
+    "blogCoverImageHint": "PNG, JPG, WEBP, GIF ou AVIF, jusqu'à 8 Mo.",
+    "blogCoverImageChange": "Changer l'image",
+    "blogCoverImageRemove": "Supprimer l'image",
+    "blogCoverImageUploading": "Envoi de l'image...",
     "blogDeleteConfirmTitle": "Supprimer l'article",
     "blogDeleteConfirmText": "L'article est retiré et ne peut pas être récupéré ici.",
     "blogDeleteConfirmCta": "Supprimer définitivement",
@@ -408,7 +413,10 @@
       "EXCERPT_REQUIRED": "Saisissez le résumé.",
       "CONTENT_REQUIRED": "Rédigez le contenu de l'article.",
       "AUTHOR_REQUIRED": "Saisissez l'auteur.",
-      "INVALID_DATE": "Saisissez une date valide."
+      "INVALID_DATE": "Saisissez une date valide.",
+      "FILE_REQUIRED": "Sélectionnez une image.",
+      "INVALID_FILE_TYPE": "Format d'image non pris en charge.",
+      "FILE_TOO_LARGE": "L'image dépasse la limite de 8 Mo."
     }
   },
   "studyLanguage": {
