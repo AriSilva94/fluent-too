@@ -1,3 +1,4 @@
+import { buildClientIpHeaders } from "@/lib/security/client-ip";
 import { mapStrapiError } from "./errors";
 import type {
   AuthResponse,
@@ -18,6 +19,7 @@ type ClientOptions = {
   baseUrl?: string;
   fetcher?: Fetcher;
   timeoutMs?: number;
+  clientIp?: string | null;
 };
 
 type StrapiAuthBody = {
@@ -33,7 +35,7 @@ export function createStrapiClient(options: ClientOptions = {}) {
   const timeoutMs = options.timeoutMs ?? 10000;
 
   async function request<T>(path: string, init: RequestInit = {}): Promise<AuthResponse<T>> {
-    const headers = normalizeHeaders(init.headers);
+    const headers = { ...buildClientIpHeaders(options.clientIp), ...normalizeHeaders(init.headers) };
     if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
 
     const response = await fetcher(`${baseUrl}${path}`, {

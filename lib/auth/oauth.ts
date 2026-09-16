@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { buildCookieInstructions, buildClearOAuthStateCookie, type CookieInstruction } from "./cookies";
 import { safeRedirect } from "./redirect";
 import { defaultLocale, isValidLocale } from "@/lib/i18n";
@@ -14,11 +15,24 @@ export function buildGoogleStartUrl(strapiPublicUrl: string, callbackUrl: string
   return url.toString();
 }
 
-export function parseGoogleCallback(url: URL, hasNonceCookie: boolean) {
+export type OAuthNonce = { expected?: string; received?: string };
+
+export function buildGoogleCallbackUrl(siteUrl: string, nonce: string) {
+  return `${trimTrailingSlash(siteUrl)}/api/auth/google/callback/${encodeURIComponent(nonce)}`;
+}
+
+export function nonceMatches({ expected, received }: OAuthNonce) {
+  if (!expected || !received) return false;
+  const a = Buffer.from(expected);
+  const b = Buffer.from(received);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+export function parseGoogleCallback(url: URL, nonce: OAuthNonce) {
   if (url.searchParams.get("error")) return { ok: false as const, code: "GOOGLE_AUTH_FAILED" as const };
   const accessToken = url.searchParams.get("access_token");
   if (!accessToken) return { ok: false as const, code: "GOOGLE_AUTH_FAILED" as const };
-  if (!hasNonceCookie) return { ok: false as const, code: "OAUTH_STATE_MISMATCH" as const };
+  if (!nonceMatches(nonce)) return { ok: false as const, code: "OAUTH_STATE_MISMATCH" as const };
 
   return {
     ok: true as const,
@@ -29,9 +43,9 @@ export function parseGoogleCallback(url: URL, hasNonceCookie: boolean) {
 
 export async function handleGoogleCallback(
   url: URL,
-  options: { client: GoogleClient; secureCookies?: boolean; hasNonceCookie: boolean }
+  options: { client: GoogleClient; secureCookies?: boolean; nonce: OAuthNonce }
 ): Promise<{ status: number; redirectTo: string; cookies?: CookieInstruction[] }> {
-  const parsed = parseGoogleCallback(url, options.hasNonceCookie);
+  const parsed = parseGoogleCallback(url, options.nonce);
   const clearNonceCookie = buildClearOAuthStateCookie();
 
   if (!parsed.ok) {

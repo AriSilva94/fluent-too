@@ -3,6 +3,7 @@ import { applyCookies, readTokenCookies } from "@/app/api/auth/_shared";
 import { buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { getSiteUrl, isTrustedOrigin } from "@/lib/auth/request";
 import { createProfileClient } from "@/lib/profile/client";
+import { resolveRequestClientIp } from "@/lib/security/client-ip";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "@/lib/auth/session";
 
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
   const accessToken = wasSessionRefreshed(session) ? session.tokens.accessToken : tokens.accessToken;
   if (!accessToken) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
 
-  const result = await createProfileClient().becomeStudent(accessToken);
+  const result = await createProfileClient({ clientIp: resolveRequestClientIp(request.headers) }).becomeStudent(accessToken);
   const response = result.ok
     ? NextResponse.json({ ok: true })
     : NextResponse.json({ ok: false, error: result.error }, { status: result.status ?? 502 });

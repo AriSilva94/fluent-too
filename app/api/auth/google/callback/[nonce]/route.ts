@@ -3,13 +3,14 @@ import { handleGoogleCallback } from "@/lib/auth/oauth";
 import { OAUTH_STATE_COOKIE, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { getSiteUrl } from "@/lib/auth/request";
-import { applyCookies } from "../../_shared";
+import { applyCookies } from "../../../_shared";
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ nonce: string }> }) {
+  const { nonce } = await params;
   const result = await handleGoogleCallback(new URL(request.url), {
     client: createStrapiClient(),
     secureCookies: resolveAuthCookieSecure(request.url),
-    hasNonceCookie: Boolean(request.cookies.get(OAUTH_STATE_COOKIE)?.value),
+    nonce: { expected: request.cookies.get(OAUTH_STATE_COOKIE)?.value, received: nonce },
   });
   const response = NextResponse.redirect(new URL(result.redirectTo, getSiteUrl(request)), { status: result.status });
   applyCookies(response, result.cookies);

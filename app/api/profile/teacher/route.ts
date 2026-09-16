@@ -3,6 +3,7 @@ import { applyCookies, readTokenCookies } from "@/app/api/auth/_shared";
 import { buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { getSiteUrl, isTrustedOrigin } from "@/lib/auth/request";
 import { createProfileClient } from "@/lib/profile/client";
+import { resolveRequestClientIp } from "@/lib/security/client-ip";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "@/lib/auth/session";
 import { validateAttachment, validateTeacherApplication } from "@/lib/auth/teacher-registration";
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
   if (payload.data.credentialUrl) body.append("credentialUrl", payload.data.credentialUrl);
   if (attachment) body.append("attachment", attachment);
 
-  const result = await createProfileClient().becomeTeacher(accessToken, body);
+  const result = await createProfileClient({ clientIp: resolveRequestClientIp(request.headers) }).becomeTeacher(accessToken, body);
   const response = result.ok
     ? NextResponse.json({ ok: true })
     : NextResponse.json({ ok: false, error: result.error }, { status: result.status ?? 502 });

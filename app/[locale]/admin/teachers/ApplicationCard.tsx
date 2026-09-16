@@ -24,7 +24,7 @@ export type TeacherApplication = {
   bio?: string | null;
   experience?: string | null;
   credentialUrl?: string | null;
-  attachment?: { id: number; url: string; name?: string | null } | null;
+  attachment?: { id: number; name?: string | null; mime?: string | null; size?: number | null } | null;
   user?: ApplicationUser | null;
   reviewedBy?: ApplicationUser | null;
   reviewedAt?: string | null;
@@ -130,14 +130,14 @@ export default function ApplicationCard({
         </div>
       )}
 
-      {(application.attachment?.url || (application.credentialUrl && isHttpUrl(application.credentialUrl))) && (
+      {(application.attachment || (application.credentialUrl && isHttpUrl(application.credentialUrl))) && (
         <div className="flex flex-wrap gap-2 px-5 pb-5">
           {application.credentialUrl && isHttpUrl(application.credentialUrl) && (
             <ResourceLink href={application.credentialUrl} icon={Link2} label={dict.admin.teachersCredentialLabel} />
           )}
-          {application.attachment?.url && (
+          {application.attachment && (
             <ResourceLink
-              href={application.attachment.url}
+              href={`/api/teacher-applications/${application.id}/attachment`}
               icon={FileText}
               label={application.attachment.name ?? dict.admin.teachersAttachmentLabel}
             />

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { buildPageMetadata } from "@/lib/seo";
@@ -9,6 +9,7 @@ import { createStrapiClient } from "@/lib/auth/strapi-client";
 import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "@/lib/auth/session";
 import { createQuizAttemptsClient } from "@/lib/quiz-attempts/client";
 import { createProfileClient } from "@/lib/profile/client";
+import { resolveRequestClientIp } from "@/lib/security/client-ip";
 import { createTeacherReachClient } from "@/lib/teacher/reach-client";
 import { canCreateContent, hasProfile, isPendingTeacher } from "@/lib/auth/roles";
 import { accountDisplayName } from "@/lib/auth/display-name";
@@ -75,7 +76,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ loca
 
   const teacherApplicationView = isPendingTeacher(role)
     ? resolveTeacherApplicationView(
-        accessToken ? await createProfileClient().myApplication(accessToken) : { ok: false, error: "UNKNOWN_ERROR" }
+        accessToken ? await createProfileClient({ clientIp: resolveRequestClientIp(await headers()) }).myApplication(accessToken) : { ok: false, error: "UNKNOWN_ERROR" }
       )
     : null;
 
