@@ -55,7 +55,7 @@ describe("TeacherQuizzesPanel", () => {
     renderPanel();
 
     expect(screen.getByRole("cell", { name: /Saudações básicas/ })).toBeInTheDocument();
-    expect(screen.getByText(/English · A1 · Múltipla escolha/)).toBeInTheDocument();
+    expect(screen.getByText(/Inglês · A1 · Múltipla escolha/)).toBeInTheDocument();
     expect(screen.getByText("Publicado")).toBeInTheDocument();
   });
 
@@ -86,8 +86,11 @@ describe("TeacherQuizzesPanel", () => {
 
     await user.click(screen.getByRole("button", { name: "Novo quiz" }));
 
-    const select = screen.getByLabelText(/Idioma/);
-    expect(within(select).getAllByRole("option").map((option) => option.textContent)).toEqual(["English", "Français"]);
+    await user.click(screen.getByLabelText(/Idioma/));
+    expect((await screen.findAllByRole("option")).map((option) => option.textContent)).toEqual([
+      "Inglês",
+      "Francês",
+    ]);
   });
 
   it("bloqueia a criação e avisa quando nenhum idioma foi aprovado", () => {
@@ -104,12 +107,14 @@ describe("TeacherQuizzesPanel", () => {
     await user.click(screen.getByRole("button", { name: "Novo quiz" }));
     expect(screen.getByRole("group", { name: /Alternativas/ })).toBeInTheDocument();
 
-    await user.selectOptions(screen.getByLabelText(/Tipo de quiz/), "flashcard");
+    await user.click(screen.getByLabelText(/Tipo de quiz/));
+    await user.click(await screen.findByRole("option", { name: "Flashcard" }));
     expect(screen.queryByRole("group", { name: /Alternativas/ })).not.toBeInTheDocument();
     expect(screen.getByLabelText(/Frente/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Verso/)).toBeInTheDocument();
 
-    await user.selectOptions(screen.getByLabelText(/Tipo de quiz/), "fill-gap");
+    await user.click(screen.getByLabelText(/Tipo de quiz/));
+    await user.click(await screen.findByRole("option", { name: "Complete a frase" }));
     expect(screen.getByLabelText(/Frase com lacunas/)).toBeInTheDocument();
   });
 
@@ -118,7 +123,8 @@ describe("TeacherQuizzesPanel", () => {
     renderPanel();
 
     await user.click(screen.getByRole("button", { name: "Novo quiz" }));
-    await user.selectOptions(screen.getByLabelText(/Tipo de quiz/), "fill-gap");
+    await user.click(screen.getByLabelText(/Tipo de quiz/));
+    await user.click(await screen.findByRole("option", { name: "Complete a frase" }));
     await user.type(screen.getByLabelText(/Frase com lacunas/), "It is ___ the ___.");
 
     const answers = screen.getByRole("group", { name: /Respostas das lacunas/ });
@@ -224,5 +230,6 @@ async function fillMultipleChoice(user: ReturnType<typeof userEvent.setup>) {
   await user.type(options[0]!, "Good morning");
   await user.type(options[1]!, "Good night");
 
-  await user.selectOptions(screen.getByLabelText(/Alternativa correta/), "Good morning");
+  await user.click(screen.getByLabelText(/Alternativa correta/));
+  await user.click(await screen.findByRole("option", { name: "Good morning" }));
 }

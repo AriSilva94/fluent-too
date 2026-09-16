@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/navigation/Breadcrumbs";
-import { LANGUAGE_LABELS } from "@/components/quiz/QuizEditorForm";
 import DataTable, { rowActionClass, rowDangerActionClass, type DataColumn } from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import LanguageFlag from "@/components/ui/LanguageFlag";
+import Select from "@/components/ui/Select";
+import DateField from "@/components/ui/DateField";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { ManagedBlogPost } from "@/lib/blog/manage-client";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/lib/quizzes/manage";
@@ -270,30 +271,23 @@ export default function AdminBlogPanel({
               </Field>
 
               <Field label={dict.admin.blogFieldLanguage}>
-                <select
+                <Select
                   value={form.targetLanguage}
-                  onChange={(event) =>
+                  onChange={(value) =>
                     updateForm({
-                      targetLanguage: event.target.value as TargetLanguage,
+                      targetLanguage: value as TargetLanguage,
                     })
                   }
-                  className={inputClass}
-                >
-                  {TARGET_LANGUAGES.map((language) => (
-                    <option key={language} value={language}>
-                      {LANGUAGE_LABELS[language]}
-                    </option>
-                  ))}
-                </select>
+                  options={TARGET_LANGUAGES.map((language) => ({ value: language, label: dict.languages[language] }))}
+                  className="font-semibold text-gray-900"
+                />
               </Field>
 
               <Field label={dict.admin.blogFieldDate}>
-                <input
-                  type="date"
-                  required
+                <DateField
                   value={form.date}
-                  onChange={(event) => updateForm({ date: event.target.value })}
-                  className={inputClass}
+                  onChange={(value) => updateForm({ date: value })}
+                  className="font-semibold text-gray-900"
                 />
               </Field>
 
@@ -386,7 +380,7 @@ export default function AdminBlogPanel({
                 primaryHeader={dict.admin.blogFieldTitle}
                 primary={(post) => post.title}
                 meta={(post) =>
-                  [post.category, normalizeDate(post.date), languageLabel(post.targetLanguage)]
+                  [post.category, normalizeDate(post.date), languageLabel(dict, post.targetLanguage)]
                     .filter(Boolean)
                     .join(" · ")
                 }
@@ -485,8 +479,8 @@ const secondaryButtonClass =
 const dangerButtonClass =
   "inline-flex min-h-11 items-center justify-center rounded-lg bg-red-50 px-5 text-sm font-black text-red-700 ring-1 ring-red-200 transition-colors hover:bg-red-100 disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2";
 
-function languageLabel(value: string | undefined) {
-  return LANGUAGE_LABELS[value as TargetLanguage] ?? value ?? "";
+function languageLabel(dict: Dictionary, value: string | undefined) {
+  return dict.languages[value as TargetLanguage] ?? value ?? "";
 }
 
 function postColumns(dict: Dictionary): DataColumn<ManagedBlogPost>[] {
@@ -501,7 +495,7 @@ function postColumns(dict: Dictionary): DataColumn<ManagedBlogPost>[] {
     {
       key: "language",
       header: dict.admin.blogFieldLanguage,
-      cell: (post) => <LanguageFlag language={post.targetLanguage} label={languageLabel(post.targetLanguage)} />,
+      cell: (post) => <LanguageFlag language={post.targetLanguage} label={languageLabel(dict, post.targetLanguage)} />,
       headerClassName: "hidden md:table-cell",
       cellClassName: "hidden md:table-cell",
     },

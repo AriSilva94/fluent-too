@@ -10,7 +10,6 @@ import LevelTag from "@/components/ui/LevelTag";
 import type { ManagedQuiz } from "@/lib/quizzes/manage-client";
 import type { TargetLanguage } from "@/lib/quizzes/manage";
 import { QUIZ_TYPE, type QuizType } from "@/lib/quizzes/types";
-import { LANGUAGE_LABELS } from "./QuizEditorForm";
 
 interface Props {
   quizzes: ManagedQuiz[];
@@ -29,7 +28,7 @@ const TYPE_ICONS: Record<QuizType, LucideIcon> = {
 
 export default function QuizTable({ quizzes, dict, typeLabels, actions, pageSize, extraChrome }: Props) {
   const language = (quiz: ManagedQuiz) =>
-    LANGUAGE_LABELS[quiz.targetLanguage as TargetLanguage] ?? quiz.targetLanguage;
+    dict.languages[quiz.targetLanguage as TargetLanguage] ?? quiz.targetLanguage;
   const type = (quiz: ManagedQuiz) => typeLabels[quiz.type as QuizType] ?? quiz.type;
 
   const columns: DataColumn<ManagedQuiz>[] = [

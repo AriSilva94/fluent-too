@@ -6,6 +6,7 @@ import type { Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import { Field, FieldGroup, fieldControlClass } from "@/components/ui/Field";
+import Select from "@/components/ui/Select";
 import { QUIZ_LEVELS, QUIZ_TYPES, type TargetLanguage } from "@/lib/quizzes/manage";
 import type { ManagedQuiz } from "@/lib/quizzes/manage-client";
 import {
@@ -20,8 +21,6 @@ import {
 import type { QuizDraft } from "@/lib/quizzes/preview";
 import { QUIZ_LEVEL, QUIZ_TYPE, TARGET_LANGUAGE, type QuizLevel, type QuizType } from "@/lib/quizzes/types";
 import QuizPreviewPanel from "./QuizPreviewPanel";
-
-export const LANGUAGE_LABELS: Record<TargetLanguage, string> = { pt: "Português", en: "English", fr: "Français" };
 
 const PANE = { edit: "edit", preview: "preview" } as const;
 
@@ -186,51 +185,33 @@ export default function QuizEditorForm({
             </Field>
 
             <Field label={dict.teacher.fieldLanguage}>
-              <select
+              <Select
                 value={form.targetLanguage}
-                onChange={(event) => updateForm({ targetLanguage: event.target.value as TargetLanguage })}
-                className={fieldControlClass}
-              >
-                {languages.map((language) => (
-                  <option key={language} value={language}>
-                    {LANGUAGE_LABELS[language]}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => updateForm({ targetLanguage: value as TargetLanguage })}
+                options={languages.map((language) => ({ value: language, label: dict.languages[language] }))}
+              />
             </Field>
 
             <Field label={dict.teacher.fieldLevel}>
-              <select
+              <Select
                 value={form.level}
-                onChange={(event) => updateForm({ level: event.target.value as QuizLevel })}
-                className={fieldControlClass}
-              >
-                {QUIZ_LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => updateForm({ level: value as QuizLevel })}
+                options={QUIZ_LEVELS.map((level) => ({ value: level, label: level }))}
+              />
             </Field>
 
             <Field label={dict.teacher.fieldType}>
-              <select
+              <Select
                 value={form.type}
-                onChange={(event) => {
+                onChange={(value) => {
                   setActiveIndex(null);
                   updateForm({
-                    type: event.target.value as QuizType,
+                    type: value as QuizType,
                     questions: [createEmptyQuestion(newQuestionId())],
                   });
                 }}
-                className={fieldControlClass}
-              >
-                {QUIZ_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {typeLabels[type]}
-                  </option>
-                ))}
-              </select>
+                options={QUIZ_TYPES.map((type) => ({ value: type, label: typeLabels[type] }))}
+              />
             </Field>
 
             <Field label={dict.teacher.fieldMinutes}>
@@ -341,21 +322,15 @@ export default function QuizEditorForm({
                     </FieldGroup>
 
                     <Field label={dict.teacher.correctAnswer}>
-                      <select
+                      <Select
                         value={question.correctAnswer}
-                        onChange={(event) => updateQuestion(index, { correctAnswer: event.target.value })}
-                        className={fieldControlClass}
-                      >
-                        <option value="">—</option>
-                        {question.options
+                        onChange={(value) => updateQuestion(index, { correctAnswer: value })}
+                        placeholder="—"
+                        options={question.options
                           .map((option) => option.trim())
                           .filter(Boolean)
-                          .map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                      </select>
+                          .map((option) => ({ value: option, label: option }))}
+                      />
                     </Field>
                   </div>
                 )}
