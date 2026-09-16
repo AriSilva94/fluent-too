@@ -32,10 +32,10 @@ export default function LocaleChrome({ locale, dict, children }: LocaleChromePro
   const hideFooter = isAuthSurfacePath(pathname);
 
   return (
-    <>
+    <div className="flex min-h-dvh flex-col">
       <Header locale={locale} dict={dict} />
-      <main>{children}</main>
+      <main className="flex flex-1 flex-col">{children}</main>
       {hideFooter ? null : <Footer locale={locale} dict={dict} />}
-    </>
+    </div>
   );
 }

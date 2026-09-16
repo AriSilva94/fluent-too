@@ -1,10 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import AuthForm from "@/components/auth/AuthForm";
 import type { Dictionary } from "@/lib/getDictionary";
+import type { Locale } from "@/lib/i18n";
+import { buildAuthVisual } from "@/lib/auth/visual";
 
-export default function ChangePasswordForm({ dict, email }: { dict: Dictionary; email: string }) {
+export default function ChangePasswordForm({ dict, email, locale }: { dict: Dictionary; email: string; locale: Locale }) {
   const [saved, setSaved] = useState(false);
 
   return (
@@ -38,9 +41,14 @@ export default function ChangePasswordForm({ dict, email }: { dict: Dictionary; 
           },
         ]}
         messages={dict.auth.errors}
-        visualTitle={dict.auth.visualTitle}
-        visualText={dict.auth.visualText}
+      passwordLabels={{ show: dict.auth.showPassword, hide: dict.auth.hidePassword }}
+      visual={buildAuthVisual(dict, locale)}
         surface="embedded"
+        footer={
+          <Link href={`/${locale}/forgot-password`} className="font-black text-brand-orange transition-colors hover:text-brand-orange/80">
+            {dict.auth.forgotPassword}
+          </Link>
+        }
         onSubmit={async (values) => {
           const response = await fetch("/api/auth/change-password", {
             method: "POST",

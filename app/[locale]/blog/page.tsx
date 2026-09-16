@@ -4,6 +4,12 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
 import { getBlogPosts } from "@/lib/blog/strapi";
+import { formatBlogDate } from "@/lib/blog/format-date";
+import Container from "@/components/ui/Container";
+import SectionHeading from "@/components/ui/SectionHeading";
+import StudyLanguageFilter from "@/components/StudyLanguageFilter";
+import { readStudyLanguage } from "@/lib/study-language-server";
+import { buildStudyLanguageLabels, toTargetLanguage } from "@/lib/study-language";
 import { buildPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -36,17 +42,23 @@ export default async function BlogListPage({
   if (!isValidLocale(locale)) notFound();
 
   const dict = await getDictionary(locale as Locale);
-  const posts = await getBlogPosts(locale as Locale);
+  const studyLanguage = await readStudyLanguage();
+  const posts = await getBlogPosts(toTargetLanguage(studyLanguage));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">{dict.blog.title}</h1>
+    <Container className="py-12">
+      <SectionHeading title={dict.blog.title} subtitle={dict.home.blog.subtitle} center as="h1" />
 
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8">
+        <div className="mb-6 flex justify-center">
+          <StudyLanguageFilter value={studyLanguage} labels={buildStudyLanguageLabels(dict.studyLanguage)} />
+        </div>
+
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
           <Link
             key={post.slug}
-            href={`/${locale}/blog/${post.slug}`}
+            href={`/${locale}/blog/${post.slug}?idioma=${post.targetLanguage}`}
             className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-lg h-full"
           >
              <div 
@@ -60,7 +72,7 @@ export default async function BlogListPage({
                     <span className="rounded-full bg-brand-orange/10 px-2.5 py-1 font-semibold uppercase tracking-wide text-brand-orange">
                       {post.category}
                     </span>
-                    <span>{post.date}</span>
+                    <span>{formatBlogDate(post.date, locale as Locale)}</span>
                     <span>•</span>
                     <span>{post.author}</span>
                     <span>•</span>
@@ -78,12 +90,13 @@ export default async function BlogListPage({
             </div>
           </Link>
         ))}
-        {posts.length === 0 && (
+          {posts.length === 0 && (
             <div className="col-span-full text-center py-12 text-gray-500">
-                <p>{dict.blog.noPosts}</p>
+              <p>{dict.blog.noPosts}</p>
             </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </Container>
   );
 }

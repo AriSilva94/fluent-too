@@ -5,23 +5,32 @@ import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Container from "@/components/ui/Container";
-import AuthStatus from "@/components/auth/AuthStatus";
+import AuthStatus, { AUTH_LAYOUT } from "@/components/auth/AuthStatus";
+import HeaderNotifications from "@/components/notifications/HeaderNotifications";
 import LanguageSwitcher from "@/components/home/LanguageSwitcher";
-import MobileMenu from "@/components/home/MobileMenu";
+import MobileMenu, { MOBILE_MENU_ID } from "@/components/home/MobileMenu";
+import MenuToggle from "@/components/home/MenuToggle";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
 import { assetUrl } from "@/lib/cdnAssets";
 import { buildHomeAnchorHref, shouldHandleHomeAnchorScroll } from "./headerNavigation";
+
+export const HOME_ANCHOR = {
+  home: "#inicio",
+  resources: "#recursos",
+  blog: "#blog",
+  contact: "#contato",
+} as const;
 
 export default function Header({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   const navLinks = [
-    { hash: "#inicio", href: buildHomeAnchorHref(locale, "#inicio"), label: dict.nav.home },
-    { hash: "#recursos", href: buildHomeAnchorHref(locale, "#recursos"), label: dict.nav.resources },
-    { hash: "#blog", href: buildHomeAnchorHref(locale, "#blog"), label: dict.nav.blog },
-    { hash: "#contato", href: buildHomeAnchorHref(locale, "#contato"), label: dict.nav.contact },
+    { hash: HOME_ANCHOR.home, href: buildHomeAnchorHref(locale, HOME_ANCHOR.home), label: dict.nav.home },
+    { hash: HOME_ANCHOR.resources, href: buildHomeAnchorHref(locale, HOME_ANCHOR.resources), label: dict.nav.resources },
+    { hash: HOME_ANCHOR.blog, href: buildHomeAnchorHref(locale, HOME_ANCHOR.blog), label: dict.nav.blog },
+    { hash: HOME_ANCHOR.contact, href: buildHomeAnchorHref(locale, HOME_ANCHOR.contact), label: dict.nav.contact },
   ];
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
@@ -29,7 +38,7 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
     e.preventDefault();
     const id = hash.replace("#", "");
 
-    if (id === "inicio") {
+    if (hash === HOME_ANCHOR.home) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -73,44 +82,18 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
           <div className="ml-4 border-l pl-4 border-white/30">
             <LanguageSwitcher locale={locale} variant="header" />
           </div>
-          <AuthStatus
-            locale={locale}
-            labels={{ login: dict.login.submit, dashboard: dict.dashboard.title, logout: dict.auth.logout }}
-          />
+          <AuthStatus locale={locale} dict={dict} />
         </nav>
 
-        <div className="flex items-center gap-4 lg:hidden">
-          <LanguageSwitcher locale={locale} variant="header" />
-          <button
-            type="button"
-            className="z-50 flex h-10 w-10 items-center justify-center text-white focus:outline-none"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? dict.nav.menuClose : dict.nav.menuOpen}
-          >
-            {menuOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="h-8 w-8"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="h-8 w-8"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <HeaderNotifications locale={locale} labels={dict.notifications} />
+          <MenuToggle
+            isOpen={menuOpen}
+            onToggle={() => setMenuOpen((open) => !open)}
+            labelOpen={dict.nav.menuOpen}
+            labelClose={dict.nav.menuClose}
+            controls={MOBILE_MENU_ID}
+          />
         </div>
       </Container>
 
@@ -119,12 +102,9 @@ export default function Header({ locale, dict }: { locale: Locale; dict: Diction
         onClose={() => setMenuOpen(false)}
         navLinks={navLinks}
         scrollToSection={scrollToSection}
-        authSlot={
-          <AuthStatus
-            locale={locale}
-            labels={{ login: dict.login.submit, dashboard: dict.dashboard.title, logout: dict.auth.logout }}
-          />
-        }
+        locale={locale}
+        labels={{ title: dict.nav.mainMenu, language: dict.nav.language }}
+        authSlot={<AuthStatus locale={locale} dict={dict} showBell={false} layout={AUTH_LAYOUT.sheet} />}
       />
     </header>
   );

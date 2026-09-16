@@ -1,13 +1,14 @@
 import type { ApplicationResult } from "@/lib/profile/client";
+import { APPLICATION_STATUS } from "@/lib/teacher-applications/client";
 
-export type TeacherApplicationView = "pending" | "rejected";
+export type TeacherApplicationView = typeof APPLICATION_STATUS.pending | typeof APPLICATION_STATUS.rejected;
 
 export function resolveTeacherApplicationView(result: ApplicationResult): {
   view: TeacherApplicationView;
   reviewNote: string | null;
 } {
-  if (!result.ok || !result.data || result.data.status !== "rejected") {
-    return { view: "pending", reviewNote: null };
+  if (!result.ok || !result.data || result.data.status !== APPLICATION_STATUS.rejected) {
+    return { view: APPLICATION_STATUS.pending, reviewNote: null };
   }
-  return { view: "rejected", reviewNote: result.data.reviewNote };
+  return { view: APPLICATION_STATUS.rejected, reviewNote: result.data.reviewNote };
 }

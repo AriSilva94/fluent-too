@@ -41,7 +41,7 @@ describe("getBlogPosts (listagem)", () => {
     global.fetch = fetcher as unknown as typeof fetch;
 
     try {
-      await getBlogPosts("en-us");
+      await getBlogPosts("en");
       const url = decodeURIComponent(String(fetcher.mock.calls.at(0)?.at(0)));
       expect(url).toContain("fields[0]=title");
       expect(url).not.toContain("content");
@@ -58,9 +58,23 @@ describe("getBlogPostBySlug (detalhe)", () => {
     global.fetch = fetcher as unknown as typeof fetch;
 
     try {
-      await getBlogPostBySlug("a1-en-basics", "en-us");
+      await getBlogPostBySlug("a1-en-basics");
       const url = decodeURIComponent(String(fetcher.mock.calls.at(0)?.at(0)));
       expect(url).not.toContain("fields[0]");
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it("filtra pelo idioma quando informado, porque as traducoes dividem o slug", async () => {
+    const originalFetch = global.fetch;
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ data: [] })));
+    global.fetch = fetcher as unknown as typeof fetch;
+
+    try {
+      await getBlogPostBySlug("culture-and-language", "fr");
+      const url = decodeURIComponent(String(fetcher.mock.calls.at(0)?.at(0)));
+      expect(url).toContain("filters[targetLanguage][$eq]=fr");
     } finally {
       global.fetch = originalFetch;
     }

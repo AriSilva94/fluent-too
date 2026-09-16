@@ -4,6 +4,7 @@ import AuthForm from "@/components/auth/AuthForm";
 import AuthFeedback from "@/components/auth/AuthFeedback";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
+import { buildAuthVisual } from "@/lib/auth/visual";
 
 export default function ResetPasswordForm({ dict, locale, code }: { dict: Dictionary; locale: Locale; code?: string }) {
   if (!code) {
@@ -11,9 +12,7 @@ export default function ResetPasswordForm({ dict, locale, code }: { dict: Dictio
       <AuthFeedback
         title={dict.auth.resetTitle}
         message={dict.auth.resetMissingCode}
-        homeHref={`/${locale}/`}
-        visualTitle={dict.auth.visualTitle}
-        visualText={dict.auth.visualText}
+        visual={buildAuthVisual(dict, locale)}
       />
     );
   }
@@ -33,9 +32,8 @@ export default function ResetPasswordForm({ dict, locale, code }: { dict: Dictio
         },
       ]}
       messages={dict.auth.errors}
-      visualTitle={dict.auth.visualTitle}
-      visualText={dict.auth.visualText}
-      homeHref={`/${locale}/`}
+      passwordLabels={{ show: dict.auth.showPassword, hide: dict.auth.hidePassword }}
+      visual={buildAuthVisual(dict, locale)}
       onSubmit={async (values) => {
         const response = await fetch("/api/auth/reset-password", {
           method: "POST",

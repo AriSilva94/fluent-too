@@ -1,8 +1,10 @@
-export const locales = ["pt-br", "en-us", "fr-fr"] as const;
+export const LOCALE = { ptBr: "pt-br", enUs: "en-us", frFr: "fr-fr" } as const;
+
+export const locales = [LOCALE.ptBr, LOCALE.enUs, LOCALE.frFr] as const;
 
 export type Locale = (typeof locales)[number];
 
-export const defaultLocale: Locale = "pt-br";
+export const defaultLocale: Locale = LOCALE.ptBr;
 
 export const localeLabels: Record<Locale, string> = {
   "pt-br": "PT-BR",

@@ -5,10 +5,11 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/getDictionary";
 import { getBlogPosts } from "@/lib/blog/strapi";
+import { readStudyTargetLanguage } from "@/lib/study-language-server";
 import { assetUrl } from "@/lib/cdnAssets";
 
 export default async function BlogSection({ locale, dict }: { locale: Locale; dict: Dictionary }) {
-  const posts = (await getBlogPosts(locale)).slice(0, 6);
+  const posts = (await getBlogPosts(await readStudyTargetLanguage())).slice(0, 6);
 
   return (
     <section id="blog" className="bg-white pb-8 pt-0 md:pb-14 md:pt-1">
@@ -22,7 +23,7 @@ export default async function BlogSection({ locale, dict }: { locale: Locale; di
           {posts.map((post) => (
             <Link
               key={post.slug}
-              href={`/${locale}/blog/${post.slug}`}
+              href={`/${locale}/blog/${post.slug}?idioma=${post.targetLanguage}`}
               className="group flex flex-col overflow-hidden rounded-[22px] border-2 border-brand-orange bg-white transition-all hover:shadow-lg h-full"
             >
               <div className="relative h-52 w-full">
@@ -55,6 +56,15 @@ export default async function BlogSection({ locale, dict }: { locale: Locale; di
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <Link
+            href={`/${locale}/blog`}
+            className="inline-flex min-h-11 items-center rounded-lg bg-brand-orange px-6 text-sm font-black text-white transition-colors hover:bg-brand-orange/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2"
+          >
+            {dict.home.blog.viewAll}
+          </Link>
         </div>
       </Container>
     </section>

@@ -1,6 +1,7 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import ptBr from "@/messages/pt-br.json";
 import type { Dictionary } from "@/lib/getDictionary";
 import TeacherApplicationsPanel from "./TeacherApplicationsPanel";
 
@@ -10,32 +11,7 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh }),
 }));
 
-const dict = {
-  dashboard: {
-    title: "Painel",
-  },
-  admin: {
-    teachersTitle: "Candidaturas de professores",
-    teachersEmpty: "Nenhuma candidatura encontrada.",
-    teachersLoadError: "Não foi possível carregar as candidaturas.",
-    teachersFilterPending: "Pendentes",
-    teachersFilterApproved: "Aprovadas",
-    teachersFilterRejected: "Rejeitadas",
-    teachersApprove: "Aprovar",
-    teachersReject: "Rejeitar",
-    teachersRejectNoteLabel: "Motivo da rejeição",
-    teachersRejectNoteRequired: "Informe um motivo antes de rejeitar.",
-    teachersAlreadyReviewed: "Esta candidatura já foi revisada.",
-    teachersReviewError: "Não foi possível concluir a ação.",
-    teachersApproveConfirmTitle: "Aprovar candidatura?",
-    teachersApproveConfirmText: "Este usuário passará a ter acesso como professor.",
-    teachersApproveConfirmCta: "Aprovar professor",
-    teachersRejectConfirmTitle: "Rejeitar candidatura?",
-    teachersRejectConfirmText: "Informe o motivo para o candidato.",
-    teachersRejectConfirmCta: "Rejeitar candidatura",
-    cancel: "Cancelar",
-  },
-} as unknown as Dictionary;
+const dict = ptBr as unknown as Dictionary;
 
 const application = {
   id: 12,
@@ -50,6 +26,7 @@ function renderPanel() {
   return render(
     <TeacherApplicationsPanel
       dict={dict}
+      locale="pt-br"
       initialApplications={[application]}
       initialStatus="pending"
       dashboardHref="/pt-br/dashboard"

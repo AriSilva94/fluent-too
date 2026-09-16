@@ -7,9 +7,13 @@ export const AUTH_COOKIE_NAMES = {
 
 export const OAUTH_STATE_COOKIE = "fluent_too_oauth_nonce";
 
+export const ACCESS_TOKEN_LIFESPAN_SECONDS = 600;
+export const IDLE_REFRESH_TOKEN_LIFESPAN_SECONDS = 1209600;
+export const OAUTH_STATE_LIFESPAN_SECONDS = 600;
+
 export type AuthCookieOptions = {
   httpOnly: true;
-  sameSite: "lax";
+  sameSite: "lax" | "strict";
   secure: boolean;
   path: "/";
   maxAge: number;
@@ -21,10 +25,10 @@ export type CookieInstruction = {
   options: AuthCookieOptions;
 };
 
-export function buildAuthCookieOptions(maxAge: number, secure = process.env.AUTH_COOKIE_SECURE !== "false"): AuthCookieOptions {
+export function buildAuthCookieOptions(maxAge: number, secure = process.env.AUTH_COOKIE_SECURE !== "false", sameSite: "lax" | "strict" = "lax"): AuthCookieOptions {
   return {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite,
     secure,
     path: "/",
     maxAge,
@@ -33,8 +37,8 @@ export function buildAuthCookieOptions(maxAge: number, secure = process.env.AUTH
 
 export function buildCookieInstructions(tokens: AuthTokens, secure = process.env.AUTH_COOKIE_SECURE !== "false") {
   return [
-    { name: AUTH_COOKIE_NAMES.access, value: tokens.accessToken, options: buildAuthCookieOptions(600, secure) },
-    { name: AUTH_COOKIE_NAMES.refresh, value: tokens.refreshToken, options: buildAuthCookieOptions(2592000, secure) },
+    { name: AUTH_COOKIE_NAMES.access, value: tokens.accessToken, options: buildAuthCookieOptions(ACCESS_TOKEN_LIFESPAN_SECONDS, secure, "lax") },
+    { name: AUTH_COOKIE_NAMES.refresh, value: tokens.refreshToken, options: buildAuthCookieOptions(IDLE_REFRESH_TOKEN_LIFESPAN_SECONDS, secure, "lax") },
   ];
 }
 
@@ -47,15 +51,15 @@ export function resolveAuthCookieSecure(url?: string | URL) {
 
 export function buildClearCookieInstructions() {
   return [
-    { name: AUTH_COOKIE_NAMES.access, value: "", options: buildAuthCookieOptions(0, false) },
-    { name: AUTH_COOKIE_NAMES.refresh, value: "", options: buildAuthCookieOptions(0, false) },
+    { name: AUTH_COOKIE_NAMES.access, value: "", options: buildAuthCookieOptions(0, false, "lax") },
+    { name: AUTH_COOKIE_NAMES.refresh, value: "", options: buildAuthCookieOptions(0, false, "lax") },
   ];
 }
 
 export function buildOAuthStateCookie(nonce: string, secure = process.env.AUTH_COOKIE_SECURE !== "false"): CookieInstruction {
-  return { name: OAUTH_STATE_COOKIE, value: nonce, options: buildAuthCookieOptions(600, secure) };
+  return { name: OAUTH_STATE_COOKIE, value: nonce, options: buildAuthCookieOptions(OAUTH_STATE_LIFESPAN_SECONDS, secure, "lax") };
 }
 
 export function buildClearOAuthStateCookie(): CookieInstruction {
-  return { name: OAUTH_STATE_COOKIE, value: "", options: buildAuthCookieOptions(0, false) };
+  return { name: OAUTH_STATE_COOKIE, value: "", options: buildAuthCookieOptions(0, false, "lax") };
 }

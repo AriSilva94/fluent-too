@@ -4,7 +4,7 @@ import { buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/coo
 import { getSiteUrl, isTrustedOrigin } from "@/lib/auth/request";
 import { createProfileClient } from "@/lib/profile/client";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
-import { resolveSession } from "@/lib/auth/session";
+import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "@/lib/auth/session";
 import { validateAttachment, validateTeacherApplication } from "@/lib/auth/teacher-registration";
 
 export const MAX_TEACHER_APPLICATION_BODY_BYTES = 5 * 1024 * 1024 + 256 * 1024;
@@ -26,9 +26,9 @@ export async function POST(request: Request) {
 
   const tokens = readTokenCookies(request);
   const session = await resolveSession(tokens, createStrapiClient());
-  if (session.status === "anonymous") return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  if (isAnonymousSession(session)) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
 
-  const accessToken = session.status === "refreshed" ? session.tokens.accessToken : tokens.accessToken;
+  const accessToken = wasSessionRefreshed(session) ? session.tokens.accessToken : tokens.accessToken;
   if (!accessToken) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
 
   const form = await request.formData();
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     ? NextResponse.json({ ok: true })
     : NextResponse.json({ ok: false, error: result.error }, { status: result.status ?? 502 });
 
-  if (session.status === "refreshed") {
+  if (wasSessionRefreshed(session)) {
     applyCookies(response, buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.url)));
   }
   return response;

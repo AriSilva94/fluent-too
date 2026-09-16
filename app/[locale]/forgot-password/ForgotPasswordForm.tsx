@@ -5,6 +5,7 @@ import AuthForm from "@/components/auth/AuthForm";
 import AuthFeedback from "@/components/auth/AuthFeedback";
 import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
+import { buildAuthVisual } from "@/lib/auth/visual";
 
 export default function ForgotPasswordForm({ dict, locale }: { dict: Dictionary; locale: Locale }) {
   const [sent, setSent] = useState(false);
@@ -16,9 +17,7 @@ export default function ForgotPasswordForm({ dict, locale }: { dict: Dictionary;
         message={dict.auth.forgotSuccess}
         actionHref={`/${locale}/login`}
         actionLabel={dict.auth.loginLink}
-        homeHref={`/${locale}/`}
-        visualTitle={dict.auth.visualTitle}
-        visualText={dict.auth.visualText}
+        visual={buildAuthVisual(dict, locale)}
       />
     );
   }
@@ -30,9 +29,7 @@ export default function ForgotPasswordForm({ dict, locale }: { dict: Dictionary;
       submitLabel={dict.auth.forgotSubmit}
       fields={[{ name: "email", label: dict.login.emailLabel, type: "email", autoComplete: "email" }]}
       messages={dict.auth.errors}
-      visualTitle={dict.auth.visualTitle}
-      visualText={dict.auth.visualText}
-      homeHref={`/${locale}/`}
+      visual={buildAuthVisual(dict, locale)}
       onSubmit={async (values) => {
         await fetch("/api/auth/forgot-password", {
           method: "POST",

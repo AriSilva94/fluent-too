@@ -17,6 +17,7 @@ export type Dictionary = {
     menuOpen: string;
     menuClose: string;
     mainMenu: string;
+    language: string;
   };
   home: {
     hero: {
@@ -36,6 +37,7 @@ export type Dictionary = {
     };
     blog: {
       title: string;
+      subtitle: string;
       viewAll: string;
     };
     quiz: {
@@ -43,10 +45,12 @@ export type Dictionary = {
       tabsLabel: string;
       panelLabel: string;
       subtitle: string;
+      viewAll: string;
     };
   };
   footer: {
     copyright: string;
+    backToTop: string;
   };
   about: {
     title: string;
@@ -61,6 +65,17 @@ export type Dictionary = {
     readingTime: string;
   };
   levels: Record<string, string>;
+  table: {
+    range: string;
+    page: string;
+    previous: string;
+    next: string;
+    actions: string;
+    status: string;
+    viewLabel: string;
+    viewTable: string;
+    viewGrid: string;
+  };
   quizzes: {
     title: string;
     backToQuizzes: string;
@@ -84,6 +99,7 @@ export type Dictionary = {
     didntKnow: string;
     knewIt: string;
     noQuizzesFound: string;
+    levelBadge: string;
     saveSuccess: string;
     saveFailed: string;
     saveProfileRequired: string;
@@ -103,8 +119,15 @@ export type Dictionary = {
   };
   auth: {
     google: string;
-    visualTitle: string;
     visualText: string;
+    visualHeadline: string;
+    visualPoint1: string;
+    visualPoint2: string;
+    visualPoint3: string;
+    showPassword: string;
+    hidePassword: string;
+    noAccount: string;
+    consent: string;
     registerTitle: string;
     registerSubtitle: string;
     registerSubmit: string;
@@ -170,6 +193,86 @@ export type Dictionary = {
     teacherRejectedTitle: string;
     teacherRejectedText: string;
     teacherRejectedCta: string;
+    teacherAreaTitle: string;
+    teacherAreaCta: string;
+    greeting: string;
+    studentSubtitle: string;
+    resumeTitle: string;
+    resumeCta: string;
+    resumeMeta: string;
+    progressTitle: string;
+    progressAttempts: string;
+    progressAverage: string;
+    progressLevel: string;
+    recommendedTitle: string;
+    recommendedEmpty: string;
+    recommendedCta: string;
+    masteredLabel: string;
+    startTitle: string;
+    startText: string;
+    startCta: string;
+    teacherReachTitle: string;
+    teacherReachAttempts: string;
+    teacherReachLearners: string;
+    teacherReachAverage: string;
+    teacherReachTop: string;
+    teacherReachEmpty: string;
+  };
+  teacher: {
+    title: string;
+    subtitle: string;
+    empty: string;
+    loadError: string;
+    newQuiz: string;
+    editQuiz: string;
+    statusPublished: string;
+    statusDraft: string;
+    fieldTitle: string;
+    fieldDescription: string;
+    fieldLanguage: string;
+    fieldLevel: string;
+    fieldType: string;
+    fieldMinutes: string;
+    fieldPublic: string;
+    fieldPublicHint: string;
+    typeMultipleChoice: string;
+    typeFillGap: string;
+    typeFlashcard: string;
+    questions: string;
+    addQuestion: string;
+    removeQuestion: string;
+    questionNumber: string;
+    questionText: string;
+    options: string;
+    addOption: string;
+    removeOption: string;
+    correctAnswer: string;
+    gapParts: string;
+    gapPartsHint: string;
+    gapAnswers: string;
+    cardFront: string;
+    cardBack: string;
+    save: string;
+    saving: string;
+    cancel: string;
+    delete: string;
+    deleteConfirmTitle: string;
+    deleteConfirmText: string;
+    deleteConfirmCta: string;
+    saved: string;
+    noLanguages: string;
+    previewTitle: string;
+    previewHint: string;
+    previewUntitled: string;
+    previewNoDescription: string;
+    previewQuestion: string;
+    previewOption: string;
+    previewSentence: string;
+    previewCardFront: string;
+    previewCardBack: string;
+    tabEdit: string;
+    tabPreview: string;
+    errors: Record<string, string>;
   };
   admin: {
     title: string;
@@ -192,7 +295,57 @@ export type Dictionary = {
     teachersRejectConfirmTitle: string;
     teachersRejectConfirmText: string;
     teachersRejectConfirmCta: string;
+    teachersStatusPending: string;
+    teachersStatusApproved: string;
+    teachersStatusRejected: string;
+    teachersDecidedBy: string;
+    teachersReviewerUnknown: string;
+    teachersNoUser: string;
+    teachersLanguagesColumn: string;
+    teachersReviewedColumn: string;
+    teachersCredentialLabel: string;
+    teachersAttachmentLabel: string;
     cancel: string;
+    hubSubtitle: string;
+    hubCta: string;
+    teachersSubtitle: string;
+    hubQuizzesSummary: string;
+    hubBlogSummary: string;
+    hubPendingLabel: string;
+    hubPendingCta: string;
+    hubNoPending: string;
+    hubOpen: string;
+    quizzesTitle: string;
+    quizzesSubtitle: string;
+    quizzesEmpty: string;
+    quizzesLoadError: string;
+    publish: string;
+    unpublish: string;
+    moderationError: string;
+    filterAllLanguages: string;
+    filterLanguageLegend: string;
+    blogTitle: string;
+    blogSubtitle: string;
+    blogEmpty: string;
+    blogLoadError: string;
+    blogNew: string;
+    blogFieldTitle: string;
+    blogFieldSlug: string;
+    blogFieldCategory: string;
+    blogFieldExcerpt: string;
+    blogFieldContent: string;
+    blogFieldDate: string;
+    blogFieldAuthor: string;
+    blogFieldReadingTime: string;
+    blogFieldLanguage: string;
+    blogDeleteConfirmTitle: string;
+    blogDeleteConfirmText: string;
+    blogDeleteConfirmCta: string;
+    blogSaved: string;
+    save: string;
+    saving: string;
+    edit: string;
+    delete: string;
   };
   notFound: {
     badge: string;
@@ -215,6 +368,40 @@ export type Dictionary = {
       title: string;
       description: string;
     };
+  };
+  languages: Record<string, string>;
+  account: {
+    menuLabel: string;
+    security: string;
+    roleStudent: string;
+    roleTeacher: string;
+    roleTeacherPending: string;
+    roleAdmin: string;
+    roleSuperAdmin: string;
+    roleUnassigned: string;
+  };
+  notifications: {
+    label: string;
+    empty: string;
+    emptyHint: string;
+    loadError: string;
+    retry: string;
+    markAll: string;
+    justNow: string;
+    unread: string;
+    unreadOne: string;
+    kinds: Record<string, string>;
+    details: Record<string, string>;
+  };
+  legal: {
+    updatedAt: string;
+    termsShort: string;
+    privacyShort: string;
+    backHome: string;
+  };
+  studyLanguage: {
+    legend: string;
+    all: string;
   };
 };
 

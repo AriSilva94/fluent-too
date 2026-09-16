@@ -42,6 +42,19 @@ describe("resolveSession", () => {
     expect(client.refresh).toHaveBeenCalledTimes(1);
   });
 
+  it("mantem a sessao quando o cookie de refresh nao chega mas o access e aceito", async () => {
+    const client = {
+      me: vi.fn(async () => ({ ok: true as const, data: user })),
+      refresh: vi.fn(),
+    };
+
+    await expect(resolveSession({ accessToken: "access" }, client)).resolves.toEqual({
+      status: "authenticated",
+      user,
+    });
+    expect(client.refresh).not.toHaveBeenCalled();
+  });
+
   it("limpa sessao invalida", async () => {
     const client = {
       me: vi.fn(async () => ({ ok: false as const, error: "UNAUTHORIZED" as const, status: 401 })),
@@ -95,6 +108,31 @@ describe("resolveSessionOptimistic", () => {
       status: "refreshed",
       tokens: rotatedTokens,
     });
+  });
+
+  it("mantem a sessao quando o cookie de refresh nao chega mas o access ainda vale", async () => {
+    const client = { refresh: vi.fn() };
+    const accessToken = buildJwt(Math.floor(Date.now() / 1000) + 600);
+
+    await expect(resolveSessionOptimistic({ accessToken }, client)).resolves.toEqual({ status: "authenticated" });
+    expect(client.refresh).not.toHaveBeenCalled();
+  });
+
+  it("renova quando so o cookie de refresh chega", async () => {
+    const client = { refresh: vi.fn(async () => ({ ok: true as const, data: { tokens: rotatedTokens } })) };
+
+    await expect(resolveSessionOptimistic({ refreshToken: "refresh" }, client)).resolves.toEqual({
+      status: "refreshed",
+      tokens: rotatedTokens,
+    });
+  });
+
+  it("limpa quando o access venceu e nao ha refresh", async () => {
+    const client = { refresh: vi.fn() };
+    const accessToken = buildJwt(Math.floor(Date.now() / 1000) - 60);
+
+    await expect(resolveSessionOptimistic({ accessToken }, client)).resolves.toEqual({ status: "anonymous", clear: true });
+    expect(client.refresh).not.toHaveBeenCalled();
   });
 
   it("marca anonimo sem cookies", async () => {

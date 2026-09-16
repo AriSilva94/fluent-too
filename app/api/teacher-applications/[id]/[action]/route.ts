@@ -3,13 +3,12 @@ import { applyCookies, readTokenCookies } from "@/app/api/auth/_shared";
 import { buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { getSiteUrl, isTrustedOrigin } from "@/lib/auth/request";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
-import { resolveSession } from "@/lib/auth/session";
-import { createTeacherApplicationsClient } from "@/lib/teacher-applications/client";
-
-type ReviewAction = "approve" | "reject";
+import { isAnonymousSession, resolveSession, wasSessionRefreshed } from "@/lib/auth/session";
+import { createTeacherApplicationsClient, REVIEW_ACTION, REVIEW_ERROR, type ReviewAction } from "@/lib/teacher-applications/client";
+import { isMemberOf } from "@/lib/enums";
 
 export function parseReviewAction(value: string): ReviewAction | null {
-  return value === "approve" || value === "reject" ? value : null;
+  return isMemberOf(REVIEW_ACTION, value) ? value : null;
 }
 
 export function parseApplicationId(value: string): number | null {
@@ -34,9 +33,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const tokens = readTokenCookies(request);
   const session = await resolveSession(tokens, createStrapiClient());
-  if (session.status === "anonymous") return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
+  if (isAnonymousSession(session)) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
 
-  const accessToken = session.status === "refreshed" ? session.tokens.accessToken : tokens.accessToken;
+  const accessToken = wasSessionRefreshed(session) ? session.tokens.accessToken : tokens.accessToken;
   if (!accessToken) return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
 
   const id = parseApplicationId(rawId);
@@ -45,15 +44,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const body = (await request.json().catch(() => ({}))) as { reviewNote?: unknown };
   const client = createTeacherApplicationsClient();
 
-  const result = action === "approve" ? await client.approve(accessToken, id) : await reject(client, accessToken, id, body.reviewNote);
+  const result = action === REVIEW_ACTION.approve ? await client.approve(accessToken, id) : await reject(client, accessToken, id, body.reviewNote);
 
   if (!result.ok) {
-    const status = result.error === "ALREADY_REVIEWED" ? 409 : result.error === "REVIEW_NOTE_REQUIRED" ? 400 : 502;
+    const status = result.error === REVIEW_ERROR.alreadyReviewed ? 409 : result.error === REVIEW_ERROR.reviewNoteRequired ? 400 : 502;
     return NextResponse.json({ ok: false, error: result.error }, { status });
   }
 
   const response = NextResponse.json({ ok: true });
-  if (session.status === "refreshed") {
+  if (wasSessionRefreshed(session)) {
     applyCookies(response, buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.url)));
   }
   return response;

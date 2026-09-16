@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import AuthFeedback from "@/components/auth/AuthFeedback";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
+import { buildAuthVisual } from "@/lib/auth/visual";
 
 export default async function EmailConfirmedPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -14,9 +15,7 @@ export default async function EmailConfirmedPage({ params }: { params: Promise<{
       message={dict.auth.emailConfirmedSubtitle}
       actionHref={`/${locale}/login`}
       actionLabel={dict.auth.loginLink}
-      homeHref={`/${locale}/`}
-      visualTitle={dict.auth.visualTitle}
-      visualText={dict.auth.visualText}
+        visual={buildAuthVisual(dict, locale)}
     />
   );
 }

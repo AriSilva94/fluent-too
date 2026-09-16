@@ -2,42 +2,60 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { ChevronDown, KeyRound, LayoutDashboard, LogIn, LogOut, ShieldCheck, SquarePen } from "lucide-react";
+import NotificationBell from "@/components/notifications/NotificationBell";
+import { APP_ROLES, type AppRole } from "@/lib/auth/contracts";
+import { canCreateContent, canManageContent } from "@/lib/auth/roles";
+import { resetFeed } from "@/lib/notifications/store";
+import { clearSession, getSession, loadSession, subscribeToSession, type SessionUser } from "@/lib/auth/session-store";
+import type { Dictionary } from "@/lib/getDictionary";
 import type { Locale } from "@/lib/i18n";
+import { KEY } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-type SessionUser = {
-  email: string;
-  username?: string;
-};
+export const AUTH_LAYOUT = { header: "header", sheet: "sheet" } as const;
+
+export type AuthLayout = (typeof AUTH_LAYOUT)[keyof typeof AUTH_LAYOUT];
 
 type AuthStatusProps = {
   locale: Locale;
-  labels: {
-    login: string;
-    dashboard: string;
-    logout: string;
-  };
+  dict: Dictionary;
+  showBell?: boolean;
+  layout?: AuthLayout;
   navigate?: (url: string) => void;
 };
 
-export default function AuthStatus({ locale, labels, navigate = (url) => window.location.assign(url) }: AuthStatusProps) {
-  const [user, setUser] = useState<SessionUser | null | undefined>(undefined);
+const signInStyles: Record<AuthLayout, string> = {
+  [AUTH_LAYOUT.header]:
+    "inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/10 px-4 py-1.5 text-sm font-bold text-white transition-colors duration-200 hover:border-white hover:bg-white hover:text-brand-orange",
+  [AUTH_LAYOUT.sheet]:
+    "flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3.5 text-base font-black uppercase tracking-[0.08em] text-brand-orange shadow-[0_10px_24px_rgba(15,23,42,0.18)] transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+};
+
+const ROLE_LABEL_KEY: Record<AppRole, keyof Dictionary["account"]> = {
+  [APP_ROLES.superAdmin]: "roleSuperAdmin",
+  [APP_ROLES.appAdmin]: "roleAdmin",
+  [APP_ROLES.teacher]: "roleTeacher",
+  [APP_ROLES.teacherPending]: "roleTeacherPending",
+  [APP_ROLES.student]: "roleStudent",
+  [APP_ROLES.unassigned]: "roleUnassigned",
+};
+
+export default function AuthStatus({
+  locale,
+  dict,
+  showBell = true,
+  layout = AUTH_LAYOUT.header,
+  navigate = (url) => window.location.assign(url),
+}: AuthStatusProps) {
+  const [user, setUser] = useState<SessionUser | null | undefined>(getSession);
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let active = true;
-    fetch("/api/auth/session")
-      .then((response) => response.json())
-      .then((body) => {
-        if (active) setUser(body.ok && body.user ? body.user : null);
-      })
-      .catch(() => {
-        if (active) setUser(null);
-      });
-    return () => {
-      active = false;
-    };
+    const unsubscribe = subscribeToSession(setUser);
+    loadSession();
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
@@ -47,7 +65,7 @@ export default function AuthStatus({ locale, labels, navigate = (url) => window.
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) setMenuOpen(false);
     }
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === KEY.escape) setMenuOpen(false);
     }
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -61,87 +79,118 @@ export default function AuthStatus({ locale, labels, navigate = (url) => window.
   async function logout() {
     setMenuOpen(false);
     await fetch("/api/auth/logout", { method: "POST" });
-    setUser(null);
+    clearSession();
+    resetFeed();
     navigate(`/${locale}/login`);
   }
 
-  if (user === undefined) return <span className="h-9 w-9" aria-hidden="true" />;
+  if (user === undefined) return <span className="h-10 w-10" aria-hidden="true" />;
 
   if (!user) {
     return (
-      <Link href={`/${locale}/login`} className="text-sm font-medium text-white transition-colors hover:text-white/80">
-        {labels.login}
+      <Link
+        href={`/${locale}/login`}
+        className={cn(
+          signInStyles[layout],
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-orange"
+        )}
+      >
+        <LogIn aria-hidden className="h-4 w-4 flex-shrink-0" strokeWidth={2.5} />
+        {dict.login.submit}
       </Link>
     );
   }
 
   const displayName = user.username || user.email;
+  const role = user.role?.type;
+  const roleLabel = role ? dict.account[ROLE_LABEL_KEY[role]] : null;
   const initials = getInitials(displayName);
 
-  return (
-    <div ref={wrapperRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setMenuOpen((open) => !open)}
-        aria-expanded={menuOpen}
-        aria-haspopup="true"
-        aria-label={displayName}
-        className="flex items-center gap-2 rounded-full border border-white/30 bg-white/15 py-1 pl-1 pr-3 text-white transition-colors hover:bg-white/25"
-      >
-        <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-brand-blue text-xs font-bold text-white">
-          {initials}
-        </span>
-        <svg
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          className={cn("h-3.5 w-3.5 opacity-85 transition-transform", menuOpen && "rotate-180")}
-        >
-          <path d="M5 7.5l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+  const links = [
+    { href: `/${locale}/dashboard`, label: dict.dashboard.title, icon: LayoutDashboard, show: true },
+    { href: `/${locale}/teacher/quizzes`, label: dict.teacher.title, icon: SquarePen, show: canCreateContent(role) },
+    { href: `/${locale}/admin`, label: dict.admin.title, icon: ShieldCheck, show: canManageContent(role) },
+    { href: `/${locale}/dashboard/security`, label: dict.account.security, icon: KeyRound, show: true },
+  ].filter((link) => link.show);
 
-      {menuOpen ? (
-        <div className="absolute right-0 top-[calc(100%+10px)] z-10 w-60 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.18)]">
-          <div className="flex items-center gap-2.5 border-b border-neutral-200 px-4 py-3">
-            <span className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
+  const isSheet = layout === AUTH_LAYOUT.sheet;
+
+  return (
+    <div className={cn("flex items-center gap-2", isSheet && "w-full")}>
+      {showBell ? <NotificationBell locale={locale} labels={dict.notifications} /> : null}
+
+      <div ref={wrapperRef} className={cn("relative", isSheet && "w-full")}>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-haspopup="true"
+          aria-label={displayName}
+          className={cn(
+            "flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 py-1 pl-1 pr-2 text-white transition-colors hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-orange",
+            isSheet && "w-full justify-between gap-3 py-1.5 pr-3"
+          )}
+        >
+          <span className={cn("flex items-center gap-2.5", isSheet && "min-w-0")}>
+            <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-brand-blue text-xs font-bold text-white">
               {initials}
             </span>
-            <span className="min-w-0 truncate text-sm font-semibold text-neutral-900">{displayName}</span>
+            {isSheet ? <span className="truncate text-sm font-bold">{displayName}</span> : null}
+          </span>
+          <ChevronDown aria-hidden className={cn("h-3.5 w-3.5 opacity-85 transition-transform", menuOpen && "rotate-180")} strokeWidth={2.5} />
+        </button>
+
+        {menuOpen ? (
+          <div
+            className={cn(
+              "absolute right-0 z-20 w-[min(17rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-[0_16px_40px_rgba(15,23,42,0.18)]",
+              isSheet ? "bottom-[calc(100%+10px)] w-full" : "top-[calc(100%+10px)]"
+            )}
+          >
+            <div className="flex items-center gap-3 border-b border-neutral-200 bg-[#f9fbff] px-4 py-3.5">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
+                {initials}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-black text-neutral-900">{displayName}</span>
+                {user.username && user.username !== user.email ? (
+                  <span className="block truncate text-xs font-semibold text-neutral-500">{user.email}</span>
+                ) : null}
+                {roleLabel ? (
+                  <span className="mt-1.5 inline-flex rounded-md bg-brand-blue/10 px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-brand-blue-ink">
+                    {roleLabel}
+                  </span>
+                ) : null}
+              </span>
+            </div>
+
+            <div className="grid gap-0.5 p-1.5">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-neutral-900 transition-colors hover:bg-[#f5f8ff]"
+                >
+                  <link.icon aria-hidden className="h-4 w-4 flex-shrink-0 text-neutral-400" strokeWidth={2.2} />
+                  {link.label}
+                </Link>
+              ))}
+
+              <div className="mx-1.5 my-1 h-px bg-neutral-200" />
+
+              <button
+                type="button"
+                onClick={logout}
+                className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
+              >
+                <LogOut aria-hidden className="h-4 w-4 flex-shrink-0" strokeWidth={2.2} />
+                {dict.auth.logout}
+              </button>
+            </div>
           </div>
-
-          <div className="grid gap-0.5 p-1.5">
-            <Link
-              href={`/${locale}/dashboard`}
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-neutral-900 transition-colors hover:bg-[#f5f8ff]"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4 flex-shrink-0 opacity-70">
-                <rect x="3" y="3" width="7" height="9" rx="1" />
-                <rect x="14" y="3" width="7" height="5" rx="1" />
-                <rect x="14" y="12" width="7" height="9" rx="1" />
-                <rect x="3" y="16" width="7" height="5" rx="1" />
-              </svg>
-              {labels.dashboard}
-            </Link>
-
-            <div className="mx-1.5 my-1 h-px bg-neutral-200" />
-
-            <button
-              type="button"
-              onClick={logout}
-              className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4 flex-shrink-0">
-                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M16 17l5-5-5-5M21 12H9" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              {labels.logout}
-            </button>
-          </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
 }

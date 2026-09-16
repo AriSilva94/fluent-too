@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { locales, defaultLocale, isValidLocale, localeToLangTag } from "@/lib/i18n";
 import { AUTH_COOKIE_NAMES, buildClearCookieInstructions, buildCookieInstructions, resolveAuthCookieSecure } from "@/lib/auth/cookies";
 import { createStrapiClient } from "@/lib/auth/strapi-client";
-import { resolveSessionOptimistic } from "@/lib/auth/session";
-import { decideAuthNavigation } from "@/lib/auth/proxy";
+import { isAnonymousSession, resolveSessionOptimistic, toSessionState, wasSessionRefreshed } from "@/lib/auth/session";
+import { decideAuthNavigation, NAVIGATION } from "@/lib/auth/proxy";
 import { buildContentSecurityPolicy, generateNonce } from "@/lib/security/csp";
 
 const LOCALE_COOKIE = "NEXT_LOCALE";
@@ -60,11 +60,7 @@ export async function proxy(request: NextRequest) {
     },
     createStrapiClient()
   );
-  const decision = decideAuthNavigation(
-    pathname,
-    session.status === "anonymous" ? "anonymous" : "authenticated",
-    process.env.STRAPI_PUBLIC_URL ?? "http://localhost:1337"
-  );
+  const decision = decideAuthNavigation(pathname, toSessionState(session));
 
   const nonce = generateNonce();
   const csp = buildContentSecurityPolicy(nonce, process.env.STRAPI_PUBLIC_URL ?? "http://localhost:1337");
@@ -72,7 +68,7 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set("x-nonce", nonce);
 
   const response =
-    decision.type === "redirect"
+    decision.type === NAVIGATION.redirect
       ? NextResponse.redirect(new URL(decision.location, request.url))
       : NextResponse.next({ request: { headers: requestHeaders } });
 
@@ -83,13 +79,13 @@ export async function proxy(request: NextRequest) {
   response.headers.set("x-locale", firstSegment);
   response.headers.set("Content-Security-Policy", csp);
 
-  if (session.status === "refreshed") {
+  if (wasSessionRefreshed(session)) {
     for (const cookie of buildCookieInstructions(session.tokens, resolveAuthCookieSecure(request.nextUrl))) {
       response.cookies.set(cookie.name, cookie.value, cookie.options);
     }
   }
 
-  if (session.status === "anonymous" && session.clear) {
+  if (isAnonymousSession(session) && session.clear) {
     for (const cookie of buildClearCookieInstructions()) {
       response.cookies.set(cookie.name, cookie.value, cookie.options);
     }
