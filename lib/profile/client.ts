@@ -1,4 +1,5 @@
 import type { AuthErrorCode } from "@/lib/auth/contracts";
+import { buildClientIpHeaders } from "@/lib/security/client-ip";
 
 type Fetcher = typeof fetch;
 
@@ -6,6 +7,7 @@ type ClientOptions = {
   baseUrl?: string;
   fetcher?: Fetcher;
   timeoutMs?: number;
+  clientIp?: string | null;
 };
 
 export type TeacherApplicationStatus = "pending" | "approved" | "rejected";
@@ -26,12 +28,13 @@ export function createProfileClient(options: ClientOptions = {}) {
   const baseUrl = trimTrailingSlash(options.baseUrl ?? process.env.STRAPI_INTERNAL_URL ?? "http://localhost:1337");
   const fetcher = options.fetcher ?? fetch;
   const timeoutMs = options.timeoutMs ?? 10000;
+  const clientIpHeaders = buildClientIpHeaders(options.clientIp);
 
   async function post(path: string, accessToken: string, body?: FormData): Promise<ActionResult> {
     try {
       const response = await fetcher(`${baseUrl}${path}`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { ...clientIpHeaders, Authorization: `Bearer ${accessToken}` },
         ...(body ? { body } : {}),
         signal: AbortSignal.timeout(timeoutMs),
       });
@@ -55,7 +58,7 @@ export function createProfileClient(options: ClientOptions = {}) {
     async myApplication(accessToken: string): Promise<ApplicationResult> {
       try {
         const response = await fetcher(`${baseUrl}/api/profile/application`, {
-          headers: { Authorization: `Bearer ${accessToken}` },
+          headers: { ...clientIpHeaders, Authorization: `Bearer ${accessToken}` },
           signal: AbortSignal.timeout(timeoutMs),
         });
 

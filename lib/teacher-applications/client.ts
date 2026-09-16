@@ -84,8 +84,22 @@ export function createTeacherApplicationsClient(options: ClientOptions = {}) {
         return { ok: false, error: "UNKNOWN_ERROR" };
       }
     },
+
+    async downloadAttachment(accessToken: string, id: number): Promise<Response | null> {
+      try {
+        const response = await fetcher(`${baseUrl}/api/teacher-applications/${id}/attachment`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          signal: AbortSignal.timeout(ATTACHMENT_TIMEOUT_MS),
+        });
+        return response.ok && response.body ? response : null;
+      } catch {
+        return null;
+      }
+    },
   };
 }
+
+const ATTACHMENT_TIMEOUT_MS = 30000;
 
 async function readErrorMessage(response: Response) {
   try {

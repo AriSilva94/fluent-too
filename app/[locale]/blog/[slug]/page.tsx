@@ -9,7 +9,7 @@ import { formatBlogDate } from "@/lib/blog/format-date";
 import { isMemberOf } from "@/lib/enums";
 import { TARGET_LANGUAGE } from "@/lib/quizzes/types";
 import type { Metadata } from "next";
-import { buildPageMetadata, getLocalizedUrl, getSiteName } from "@/lib/seo";
+import { buildPageMetadata, getLocalizedUrl, getSiteName, serializeJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +72,7 @@ export default async function BlogPostPage({
 
   return (
     <div className="bg-[linear-gradient(180deg,#f5f8ff_0%,#ffffff_22%)]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
 
       <article className="mx-auto max-w-3xl px-4 py-14 sm:py-20">
         <div className="auth-rise">

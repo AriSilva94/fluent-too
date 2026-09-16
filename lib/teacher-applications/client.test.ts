@@ -66,4 +66,23 @@ describe("cliente de candidaturas", () => {
 
     expect(await client.approve("token-admin", 1)).toEqual({ ok: false, error: "ALREADY_REVIEWED" });
   });
+
+  it("baixa o anexo pela rota autenticada do Strapi", async () => {
+    const fetcher = vi.fn(async () => new Response("%PDF", { status: 200, headers: { "content-type": "application/pdf" } }));
+    const client = createTeacherApplicationsClient({ baseUrl: "http://api", fetcher });
+
+    const response = await client.downloadAttachment("token-admin", 7);
+
+    expect(response?.headers.get("content-type")).toBe("application/pdf");
+    expect(fetcher).toHaveBeenCalledWith(
+      "http://api/api/teacher-applications/7/attachment",
+      expect.objectContaining({ headers: { Authorization: "Bearer token-admin" } })
+    );
+  });
+
+  it("retorna nulo quando o anexo não existe ou o acesso é negado", async () => {
+    const client = createTeacherApplicationsClient({ baseUrl: "http://api", fetcher: fetcherReturning({}, 403) });
+
+    expect(await client.downloadAttachment("token-aluno", 7)).toBeNull();
+  });
 });

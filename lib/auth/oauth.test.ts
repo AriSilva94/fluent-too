@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { buildGoogleStartUrl, handleGoogleCallback, parseGoogleCallback } from "./oauth";
+import { buildGoogleCallbackUrl, buildGoogleStartUrl, handleGoogleCallback, parseGoogleCallback } from "./oauth";
 import type { AuthUser } from "./contracts";
+
+const NONCE = "0123456789abcdef0123456789abcdef";
+const valid = { expected: NONCE, received: NONCE };
 
 const user: AuthUser = { id: 1, email: "user@example.com", username: "user", confirmed: true, blocked: false };
 
@@ -19,19 +22,32 @@ describe("google oauth", () => {
 
   it("normaliza callback com erro", () => {
     expect(
-      parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?error=access_denied"), true)
+      parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?error=access_denied"), valid)
     ).toEqual({ ok: false, code: "GOOGLE_AUTH_FAILED" });
   });
 
   it("rejeita callback sem o cookie de nonce (navegador nunca iniciou o fluxo por aqui)", () => {
     expect(
-      parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"), false)
+      parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"), { received: NONCE })
     ).toEqual({ ok: false, code: "OAUTH_STATE_MISMATCH" });
   });
 
-  it("aceita callback com o cookie de nonce presente, mesmo sem state na URL", () => {
+  it("rejeita callback cujo nonce do caminho não bate com o cookie (link forjado)", () => {
     expect(
-      parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"), true)
+      parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"), {
+        expected: NONCE,
+        received: "ffffffffffffffffffffffffffffffff",
+      })
+    ).toEqual({ ok: false, code: "OAUTH_STATE_MISMATCH" });
+  });
+
+  it("monta callback com nonce no caminho, que o Strapi preserva", () => {
+    expect(buildGoogleCallbackUrl("https://app.example.com/", NONCE)).toBe(`https://app.example.com/api/auth/google/callback/${NONCE}`);
+  });
+
+  it("aceita callback com nonce igual ao cookie, mesmo sem state na URL", () => {
+    expect(
+      parseGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"), valid)
     ).toEqual({ ok: true, accessToken: "google-token", returnTo: "/pt-br/dashboard" });
   });
 
@@ -47,7 +63,7 @@ describe("google oauth", () => {
       handleGoogleCallback(new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"), {
         client,
         secureCookies: true,
-        hasNonceCookie: true,
+        nonce: valid,
       })
     ).resolves.toEqual({
       status: 302,
@@ -62,7 +78,7 @@ describe("google oauth", () => {
 
     const result = await handleGoogleCallback(
       new URL("https://app.example.com/api/auth/google/callback?access_token=google-token"),
-      { client, secureCookies: true, hasNonceCookie: false }
+      { client, secureCookies: true, nonce: { received: NONCE } }
     );
 
     expect(result.redirectTo).toContain("error=OAUTH_STATE_MISMATCH");

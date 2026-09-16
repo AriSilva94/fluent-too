@@ -137,3 +137,7 @@ export function getDefaultMetadata(locale: Locale): Metadata {
 export function getSiteName() {
   return siteName;
 }
+
+export function serializeJsonLd(data: unknown) {
+  return JSON.stringify(data).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026");
+}

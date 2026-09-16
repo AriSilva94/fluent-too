@@ -6,7 +6,7 @@ import BlogSection from "@/components/home/BlogSection";
 import QuizSection from "@/components/home/QuizSection";
 import { getDictionary } from "@/lib/getDictionary";
 import { isValidLocale, type Locale } from "@/lib/i18n";
-import { buildPageMetadata, getLocalizedUrl, getSiteName } from "@/lib/seo";
+import { buildPageMetadata, getLocalizedUrl, getSiteName, serializeJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -46,7 +46,7 @@ export default async function HomePage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Hero dict={dict} />
       <Newsletter dict={dict} />
