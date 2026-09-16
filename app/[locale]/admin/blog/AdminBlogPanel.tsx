@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { ImagePlus, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/navigation/Breadcrumbs";
 import DataTable, { rowActionClass, rowDangerActionClass, type DataColumn } from "@/components/ui/DataTable";
@@ -24,6 +26,7 @@ type FormState = {
   author: string;
   readingTime: string;
   targetLanguage: TargetLanguage;
+  coverImage: { id: number; url: string } | null;
 };
 
 export default function AdminBlogPanel({
@@ -49,6 +52,8 @@ export default function AdminBlogPanel({
   const [deleteTarget, setDeleteTarget] = useState<ManagedBlogPost | null>(
     null,
   );
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function startNew() {
     setError("");
@@ -64,6 +69,7 @@ export default function AdminBlogPanel({
       author: defaultAuthor,
       readingTime: "",
       targetLanguage: TARGET_LANGUAGE.pt,
+      coverImage: null,
     });
   }
 
@@ -85,11 +91,32 @@ export default function AdminBlogPanel({
       )
         ? post.targetLanguage
         : TARGET_LANGUAGE.pt) as TargetLanguage,
+      coverImage: post.coverImage ?? null,
     });
   }
 
   function updateForm(patch: Partial<FormState>) {
     setForm((current) => (current ? { ...current, ...patch } : current));
+  }
+
+  async function uploadCoverImage(file: File) {
+    setUploadingCover(true);
+    setError("");
+
+    const body = new FormData();
+    body.append("file", file);
+
+    const response = await fetch("/api/admin/blog/upload", { method: "POST", body });
+    const result = await response.json().catch(() => ({ ok: false, error: "UNKNOWN_ERROR" }));
+
+    setUploadingCover(false);
+
+    if (!result.ok) {
+      setError(dict.teacher.errors[result.error] ?? dict.teacher.errors.UNKNOWN_ERROR);
+      return;
+    }
+
+    updateForm({ coverImage: result.data });
   }
 
   async function reloadPosts() {
@@ -122,6 +149,7 @@ export default function AdminBlogPanel({
       author: form.author,
       targetLanguage: form.targetLanguage,
       readingTime: form.readingTime ? Number(form.readingTime) : undefined,
+      coverImage: form.coverImage?.id ?? null,
     };
 
     const response = await fetch(
@@ -316,6 +344,62 @@ export default function AdminBlogPanel({
               </Field>
             </div>
 
+            <Field label={dict.admin.blogFieldCoverImage} hint={dict.admin.blogCoverImageHint}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (file) void uploadCoverImage(file);
+                }}
+              />
+
+              {form.coverImage ? (
+                <div className="flex items-center gap-4">
+                  <Image
+                    src={form.coverImage.url}
+                    alt=""
+                    width={96}
+                    height={96}
+                    unoptimized
+                    className="h-24 w-24 rounded-xl object-cover ring-1 ring-gray-200"
+                  />
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingCover}
+                      className={secondaryButtonClass}
+                    >
+                      {uploadingCover ? dict.admin.blogCoverImageUploading : dict.admin.blogCoverImageChange}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateForm({ coverImage: null })}
+                      disabled={uploadingCover}
+                      className="inline-flex items-center gap-1.5 text-sm font-black text-red-600 transition-colors hover:text-red-700 disabled:opacity-60"
+                    >
+                      <X aria-hidden className="size-4" />
+                      {dict.admin.blogCoverImageRemove}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingCover}
+                  className="flex h-24 w-full max-w-xs items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 text-sm font-black text-gray-500 transition-colors hover:border-brand-blue hover:text-brand-blue disabled:opacity-60"
+                >
+                  <ImagePlus aria-hidden className="size-5" />
+                  {uploadingCover ? dict.admin.blogCoverImageUploading : dict.admin.blogFieldCoverImage}
+                </button>
+              )}
+            </Field>
+
             <Field label={dict.admin.blogFieldExcerpt}>
               <textarea
                 rows={3}
@@ -454,14 +538,17 @@ function normalizeDate(value: string | undefined) {
 
 function Field({
   label,
+  hint,
   children,
 }: {
   label: string;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
     <label className="block">
       <span className="text-sm font-black text-brand-blue">{label}</span>
+      {hint && <span className="mt-1 block text-sm font-semibold text-gray-500">{hint}</span>}
       <span className="mt-2 block">{children}</span>
     </label>
   );

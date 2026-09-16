@@ -29,12 +29,14 @@ export type ManagedBlogPost = {
   readingTime?: number;
   targetLanguage?: string;
   publishedAt?: string | null;
+  coverImage?: { id: number; url: string } | null;
 };
 
 const LIST_PAGE_SIZE = 100;
 
 export function createBlogManageClient(options: ClientOptions = {}) {
   const baseUrl = trimTrailingSlash(options.baseUrl ?? process.env.STRAPI_INTERNAL_URL ?? "http://localhost:1337");
+  const publicBaseUrl = trimTrailingSlash(process.env.STRAPI_PUBLIC_URL ?? baseUrl);
   const fetcher = options.fetcher ?? fetch;
   const timeoutMs = options.timeoutMs ?? 10000;
 
@@ -44,13 +46,15 @@ export function createBlogManageClient(options: ClientOptions = {}) {
         "pagination[pageSize]": String(LIST_PAGE_SIZE),
         sort: "date:desc",
         status: "draft",
+        populate: "coverImage",
       });
 
       const response = await send(`/api/blog-posts?${params.toString()}`, { accessToken });
       if (!response.ok) return response;
 
       const body = response.data as { data?: unknown };
-      return { ok: true, data: Array.isArray(body.data) ? (body.data as ManagedBlogPost[]) : [] };
+      const posts = Array.isArray(body.data) ? (body.data as ManagedBlogPost[]) : [];
+      return { ok: true, data: posts.map((post) => ({ ...post, coverImage: resolveCoverImage(post.coverImage) })) };
     },
 
     async create(accessToken: string, payload: BlogPostInput): Promise<ManageResult<ManagedBlogPost>> {
@@ -70,7 +74,38 @@ export function createBlogManageClient(options: ClientOptions = {}) {
       if (!response.ok) return response;
       return { ok: true, data: null };
     },
+
+    async uploadCoverImage(accessToken: string, file: File): Promise<ManageResult<{ id: number; url: string }>> {
+      try {
+        const form = new FormData();
+        form.append("files", file);
+
+        const response = await fetcher(`${baseUrl}/api/upload`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${accessToken}` },
+          body: form,
+          signal: AbortSignal.timeout(timeoutMs),
+        });
+
+        if (!response.ok) {
+          return { ok: false, error: await readErrorCode(response), status: response.status };
+        }
+
+        const uploaded = (await response.json().catch(() => null)) as Array<{ id: number; url: string }> | null;
+        const media = uploaded?.[0];
+        if (!media) return { ok: false, error: "UNKNOWN_ERROR", status: 502 };
+
+        return { ok: true, data: { id: media.id, url: resolveMediaUrl(media.url, publicBaseUrl) } };
+      } catch {
+        return { ok: false, error: "UNKNOWN_ERROR", status: 502 };
+      }
+    },
   };
+
+  function resolveCoverImage(coverImage: ManagedBlogPost["coverImage"]) {
+    if (!coverImage) return coverImage ?? null;
+    return { id: coverImage.id, url: resolveMediaUrl(coverImage.url, publicBaseUrl) };
+  }
 
   async function send(
     path: string,
@@ -112,4 +147,8 @@ async function readErrorCode(response: Response) {
 
 function trimTrailingSlash(value: string) {
   return value.replace(/\/+$/, "");
+}
+
+function resolveMediaUrl(url: string, baseUrl: string) {
+  return /^https?:\/\//.test(url) ? url : `${baseUrl}${url}`;
 }

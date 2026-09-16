@@ -10,6 +10,7 @@ export type BlogPostInput = {
   author: string;
   targetLanguage: TargetLanguage;
   readingTime?: number;
+  coverImage?: number | null;
 };
 
 export type BlogPostInputError =
@@ -55,6 +56,7 @@ export function validateBlogPostInput(input: unknown): BlogPostInputResult {
   if (!isTargetLanguage(targetLanguage)) return { ok: false, error: "INVALID_LANGUAGE" };
 
   const readingTime = readPositiveInteger(value.readingTime);
+  const coverImage = readCoverImage(value.coverImage);
 
   return {
     ok: true,
@@ -68,8 +70,16 @@ export function validateBlogPostInput(input: unknown): BlogPostInputResult {
       author,
       targetLanguage,
       ...(readingTime ? { readingTime } : {}),
+      ...(coverImage !== undefined ? { coverImage } : {}),
     },
   };
+}
+
+function readCoverImage(value: unknown): number | null | undefined {
+  if (value === null) return null;
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
 export function isIsoDate(value: string) {

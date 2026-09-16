@@ -17,23 +17,28 @@ const nextConfig: NextConfig = {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
   images: {
+    ...(process.env.NODE_ENV !== "production" ? { dangerouslyAllowLocalIP: true } : {}),
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "cdn-dev.fluent-too.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "cdn.fluent-too.com",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "localhost",
         port: "1337",
+        pathname: "/**",
       },
     ],
   },
